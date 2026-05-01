@@ -168,5 +168,41 @@ namespace Graduation_Project.Services
             return savedJobs;
         }
 
+        public async Task<Resume> UploadResumeAsync(int applicantId,string fileName,string filePath)
+        {
+            await dbContext.Resumes.Where(r => r.ApplicantID == applicantId)
+                .ExecuteUpdateAsync(setters => setters
+                .SetProperty(r => r.IsActive,false));
+
+            var newResume = new Resume
+            {
+                FileName = fileName,
+                FilePath = filePath,
+                UploadDate = DateTime.UtcNow,
+                IsActive = true,
+                ApplicantID = applicantId
+            };
+
+            await dbContext.Resumes.AddAsync(newResume);
+            await dbContext.SaveChangesAsync();
+            return newResume;
+        }
+        public async Task<string?> GetActiveResumePathAsync(int applicantId)
+        {
+            return await dbContext.Resumes
+                .Where(r => r.ApplicantID == applicantId && r.IsActive)
+                .Select(r => r.FilePath)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<string?> GetActiveResumePathByUserIdAsync(string userId)
+        {
+            return await dbContext.Applicants
+                .Where(a => a.UserId == userId)
+                .SelectMany(a => a.Resumes)
+                .Where(r => r.IsActive)
+                .Select(r => r.FilePath)
+                .FirstOrDefaultAsync();
+        }
     }
 }

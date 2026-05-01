@@ -90,6 +90,11 @@ namespace Graduation_Project.Models
                 .HasForeignKey(x => x.SkillID)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Entity<Resume>()
+                .HasIndex(r => new { r.ApplicantID,r.IsActive })
+                .HasFilter("[IsActive] = 1")
+                .IsUnique();
+
         }
     }
 }

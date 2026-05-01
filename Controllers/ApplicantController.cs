@@ -2,11 +2,8 @@
 using Graduation_Project.Models;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Graduation_Project.Controllers
 {
@@ -69,5 +66,34 @@ namespace Graduation_Project.Controllers
 
         }
 
+        [HttpPost("UploadResume")]
+        [Authorize(Roles = Roles.Applicant)]
+        public async Task<IActionResult> UploadResume([FromBody] ResumeUploadDto resumeDto)
+        {
+            if(string.IsNullOrEmpty(resumeDto.CloudinaryUrl) || string.IsNullOrEmpty(resumeDto.FileName))
+                return BadRequest("Cloudinary URL and FileName are required.");
+
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if(!int.TryParse(profileIdClaim,out int applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var resume = await applicantServices.UploadResumeAsync(applicantId,resumeDto.FileName,resumeDto.CloudinaryUrl);
+            return Ok(new { resume.ResumeID,resume.FileName,resume.IsActive,resume.FilePath });
+        }
+
+        [HttpGet("ActiveResume")]
+        [Authorize(Roles = Roles.Applicant)]
+        public async Task<IActionResult> GetActiveResume()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if(!int.TryParse(profileIdClaim,out int applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var path = await applicantServices.GetActiveResumePathAsync(applicantId);
+            if(string.IsNullOrEmpty(path))
+                return NotFound("No active resume found");
+
+            return Ok(new { FilePath = path });
+        }
     }
 }

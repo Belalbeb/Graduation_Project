@@ -12,5 +12,8 @@ namespace Graduation_Project.Services
         Task<bool> DeleteApplicantAsync(int id);
         Task<ApplicantDashboardResponseDto> GetDashboardAsync(int applicantId);
         Task<List<SavedJobsResponseDto>> GetSavedsAsync(int id);
+        Task<Resume> UploadResumeAsync(int applicantId,string fileName,string filePath);
+        Task<string> GetActiveResumePathAsync(int applicantId);
+        Task<string> GetActiveResumePathByUserIdAsync(string userId);
     }
 }

@@ -16,6 +16,13 @@
 
         public DateTime ScheduledAt { get; set; }
 
-        public string Status { get; set; } 
+        public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming ;
+    }
+
+    public enum InterviewStatus
+    {
+        Upcoming,
+        Completed,
+        Cancelled
     }
 }
