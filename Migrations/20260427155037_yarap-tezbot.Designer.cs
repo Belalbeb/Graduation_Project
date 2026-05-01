@@ -4,6 +4,7 @@ using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427155037_yarap-tezbot")]
+    partial class yaraptezbot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -283,7 +286,7 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("JobTitle")
@@ -318,17 +321,8 @@ namespace Graduation_Project.Migrations
                     b.Property<int>("ApplicantId")
                         .HasColumnType("int");
 
-                    b.Property<string>("InterviewerName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("JobPostingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("MeetingLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -435,47 +429,6 @@ namespace Graduation_Project.Migrations
                     b.HasIndex("ApplicantId");
 
                     b.ToTable("ProfileViews");
-                });
-
-            modelBuilder.Entity("Graduation_Project.Models.Project", b =>
-                {
-                    b.Property<int>("ProjectID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectID"));
-
-                    b.Property<int>("ApplicantID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GithubRepoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProjectUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ProjectID");
-
-                    b.HasIndex("ApplicantID");
-
-                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.Resume", b =>
@@ -816,17 +769,6 @@ namespace Graduation_Project.Migrations
                     b.Navigation("Applicant");
                 });
 
-            modelBuilder.Entity("Graduation_Project.Models.Project", b =>
-                {
-                    b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
-                        .WithMany("Projects")
-                        .HasForeignKey("ApplicantID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Applicant");
-                });
-
             modelBuilder.Entity("Graduation_Project.Models.Resume", b =>
                 {
                     b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
@@ -915,8 +857,6 @@ namespace Graduation_Project.Migrations
                     b.Navigation("Applications");
 
                     b.Navigation("Experiences");
-
-                    b.Navigation("Projects");
 
                     b.Navigation("Resumes");
                 });

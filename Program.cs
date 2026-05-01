@@ -32,6 +32,11 @@ namespace Graduation_Project
             builder.Services.AddScoped<ICompanyServices, ComapnyServices>();
             builder.Services.AddScoped<IJobPostingService,JobPostingService>();
             builder.Services.AddScoped<IApplicationServivces, ApplicationServices>();
+            builder.Services.AddScoped<IInterviewServices, InterviewService>() ;
+            builder.Services.AddScoped<IExperienceService, ExperienceServices>() ;
+            builder.Services.AddScoped<IApplicantSkillService, ApplicantSkillService>() ;
+            builder.Services.AddScoped<ISettingsService, SettingsServices>() ;
+            builder.Services.AddScoped<IProjectService, ProjectService>() ;
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -8,55 +8,74 @@ namespace Graduation_Project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Roles.Applicant)]
     public class InterviewController : ControllerBase
     {
-        private readonly IInterviewServices _interviewServices ;
+        private readonly IInterviewServices _interviewService ;
 
-        public InterviewController(IInterviewServices interviewServices)
+        public InterviewController(IInterviewServices interviewService)
         {
-            _interviewServices = interviewServices ;
+            _interviewService = interviewService ;
         }
 
-        [HttpGet("UpcomingInterviews")]
-        [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> GetUpcomingInterviews()
-        {
-            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-
-            if(!int.TryParse(profileIdClaim, out int applicantId))
-                return Unauthorized("Invalid or missing ProfileId") ;
-
-            var result = await _interviewServices.GetUpcomingInterviewsAsync(applicantId) ;
-            if (result == null) return BadRequest() ;
-            return Ok(result) ;
-        }
-
-        [HttpGet("CompletedInterviews")]
-        [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> GetCompletedInterviews()
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetStatistics()
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
             if(!int.TryParse(profileIdClaim,out int applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
-            var result = await _interviewServices.GetCompletedInterviewsAsync(applicantId);
-            if(result == null) return BadRequest();
-            return Ok(result);
+            var stats = await _interviewService.GetStatisticsAsync(applicantId);
+            return Ok(stats);
         }
 
-        [HttpGet("CancelledInterviews")]
-        [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> GetCancelledInterviews()
+        [HttpGet("upcoming")]
+        public async Task<IActionResult> GetUpcoming()
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
             if(!int.TryParse(profileIdClaim,out int applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
-            var result = await _interviewServices.GetCancelledInterviewsAsync(applicantId);
-            if(result == null) return BadRequest();
-            return Ok(result);
+            var interviews = await _interviewService.GetUpcomingAsync(applicantId);
+            return Ok(interviews);
+        }
+
+        [HttpGet("completed")]
+        public async Task<IActionResult> GetCompleted()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if(!int.TryParse(profileIdClaim,out int applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var interviews = await _interviewService.GetCompletedAsync(applicantId);
+            return Ok(interviews);
+        }
+
+        [HttpGet("cancelled")]
+        public async Task<IActionResult> GetCancelled()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if(!int.TryParse(profileIdClaim,out int applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var interviews = await _interviewService.GetCancelledAsync(applicantId);
+            return Ok(interviews);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if(!int.TryParse(profileIdClaim,out int applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var interviews = await _interviewService.GetAllAsync(applicantId);
+            return Ok(interviews);
         }
     }
 }
