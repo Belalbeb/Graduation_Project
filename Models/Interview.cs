@@ -17,6 +17,10 @@
         public DateTime ScheduledAt { get; set; }
 
         public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming ;
+
+        public string? InterviewerName { get; set; }
+        public string? MeetingLink { get; set; }
+        public string? Notes { get; set; }
     }
 
     public enum InterviewStatus

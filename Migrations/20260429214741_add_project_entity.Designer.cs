@@ -4,6 +4,7 @@ using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429214741_add_project_entity")]
+    partial class add_project_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,17 +321,8 @@ namespace Graduation_Project.Migrations
                     b.Property<int>("ApplicantId")
                         .HasColumnType("int");
 
-                    b.Property<string>("InterviewerName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("JobPostingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("MeetingLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -505,9 +499,7 @@ namespace Graduation_Project.Migrations
 
                     b.HasKey("ResumeID");
 
-                    b.HasIndex("ApplicantID", "IsActive")
-                        .IsUnique()
-                        .HasFilter("[IsActive] = 1");
+                    b.HasIndex("ApplicantID");
 
                     b.ToTable("Resumes");
                 });
@@ -775,7 +767,7 @@ namespace Graduation_Project.Migrations
                         .IsRequired();
 
                     b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
-                        .WithMany("Interviews")
+                        .WithMany()
                         .HasForeignKey("JobPostingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -936,8 +928,6 @@ namespace Graduation_Project.Migrations
             modelBuilder.Entity("Graduation_Project.Models.JobPosting", b =>
                 {
                     b.Navigation("Applications");
-
-                    b.Navigation("Interviews");
 
                     b.Navigation("JobMetric")
                         .IsRequired();
