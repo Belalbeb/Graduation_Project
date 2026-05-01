@@ -22,6 +22,7 @@ namespace Graduation_Project.Models
 
         // Navigation
         public ICollection<Application> Applications { get; set; } = new List<Application>();
+        public ICollection<Interview> Interviews { get; set; }
         public JobMetric JobMetric { get; set; }
     }
   public enum JobType

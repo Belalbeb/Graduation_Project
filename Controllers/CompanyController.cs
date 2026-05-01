@@ -1,7 +1,9 @@
 ﻿using Graduation_Project.Models;
 using Graduation_Project.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Graduation_Project.Controllers
 {
@@ -24,10 +26,14 @@ namespace Graduation_Project.Controllers
         }
 
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetCompanyByUserId(string userId)
+        [HttpGet("get-dashboard/{companyid}")]
+        //[Authorize(Roles.Admin)]
+        public async Task<IActionResult> GetCompanyByUserId(int companyId)
         {
-            var company = await companyServices.GetCompanyByUserIdAsync(userId);
+            //var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            //if (!int.TryParse(profileIdClaim, out int companyId))
+            //    return Unauthorized("Invalid or missing ProfileId");
+            var company = await companyServices.GetCompanyDashboardAsync(companyId);
             if (company == null) return NotFound();
             return Ok(company);
         }

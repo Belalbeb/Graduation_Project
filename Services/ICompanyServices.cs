@@ -1,4 +1,5 @@
-﻿using Graduation_Project.Models;
+﻿using Graduation_Project.Dtos;
+using Graduation_Project.Models;
 
 namespace Graduation_Project.Services
 {
@@ -6,8 +7,9 @@ namespace Graduation_Project.Services
     {
         Task<Company> AddCompanyAsync(Company company);
         Task<Company?> GetCompanyByIdAsync(int id);
-        Task<Company?> GetCompanyByUserIdAsync(string userId);
+      
         Task<bool> UpdateCompanyAsync(int id, Company updatedCompany);
         Task<bool> DeleteCompanyAsync(int id);
+        public Task<CompanyResponseDto?> GetCompanyDashboardAsync(int userId);
     }
 }

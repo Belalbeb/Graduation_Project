@@ -1,6 +1,6 @@
 
 using Graduation_Project.Models;
-using Graduation_Project.Seeds;
+//using Graduation_Project.Seeds;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -67,11 +67,11 @@ namespace Graduation_Project
             app.MapScalarApiReference();
 
             app.MapControllers();
-            using (var scope = app.Services.CreateScope())
-            {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                await RoleSeeder.SeedRoles(roleManager);
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            //    await RoleSeeder.SeedRoles(roleManager);
+            //}
 
             app.Run();
         }
