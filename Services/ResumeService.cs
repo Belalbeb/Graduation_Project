@@ -1,53 +1,41 @@
-﻿using System.Security.AccessControl;
 using Graduation_Project.Models;
-using Microsoft.EntityFrameworkCore;
+using Graduation_Project.Repositories;
 
 namespace Graduation_Project.Services
 {
     public class ResumeService : IResumeServices
     {
-        private readonly ApplicationDbContext _context ;
+        private readonly IResumeRepository _repository;
 
-        public ResumeService(ApplicationDbContext context)
+        public ResumeService(IResumeRepository repository)
         {
-            _context = context ;
+            _repository = repository;
         }
 
-        public async Task<Resume> UploadNewResumeAsync(int applicantId,string fileName,string filePath)
+        public async Task<Resume> UploadNewResumeAsync(int applicantId, string fileName, string filePath)
         {
-            await _context.Resumes.Where(r => r.ApplicantID == applicantId)
-                .ExecuteUpdateAsync(setters => setters
-                .SetProperty(r => r.IsActive, false)) ;
+            await _repository.DeactivateAllAsync(applicantId);
 
             var newResume = new Resume
             {
-                FileName = fileName,
-                FilePath = filePath,
-                UploadDate = DateTime.UtcNow,
-                IsActive = true,
+                FileName    = fileName,
+                FilePath    = filePath,
+                UploadDate  = DateTime.UtcNow,
+                IsActive    = true,
                 ApplicantID = applicantId
-            } ;
+            };
 
-            await _context.Resumes.AddAsync(newResume) ;
-            await _context.SaveChangesAsync() ;
-            return newResume ;
+            return await _repository.AddAsync(newResume);
         }
+
         public async Task<string?> GetActiveResumeAsync(int applicantId)
         {
-            return await _context.Resumes
-                .Where(r => r.ApplicantID == applicantId && r.IsActive)
-                .Select(r => r.FilePath)
-                .FirstOrDefaultAsync() ;
+            return await _repository.GetActivePathAsync(applicantId);
         }
 
         public async Task<string?> GetActiveResumePathByUserIdAsync(string userId)
         {
-            return await _context.Applicants
-                .Where(a => a.UserId == userId)
-                .SelectMany(a => a.Resumes)
-                .Where(r => r.IsActive)
-                .Select(r => r.FilePath)
-                .FirstOrDefaultAsync() ;
+            return await _repository.GetActivePathByUserIdAsync(userId);
         }
     }
 }

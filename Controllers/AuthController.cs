@@ -88,7 +88,10 @@ namespace Graduation_Project.Controllers
                 Name = companyDto.Name,
                 WebsiteURL = companyDto.WebsiteURL,
                 Industry = companyDto.Industry,
-                HeadquarterAddress = companyDto.HeadquarterAddress
+                HeadquarterAddress = companyDto.HeadquarterAddress,
+                Location=companyDto.Location,
+                LogoUrl=companyDto.Logo
+
             };
             await CompanyServices.AddCompanyAsync(company);
             return Ok(new {message="company register successfully"});

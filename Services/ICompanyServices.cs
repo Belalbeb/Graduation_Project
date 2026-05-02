@@ -11,5 +11,6 @@ namespace Graduation_Project.Services
         Task<bool> UpdateCompanyAsync(int id, Company updatedCompany);
         Task<bool> DeleteCompanyAsync(int id);
         public Task<CompanyResponseDto?> GetCompanyDashboardAsync(int userId);
+        public Task<Company?> GetCompanyByUserIdAsync(string userid);
     }
 }

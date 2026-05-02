@@ -21,14 +21,17 @@ namespace Graduation_Project.Controllers
         [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> GetApplicantByUserId()
         {
-            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            //var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if (!int.TryParse(profileIdClaim, out int applicantId))
-                return Unauthorized("Invalid or missing ProfileId");
-            var applicant = await applicantServices.GetDashboardAsync(applicantId);
-            if (applicant == null)
-                return NotFound("Applicant not found");
-            return Ok(applicant);
+            //if (!int.TryParse(profileIdClaim, out int applicantId))
+            //    return Unauthorized("Invalid or missing ProfileId");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicant = await applicantServices.GetApplicantByUserIdAsync(userId);
+            if (applicant == null) return NotFound();
+            var applicantDashboard = await applicantServices.GetDashboardAsync(applicant.ApplicantID);
+            if (applicantDashboard == null)
+                return BadRequest();
+            return Ok(applicantDashboard);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateApplicant([FromRoute]int id, [FromBody] ApplicantDto applicantDto)
@@ -53,11 +56,10 @@ namespace Graduation_Project.Controllers
         [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> GetSavedJobsForApplicant()
         {
-            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-
-            if (!int.TryParse(profileIdClaim, out int applicantId))
-                return Unauthorized("Invalid or missing ProfileId");
-            var result=await applicantServices.GetSavedsAsync(applicantId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicant = await applicantServices.GetApplicantByUserIdAsync(userId);
+            if (applicant == null) return NotFound();
+            var result=await applicantServices.GetSavedsAsync(applicant.ApplicantID);
             if (result == null)
                 return BadRequest();
             return Ok(result);

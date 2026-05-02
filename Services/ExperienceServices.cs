@@ -1,109 +1,97 @@
-﻿using Graduation_Project.Dtos;
+using Graduation_Project.Dtos;
 using Graduation_Project.Models;
-using Microsoft.EntityFrameworkCore;
+using Graduation_Project.Repositories;
 
 namespace Graduation_Project.Services
 {
     public class ExperienceServices : IExperienceService
     {
-        private readonly ApplicationDbContext _context ;
-        public ExperienceServices(ApplicationDbContext context)
+        private readonly IExperienceRepository _repository;
+
+        public ExperienceServices(IExperienceRepository repository)
         {
-            _context = context ;
+            _repository = repository;
         }
+
         public async Task<Experience?> GetExperienceByIdAsync(int experienceId)
         {
-            return await _context.Experiences
-                .FirstOrDefaultAsync(e => e.ExperienceID == experienceId) ;
+            return await _repository.GetByIdAsync(experienceId);
         }
+
         public async Task<List<ExperienceResponseDto>> GetAllAsync(int applicantId)
         {
-            return await _context.Experiences
-                .Where(e => e.ApplicantID == applicantId)
-                .OrderByDescending(e => e.StartDate)
-                .Select(e => new ExperienceResponseDto
-                {
-                    ExperienceID = e.ExperienceID,
-                    CompanyName = e.CompanyName,
-                    Location = e.Location,
-                    JobTitle = e.JobTitle,
-                    Description = e.Description,
-                    JobType = e.JobType,
-                    StartDate = e.StartDate,
-                    EndDate = e.EndDate,
-                    ApplicantID = e.ApplicantID
-                })
-                .ToListAsync() ;
+            var experiences = await _repository.GetAllByApplicantAsync(applicantId);
+
+            return experiences.Select(e => new ExperienceResponseDto
+            {
+                ExperienceID = e.ExperienceID,
+                CompanyName  = e.CompanyName,
+                Location     = e.Location,
+                JobTitle     = e.JobTitle,
+                Description  = e.Description,
+                JobType      = e.JobType,
+                StartDate    = e.StartDate,
+                EndDate      = e.EndDate,
+                ApplicantID  = e.ApplicantID
+            }).ToList();
         }
+
         public async Task<ExperienceResponseDto?> AddExperienceAsync(Experience experience)
         {
             if (!await IsValidExperienceAsync(experience))
-                return null ;
+                return null;
 
-            await _context.Experiences.AddAsync(experience) ;
-            await _context.SaveChangesAsync() ;
-
+            var added = await _repository.AddAsync(experience);
 
             return new ExperienceResponseDto
             {
-                ExperienceID = experience.ExperienceID,
-                CompanyName = experience.CompanyName,
-                Location = experience.Location,
-                JobTitle = experience.JobTitle,
-                Description = experience.Description,
-                JobType = experience.JobType,
-                StartDate = experience.StartDate,
-                EndDate = experience.EndDate,
-                ApplicantID = experience.ApplicantID
-            } ;
+                ExperienceID = added.ExperienceID,
+                CompanyName  = added.CompanyName,
+                Location     = added.Location,
+                JobTitle     = added.JobTitle,
+                Description  = added.Description,
+                JobType      = added.JobType,
+                StartDate    = added.StartDate,
+                EndDate      = added.EndDate,
+                ApplicantID  = added.ApplicantID
+            };
         }
 
         public async Task<bool> DeleteExperienceAsync(int experienceId)
         {
-            var experience = await _context.Experiences
-                .FirstOrDefaultAsync(e => e.ExperienceID == experienceId) ;
-            if (experience == null)
-                return false ;
+            var experience = await _repository.GetByIdAsync(experienceId);
+            if (experience == null) return false;
 
-            _context.Experiences.Remove(experience) ;
-            await _context.SaveChangesAsync() ;
-            return true ;
+            await _repository.DeleteAsync(experience);
+            return true;
         }
-
 
         public async Task<int> UpdateExperienceAsync(int experienceId, ExperienceDto experienceDto)
         {
-            var experience = await _context.Experiences
-                .FirstOrDefaultAsync(e => e.ExperienceID == experienceId) ;
-            if (experience == null)
-                return 1 ; // 1 --> experience not found
+            var experience = await _repository.GetByIdAsync(experienceId);
+            if (experience == null) return 1; // not found
 
-            experience.CompanyName = experienceDto.CompanyName ;
-            experience.Location = experienceDto.Location ;
-            experience.JobTitle = experienceDto.JobTitle ;
-            experience.Description = experienceDto.Description ;
-            experience.JobType = experienceDto.JobType ;
-            experience.StartDate = experienceDto.StartDate ;
-            experience.EndDate = experienceDto.EndDate ;
+            experience.CompanyName = experienceDto.CompanyName;
+            experience.Location    = experienceDto.Location;
+            experience.JobTitle    = experienceDto.JobTitle;
+            experience.Description = experienceDto.Description;
+            experience.JobType     = experienceDto.JobType;
+            experience.StartDate   = experienceDto.StartDate;
+            experience.EndDate     = experienceDto.EndDate;
 
-            var valid = await IsValidExperienceAsync(experience) ;
-            if (!valid)
-                return 2 ; // 2 --> experience found but dates confilct
+            if (!await IsValidExperienceAsync(experience))
+                return 2; // dates conflict
 
-            await _context.SaveChangesAsync() ;
-            return 3 ; // 3 --> experience updated successfully
+            await _repository.UpdateAsync(experience);
+            return 3; // success
         }
 
         private async Task<bool> IsValidExperienceAsync(Experience experience)
         {
             if (experience.StartDate > experience.EndDate)
-                return false ;
+                return false;
 
-            return !await _context.Experiences
-                .AnyAsync(e => e.ApplicantID == experience.ApplicantID &&
-                        e.ExperienceID != experience.ExperienceID &&   // in case of update
-                        e.StartDate < experience.EndDate &&
-                        e.EndDate > experience.StartDate) ;
+            return !await _repository.HasOverlappingExperienceAsync(experience);
         }
     }
 }

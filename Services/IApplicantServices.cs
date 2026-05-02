@@ -15,5 +15,6 @@ namespace Graduation_Project.Services
         Task<Resume> UploadResumeAsync(int applicantId,string fileName,string filePath);
         Task<string> GetActiveResumePathAsync(int applicantId);
         Task<string> GetActiveResumePathByUserIdAsync(string userId);
+        public Task<Applicant> GetApplicantByUserIdAsync(string userId);
     }
 }

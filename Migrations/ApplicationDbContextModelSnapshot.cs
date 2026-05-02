@@ -505,9 +505,7 @@ namespace Graduation_Project.Migrations
 
                     b.HasKey("ResumeID");
 
-                    b.HasIndex("ApplicantID", "IsActive")
-                        .IsUnique()
-                        .HasFilter("[IsActive] = 1");
+                    b.HasIndex("ApplicantID");
 
                     b.ToTable("Resumes");
                 });

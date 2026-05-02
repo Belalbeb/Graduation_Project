@@ -13,10 +13,12 @@ namespace Graduation_Project.Controllers
     public class ApplicationController : ControllerBase
     {
         private readonly IApplicationServivces applicationServivces;
+        private readonly IApplicantServices applicantServices;
 
-        public ApplicationController(IApplicationServivces applicationServivces)
+        public ApplicationController(IApplicationServivces applicationServivces,IApplicantServices applicantServices)
         {
             this.applicationServivces = applicationServivces;
+            this.applicantServices = applicantServices;
         }
 
 
@@ -24,12 +26,15 @@ namespace Graduation_Project.Controllers
         [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> GetApplicationByApplicant()
         {
-            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            //var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if (!int.TryParse(profileIdClaim, out int applicantId))
-                return Unauthorized("Invalid or missing ProfileId");
+            //if (!int.TryParse(profileIdClaim, out int applicantId))
+            //    return Unauthorized("Invalid or missing ProfileId");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var applicant = await applicantServices.GetApplicantByUserIdAsync(userId);
+            if (applicant == null) return NotFound();
 
-            var result = await applicationServivces.GetApplicationByApplicant(applicantId);
+            var result = await applicationServivces.GetApplicationByApplicant(applicant.ApplicantID);
 
             if (result == null || !result.Any())
                 return NotFound("No applications found");

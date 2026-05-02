@@ -26,16 +26,23 @@ namespace Graduation_Project.Controllers
         }
 
 
-        [HttpGet("get-dashboard/{companyid}")]
-        //[Authorize(Roles.Admin)]
-        public async Task<IActionResult> GetCompanyByUserId(int companyId)
+        [HttpGet("get-dashboard")]
+        [Authorize(Roles=Roles.Company)]
+        public async Task<IActionResult> GetCompanyDashboard()
         {
             //var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
             //if (!int.TryParse(profileIdClaim, out int companyId))
             //    return Unauthorized("Invalid or missing ProfileId");
-            var company = await companyServices.GetCompanyDashboardAsync(companyId);
-            if (company == null) return NotFound();
-            return Ok(company);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var company = await companyServices.GetCompanyByUserIdAsync(userId);
+
+            if (company == null)
+                return NotFound();
+            var companyDashboard = await companyServices.GetCompanyDashboardAsync(company.CompanyID);
+            if (companyDashboard == null) return NotFound();
+            return Ok(companyDashboard);
         }
         [HttpPost]
         public async Task<IActionResult> CreateCompany([FromBody] Company company)

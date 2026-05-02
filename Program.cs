@@ -1,5 +1,7 @@
 
 using Graduation_Project.Models;
+using Graduation_Project.Repositories;
+
 //using Graduation_Project.Seeds;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,6 +29,18 @@ namespace Graduation_Project
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                   .AddEntityFrameworkStores<ApplicationDbContext>()
                   .AddDefaultTokenProviders();
+            builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
+            builder.Services.AddScoped<IApplicantSkillRepository, ApplicantSkillRepository>();
+            builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+            builder.Services.AddScoped<IExperienceRepository, ExperienceRepository>();
+            builder.Services.AddScoped<IInterviewRepository, InterviewRepository>();
+            builder.Services.AddScoped<IJobPostingRepository, JobPostingRepository>();
+            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+            builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+            builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+            builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+
             builder.Services.AddScoped<IApplicantServices, ApplicantServices>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ICompanyServices, ComapnyServices>();
