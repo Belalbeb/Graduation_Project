@@ -27,7 +27,10 @@ namespace Graduation_Project.Repositories
 
         public async Task<IEnumerable<JobPosting>> GetByCompanyAsync(int companyId)
         {
-            return await _context.JobPostings.Where(x => x.CompanyID == companyId).ToListAsync();
+            return await _context.JobPostings
+                .Include(x=>x.Applications)
+                  
+                .Where(x => x.CompanyID == companyId).ToListAsync();
         }
 
         public async Task<JobPosting> AddAsync(JobPosting jobPosting)
@@ -46,8 +49,9 @@ namespace Graduation_Project.Repositories
 
             existing.Title = jobPosting.Title;
             existing.Description = jobPosting.Description;
-            existing.Requirements = jobPosting.Requirements;
-            existing.SalaryRange = jobPosting.SalaryRange;
+            existing.Responsibility = jobPosting.Responsibility;
+            existing.MinSalary = jobPosting.MinSalary;
+            existing.MaxSalary = jobPosting.MaxSalary;
             existing.IsActive = jobPosting.IsActive;
 
             await _context.SaveChangesAsync();

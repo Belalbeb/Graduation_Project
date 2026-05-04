@@ -13,7 +13,7 @@ namespace Graduation_Project.Dtos
         public string Location { get; set; }
         public DateTime AppliedOn { get; set; }
         public string ApplicationStatus { get; set; }
-        public string JobType { get; set; }
+        public List<string> JobType { get; set; }
         public bool IsRemote { get; set; }
     }
 }

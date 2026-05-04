@@ -115,13 +115,13 @@ namespace Graduation_Project.Repositories
                 {
                     JobTitle = item.JobPosting.Title,
                     JobDescription = item.JobPosting.Description,
-                    JobRequirement = item.JobPosting.Requirements,
+                    JobRequirement = item.JobPosting.Responsibility,
                     SavedAt = item.SavedAt,
                     CompanyLogoUrl = item.JobPosting.Company.LogoUrl,
                     CompanyLocation = item.JobPosting.Company.Location,
                     CompanyName = item.JobPosting.Company.Name,
-                    JobType = item.JobPosting.JobType.ToString(),
-                    SalaryRange = item.JobPosting.SalaryRange
+                    JobType = item.JobPosting.JobTypes.Select(x=>x.ToString()).ToList(),
+                    SalaryRange = $"{item.JobPosting.MinSalary}-{item.JobPosting.MaxSalary}"
                 })
                 .ToListAsync();
         }

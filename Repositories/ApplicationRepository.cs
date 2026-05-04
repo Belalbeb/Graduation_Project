@@ -20,7 +20,7 @@ namespace Graduation_Project.Repositories
                 .Select(x => new ApplicationDto
                 {
                     ApplicationId = x.ApplicationID,
-                    JobType = x.JobPosting.JobType.ToString(),
+                    JobType = x.JobPosting.JobTypes.Select(x=>x.ToString()).ToList(),
                     ApplicationStatus = x.ApplicationStatus.ToString(),
                     AppliedOn = x.AppliedDate,
                     JobTitle = x.JobPosting.Title,

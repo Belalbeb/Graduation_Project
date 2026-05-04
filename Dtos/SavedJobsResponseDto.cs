@@ -9,7 +9,7 @@
         public string JobDescription { get; set; }
         public string JobRequirement { get; set; }
         public string SalaryRange { get; set; }
-        public string JobType { get; set; }
+        public List<string> JobType { get; set; }
         public string TimeAgo { get; set; }
         public DateTime SavedAt { get; set; }
     }

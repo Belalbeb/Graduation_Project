@@ -1,7 +1,10 @@
-﻿using Graduation_Project.Models;
+﻿using Graduation_Project.Dtos;
+using Graduation_Project.Models;
 using Graduation_Project.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Graduation_Project.Controllers
 {
@@ -35,22 +38,45 @@ namespace Graduation_Project.Controllers
         }
 
         
-        [HttpGet("company/{companyId}")]
-        public async Task<IActionResult> GetByCompany(int companyId)
+        [HttpGet("company")]
+        [Authorize(Roles=Roles.Company)]
+        public async Task<IActionResult> GetByCompany()
         {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!int.TryParse(profileIdClaim, out int companyId))
+                return Unauthorized("Invalid or missing ProfileId");
             var jobs = await _service.GetJobsByCompanyAsync(companyId);
+            if (jobs == null) return NotFound("no jobs founded for this company");
             return Ok(jobs);
         }
 
         
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] JobPosting job)
+        [Authorize(Roles =Roles.Company)]
+        public async Task<IActionResult> Create([FromBody] CreateJobDto job)
         {
-            var newJob = await _service.CreateJobAsync(job);
-            return Ok(newJob);
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!int.TryParse(profileIdClaim, out int companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new
+                    {
+                        Field = x.Key,
+                        Errors = x.Value.Errors.Select(e => e.ErrorMessage)
+                    });
+
+                return BadRequest(errors);
+            }
+
+            var newJob = await _service.CreateJobAsync(job, companyId);
+            return Created();
         }
 
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] JobPosting job)
         {
