@@ -13,7 +13,7 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<InterviewStatisticsDto> GetStatisticsAsync(int applicantId)
+        public async Task<InterviewStatisticsDto> GetStatisticsAsync(Guid applicantId)
         {
             var total     = await _repository.CountByApplicantAsync(applicantId);
             var upcoming  = await _repository.CountByApplicantAndStatusAsync(applicantId, InterviewStatus.Upcoming);
@@ -29,25 +29,25 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<List<InterviewResponseDto>> GetUpcomingAsync(int applicantId)
+        public async Task<List<InterviewResponseDto>> GetUpcomingAsync(Guid applicantId)
         {
             var interviews = await _repository.GetByApplicantAndStatusAsync(applicantId, InterviewStatus.Upcoming);
             return MapToDto(interviews);
         }
 
-        public async Task<List<InterviewResponseDto>> GetCompletedAsync(int applicantId)
+        public async Task<List<InterviewResponseDto>> GetCompletedAsync(Guid applicantId)
         {
             var interviews = await _repository.GetByApplicantAndStatusAsync(applicantId, InterviewStatus.Completed);
             return MapToDto(interviews);
         }
 
-        public async Task<List<InterviewResponseDto>> GetCancelledAsync(int applicantId)
+        public async Task<List<InterviewResponseDto>> GetCancelledAsync(Guid applicantId)
         {
             var interviews = await _repository.GetByApplicantAndStatusAsync(applicantId, InterviewStatus.Cancelled);
             return MapToDto(interviews);
         }
 
-        public async Task<List<InterviewResponseDto>> GetAllAsync(int applicantId)
+        public async Task<List<InterviewResponseDto>> GetAllAsync(Guid applicantId)
         {
             var interviews = await _repository.GetAllByApplicantAsync(applicantId);
             return MapToDto(interviews);

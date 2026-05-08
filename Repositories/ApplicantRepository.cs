@@ -20,7 +20,7 @@ namespace Graduation_Project.Repositories
             return applicant;
         }
 
-        public async Task<Applicant?> GetByIdAsync(int id)
+        public async Task<Applicant?> GetByIdAsync(Guid id)
         {
             return await _context.Applicants.FirstOrDefaultAsync(x => x.ApplicantID == id);
         }
@@ -47,28 +47,28 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> CountApplicationsAsync(int applicantId)
+        public async Task<int> CountApplicationsAsync(Guid applicantId)
         {
             return await _context.Applications.CountAsync(a => a.ApplicantID == applicantId);
         }
 
-        public async Task<int> CountSavedJobsAsync(int applicantId)
+        public async Task<int> CountSavedJobsAsync(Guid applicantId)
         {
             return await _context.SavedJobs.CountAsync(s => s.ApplicantId == applicantId);
         }
 
-        public async Task<int> CountUpcomingInterviewsAsync(int applicantId)
+        public async Task<int> CountUpcomingInterviewsAsync(Guid applicantId)
         {
             return await _context.Interviews
                 .CountAsync(i => i.ApplicantId == applicantId && i.ScheduledAt >= DateTime.UtcNow);
         }
 
-        public async Task<int> CountProfileViewsAsync(int applicantId)
+        public async Task<int> CountProfileViewsAsync(Guid applicantId)
         {
             return await _context.ProfileViews.CountAsync(p => p.ApplicantId == applicantId);
         }
 
-        public async Task<List<dynamic>> GetMonthlyApplicationsAsync(int applicantId, DateTime startOfYear)
+        public async Task<List<dynamic>> GetMonthlyApplicationsAsync(Guid applicantId, DateTime startOfYear)
         {
             return (await _context.Applications
                 .Where(a => a.ApplicantID == applicantId && a.AppliedDate >= startOfYear)
@@ -79,7 +79,7 @@ namespace Graduation_Project.Repositories
                 .ToList();
         }
 
-        public async Task<List<dynamic>> GetMonthlyInterviewsAsync(int applicantId, DateTime startOfYear)
+        public async Task<List<dynamic>> GetMonthlyInterviewsAsync(Guid applicantId, DateTime startOfYear)
         {
             return (await _context.Interviews
                 .Where(i => i.ApplicantId == applicantId && i.ScheduledAt >= startOfYear)
@@ -90,7 +90,7 @@ namespace Graduation_Project.Repositories
                 .ToList();
         }
 
-        public async Task<List<RecentApplicationDto>> GetRecentApplicationsAsync(int applicantId, int take)
+        public async Task<List<RecentApplicationDto>> GetRecentApplicationsAsync(Guid applicantId, int take)
         {
             return await _context.Applications
                 .Where(a => a.ApplicantID == applicantId)
@@ -107,7 +107,7 @@ namespace Graduation_Project.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<SavedJobsResponseDto>> GetSavedJobsAsync(int applicantId)
+        public async Task<List<SavedJobsResponseDto>> GetSavedJobsAsync(Guid applicantId)
         {
             return await _context.SavedJobs
                 .Where(x => x.ApplicantId == applicantId)
@@ -126,7 +126,7 @@ namespace Graduation_Project.Repositories
                 .ToListAsync();
         }
 
-        public async Task DeactivateAllResumesAsync(int applicantId)
+        public async Task DeactivateAllResumesAsync(Guid applicantId)
         {
             await _context.Resumes
                 .Where(r => r.ApplicantID == applicantId)
@@ -139,7 +139,7 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<string?> GetActiveResumePathAsync(int applicantId)
+        public async Task<string?> GetActiveResumePathAsync(Guid applicantId)
         {
             return await _context.Resumes
                 .Where(r => r.ApplicantID == applicantId && r.IsActive)

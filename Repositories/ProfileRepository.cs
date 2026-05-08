@@ -22,7 +22,7 @@ namespace Graduation_Project.Repositories
             return await _context.Companies.FirstOrDefaultAsync(x => x.UserId == userId);
         }
 
-        public async Task<Applicant?> GetPublicProfileAsync(int applicantId)
+        public async Task<Applicant?> GetPublicProfileAsync(Guid applicantId)
         {
             return await _context.Applicants
                 .Include(a => a.Experiences)

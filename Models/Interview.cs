@@ -1,22 +1,18 @@
-﻿namespace Graduation_Project.Models
+namespace Graduation_Project.Models
 {
     public class Interview
     {
-      
-        public int InterviewId { get; set; }
+        public Guid InterviewId { get; set; } = Guid.NewGuid();
 
-
-        public int ApplicantId { get; set; }
+        public Guid ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
 
-  
-        public int JobPostingId { get; set; }
+        public Guid JobPostingId { get; set; }
         public JobPosting JobPosting { get; set; }
-
 
         public DateTime ScheduledAt { get; set; }
 
-        public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming ;
+        public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming;
 
         public string? InterviewerName { get; set; }
         public string? MeetingLink { get; set; }

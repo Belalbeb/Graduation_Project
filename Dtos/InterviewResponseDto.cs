@@ -4,8 +4,8 @@ namespace Graduation_Project.Dtos
 {
     public class InterviewResponseDto
     {
-        public int InterviewId { get; set; }
-        public int JobPostingId { get; set; }
+        public Guid InterviewId { get; set; }
+        public Guid JobPostingId { get; set; }
         public string JobTitle { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string? CompanyLogoUrl { get; set; }

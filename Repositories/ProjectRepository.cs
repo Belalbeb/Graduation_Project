@@ -12,7 +12,7 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task<List<Project>> GetAllByApplicantAsync(int applicantId)
+        public async Task<List<Project>> GetAllByApplicantAsync(Guid applicantId)
         {
             return await _context.Projects
                 .Where(p => p.ApplicantID == applicantId)
@@ -20,7 +20,7 @@ namespace Graduation_Project.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Project?> GetByIdAsync(int projectId, int applicantId)
+        public async Task<Project?> GetByIdAsync(Guid projectId, Guid applicantId)
         {
             return await _context.Projects
                 .FirstOrDefaultAsync(p => p.ProjectID == projectId && p.ApplicantID == applicantId);

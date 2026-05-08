@@ -6,6 +6,6 @@ namespace Graduation_Project.Repositories
     {
         Task<Applicant?> GetApplicantByUserIdAsync(string userId);
         Task<Company?> GetCompanyByUserIdAsync(string userId);
-        Task<Applicant?> GetPublicProfileAsync(int applicantId);
+        Task<Applicant?> GetPublicProfileAsync(Guid applicantId);
     }
 }

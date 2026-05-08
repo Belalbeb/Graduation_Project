@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Graduation_Project.Models
@@ -6,7 +6,7 @@ namespace Graduation_Project.Models
     public class JobPosting
     {
         [Key]
-        public int JobID { get; set; }
+        public Guid JobID { get; set; } = Guid.NewGuid();
 
         // Basic Info
         public string Title { get; set; }
@@ -14,10 +14,11 @@ namespace Graduation_Project.Models
         public string Responsibility { get; set; }
 
         public decimal MinSalary { get; set; }
+        
         public decimal MaxSalary { get; set; }
 
         public string JobCategory { get; set; }
-        public string Location { get; set; } // ✅ added
+        public string Location { get; set; }
 
         public DateTime PostedDate { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
@@ -34,7 +35,7 @@ namespace Graduation_Project.Models
         public ICollection<JobSkill> Skills { get; set; } = new List<JobSkill>();
 
         // FK
-        public int CompanyID { get; set; }
+        public Guid CompanyID { get; set; }
         public Company Company { get; set; }
 
         // Navigation
@@ -58,10 +59,10 @@ namespace Graduation_Project.Models
 
     public class JobSkill
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; }
 
-        public int JobPostingId { get; set; }
+        public Guid JobPostingId { get; set; }
         public JobPosting JobPosting { get; set; }
     }
 }

@@ -12,12 +12,12 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task<Experience?> GetByIdAsync(int experienceId)
+        public async Task<Experience?> GetByIdAsync(Guid experienceId)
         {
             return await _context.Experiences.FirstOrDefaultAsync(e => e.ExperienceID == experienceId);
         }
 
-        public async Task<List<Experience>> GetAllByApplicantAsync(int applicantId)
+        public async Task<List<Experience>> GetAllByApplicantAsync(Guid applicantId)
         {
             return await _context.Experiences
                 .Where(e => e.ApplicantID == applicantId)

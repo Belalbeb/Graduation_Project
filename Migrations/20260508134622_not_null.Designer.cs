@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260407121714_circalproblem")]
-    partial class circalproblem
+    [Migration("20260508134622_not_null")]
+    partial class not_null
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,18 +27,37 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.Applicant", b =>
                 {
-                    b.Property<int>("ApplicantID")
+                    b.Property<Guid>("ApplicantID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicantID"));
+                    b.Property<string>("AboutMe")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverPhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Facebook")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Github")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Linkedin")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
@@ -47,6 +66,9 @@ namespace Graduation_Project.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Portfolio")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePicURL")
@@ -65,21 +87,19 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.ApplicantSkill", b =>
                 {
-                    b.Property<int>("ApplicantSkillID")
+                    b.Property<Guid>("ApplicantSkillID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicantSkillID"));
-
-                    b.Property<int>("ApplicantID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ApplicantID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProficiencyLevel")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SkillID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SkillID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ApplicantSkillID");
 
@@ -92,14 +112,12 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.Application", b =>
                 {
-                    b.Property<int>("ApplicationID")
+                    b.Property<Guid>("ApplicationID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicationID"));
-
-                    b.Property<int>("ApplicantID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ApplicantID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ApplicationStatus")
                         .HasColumnType("int");
@@ -111,11 +129,11 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("JobPostingID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("JobPostingID")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("ResumeID")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("ResumeID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ApplicationID");
 
@@ -201,11 +219,9 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.Company", b =>
                 {
-                    b.Property<int>("CompanyID")
+                    b.Property<Guid>("CompanyID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyID"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("HeadquarterAddress")
                         .IsRequired()
@@ -213,6 +229,12 @@ namespace Graduation_Project.Migrations
 
                     b.Property<string>("Industry")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -237,14 +259,12 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.Experience", b =>
                 {
-                    b.Property<int>("ExperienceID")
+                    b.Property<Guid>("ExperienceID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExperienceID"));
-
-                    b.Property<int>("ApplicantID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ApplicantID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -254,10 +274,17 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JobType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -271,19 +298,53 @@ namespace Graduation_Project.Migrations
                     b.ToTable("Experiences");
                 });
 
-            modelBuilder.Entity("Graduation_Project.Models.JobMetric", b =>
+            modelBuilder.Entity("Graduation_Project.Models.Interview", b =>
                 {
-                    b.Property<int>("MetricID")
+                    b.Property<Guid>("InterviewId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ApplicantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("InterviewerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MeetingLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MetricID"));
+                    b.HasKey("InterviewId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.ToTable("Interviews");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.JobMetric", b =>
+                {
+                    b.Property<Guid>("MetricID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ApplicationCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("JobID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("JobID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
@@ -301,14 +362,12 @@ namespace Graduation_Project.Migrations
 
             modelBuilder.Entity("Graduation_Project.Models.JobPosting", b =>
                 {
-                    b.Property<int>("JobID")
+                    b.Property<Guid>("JobID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobID"));
-
-                    b.Property<int>("CompanyID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CompanyID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -317,18 +376,39 @@ namespace Graduation_Project.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("PostedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsRemote")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Requirements")
+                    b.Property<string>("JobCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SalaryRange")
+                    b.PrimitiveCollection<string>("JobTypes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("MaxSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PostedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Responsibility")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("WorkApproaches")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -339,16 +419,89 @@ namespace Graduation_Project.Migrations
                     b.ToTable("JobPostings");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.JobSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.ToTable("JobSkill");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.ProfileView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ApplicantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("ProfileViews");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.Project", b =>
+                {
+                    b.Property<Guid>("ProjectID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ApplicantID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GithubRepoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProjectUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ProjectID");
+
+                    b.HasIndex("ApplicantID");
+
+                    b.ToTable("Projects");
+                });
+
             modelBuilder.Entity("Graduation_Project.Models.Resume", b =>
                 {
-                    b.Property<int>("ResumeID")
+                    b.Property<Guid>("ResumeID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ResumeID"));
-
-                    b.Property<int>("ApplicantID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ApplicantID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -357,6 +510,9 @@ namespace Graduation_Project.Migrations
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UploadDate")
                         .HasColumnType("datetime2");
@@ -368,13 +524,35 @@ namespace Graduation_Project.Migrations
                     b.ToTable("Resumes");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.SavedJobs", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ApplicantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SavedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.ToTable("SavedJobs");
+                });
+
             modelBuilder.Entity("Graduation_Project.Models.Skill", b =>
                 {
-                    b.Property<int>("SkillID")
+                    b.Property<Guid>("SkillID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkillID"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SkillName")
                         .IsRequired()
@@ -596,6 +774,25 @@ namespace Graduation_Project.Migrations
                     b.Navigation("Applicant");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.Interview", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
+                        .WithMany("Interviews")
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("JobPosting");
+                });
+
             modelBuilder.Entity("Graduation_Project.Models.JobMetric", b =>
                 {
                     b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
@@ -618,6 +815,39 @@ namespace Graduation_Project.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.JobSkill", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
+                        .WithMany("Skills")
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobPosting");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.ProfileView", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.Project", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
+                        .WithMany("Projects")
+                        .HasForeignKey("ApplicantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+                });
+
             modelBuilder.Entity("Graduation_Project.Models.Resume", b =>
                 {
                     b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
@@ -627,6 +857,25 @@ namespace Graduation_Project.Migrations
                         .IsRequired();
 
                     b.Navigation("Applicant");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.SavedJobs", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
+                        .WithMany()
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("JobPosting");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -688,6 +937,8 @@ namespace Graduation_Project.Migrations
 
                     b.Navigation("Experiences");
 
+                    b.Navigation("Projects");
+
                     b.Navigation("Resumes");
                 });
 
@@ -705,8 +956,12 @@ namespace Graduation_Project.Migrations
                 {
                     b.Navigation("Applications");
 
+                    b.Navigation("Interviews");
+
                     b.Navigation("JobMetric")
                         .IsRequired();
+
+                    b.Navigation("Skills");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.Resume", b =>

@@ -12,7 +12,7 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task DeactivateAllAsync(int applicantId)
+        public async Task DeactivateAllAsync(Guid applicantId)
         {
             await _context.Resumes
                 .Where(r => r.ApplicantID == applicantId)
@@ -26,7 +26,7 @@ namespace Graduation_Project.Repositories
             return resume;
         }
 
-        public async Task<string?> GetActivePathAsync(int applicantId)
+        public async Task<string?> GetActivePathAsync(Guid applicantId)
         {
             return await _context.Resumes
                 .Where(r => r.ApplicantID == applicantId && r.IsActive)

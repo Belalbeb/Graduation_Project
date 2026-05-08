@@ -6,28 +6,28 @@ namespace Graduation_Project.Repositories
     public interface IApplicantRepository
     {
         Task<Applicant> CreateAsync(Applicant applicant);
-        Task<Applicant?> GetByIdAsync(int id);
+        Task<Applicant?> GetByIdAsync(Guid id);
         Task<Applicant?> GetByUserIdAsync(string userId);
         Task<List<Applicant>> GetAllAsync();
         Task UpdateAsync(Applicant applicant);
         Task DeleteAsync(Applicant applicant);
 
         // Dashboard queries
-        Task<int> CountApplicationsAsync(int applicantId);
-        Task<int> CountSavedJobsAsync(int applicantId);
-        Task<int> CountUpcomingInterviewsAsync(int applicantId);
-        Task<int> CountProfileViewsAsync(int applicantId);
-        Task<List<dynamic>> GetMonthlyApplicationsAsync(int applicantId, DateTime startOfYear);
-        Task<List<dynamic>> GetMonthlyInterviewsAsync(int applicantId, DateTime startOfYear);
-        Task<List<RecentApplicationDto>> GetRecentApplicationsAsync(int applicantId, int take);
+        Task<int> CountApplicationsAsync(Guid applicantId);
+        Task<int> CountSavedJobsAsync(Guid applicantId);
+        Task<int> CountUpcomingInterviewsAsync(Guid applicantId);
+        Task<int> CountProfileViewsAsync(Guid applicantId);
+        Task<List<dynamic>> GetMonthlyApplicationsAsync(Guid applicantId, DateTime startOfYear);
+        Task<List<dynamic>> GetMonthlyInterviewsAsync(Guid applicantId, DateTime startOfYear);
+        Task<List<RecentApplicationDto>> GetRecentApplicationsAsync(Guid applicantId, int take);
 
         // Saved jobs
-        Task<List<SavedJobsResponseDto>> GetSavedJobsAsync(int applicantId);
+        Task<List<SavedJobsResponseDto>> GetSavedJobsAsync(Guid applicantId);
 
         // Resume
-        Task DeactivateAllResumesAsync(int applicantId);
+        Task DeactivateAllResumesAsync(Guid applicantId);
         Task AddResumeAsync(Resume resume);
-        Task<string?> GetActiveResumePathAsync(int applicantId);
+        Task<string?> GetActiveResumePathAsync(Guid applicantId);
         Task<string?> GetActiveResumePathByUserIdAsync(string userId);
     }
 }

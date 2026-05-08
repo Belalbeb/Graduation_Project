@@ -1,10 +1,10 @@
-﻿namespace Graduation_Project.Models
+namespace Graduation_Project.Models
 {
     public class ProfileView
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        public int ApplicantId { get; set; }
+        public Guid ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
     }
 }

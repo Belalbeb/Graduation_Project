@@ -13,19 +13,19 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<List<ProjectResponseDto>> GetAllAsync(int applicantId)
+        public async Task<List<ProjectResponseDto>> GetAllAsync(Guid applicantId)
         {
             var projects = await _repository.GetAllByApplicantAsync(applicantId);
             return projects.Select(MapToDto).ToList();
         }
 
-        public async Task<ProjectResponseDto?> GetByIdAsync(int projectId, int applicantId)
+        public async Task<ProjectResponseDto?> GetByIdAsync(Guid projectId, Guid applicantId)
         {
             var project = await _repository.GetByIdAsync(projectId, applicantId);
             return project == null ? null : MapToDto(project);
         }
 
-        public async Task<ProjectResponseDto?> AddAsync(int applicantId, ProjectDto dto)
+        public async Task<ProjectResponseDto?> AddAsync(Guid applicantId, ProjectDto dto)
         {
             var project = new Project
             {
@@ -42,7 +42,7 @@ namespace Graduation_Project.Services
             return MapToDto(added);
         }
 
-        public async Task<bool> UpdateAsync(int projectId, int applicantId, ProjectDto dto)
+        public async Task<bool> UpdateAsync(Guid projectId, Guid applicantId, ProjectDto dto)
         {
             var project = await _repository.GetByIdAsync(projectId, applicantId);
             if (project == null) return false;
@@ -58,7 +58,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int projectId, int applicantId)
+        public async Task<bool> DeleteAsync(Guid projectId, Guid applicantId)
         {
             var project = await _repository.GetByIdAsync(projectId, applicantId);
             if (project == null) return false;

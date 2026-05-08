@@ -13,12 +13,12 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<Experience?> GetExperienceByIdAsync(int experienceId)
+        public async Task<Experience?> GetExperienceByIdAsync(Guid experienceId)
         {
             return await _repository.GetByIdAsync(experienceId);
         }
 
-        public async Task<List<ExperienceResponseDto>> GetAllAsync(int applicantId)
+        public async Task<List<ExperienceResponseDto>> GetAllAsync(Guid applicantId)
         {
             var experiences = await _repository.GetAllByApplicantAsync(applicantId);
 
@@ -57,7 +57,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<bool> DeleteExperienceAsync(int experienceId)
+        public async Task<bool> DeleteExperienceAsync(Guid experienceId)
         {
             var experience = await _repository.GetByIdAsync(experienceId);
             if (experience == null) return false;
@@ -66,7 +66,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        public async Task<int> UpdateExperienceAsync(int experienceId, ExperienceDto experienceDto)
+        public async Task<int> UpdateExperienceAsync(Guid experienceId, ExperienceDto experienceDto)
         {
             var experience = await _repository.GetByIdAsync(experienceId);
             if (experience == null) return 1; // not found

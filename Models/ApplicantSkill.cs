@@ -1,14 +1,15 @@
-﻿namespace Graduation_Project.Models
+namespace Graduation_Project.Models
 {
     public class ApplicantSkill
     {
-        public int ApplicantSkillID { get; set; }
-        public int ApplicantID { get; set; }
-        public Applicant Applicant { get; set; } = null! ;
+        public Guid ApplicantSkillID { get; set; } = Guid.NewGuid();
 
-        public int SkillID { get; set; }
-        public Skill Skill { get; set; } = null! ;
+        public Guid ApplicantID { get; set; }
+        public Applicant Applicant { get; set; } = null!;
 
-        public string ProficiencyLevel { get; set; } = string.Empty ;
+        public Guid SkillID { get; set; }
+        public Skill Skill { get; set; } = null!;
+
+        public string ProficiencyLevel { get; set; } = string.Empty;
     }
 }

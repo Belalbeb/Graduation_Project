@@ -5,11 +5,11 @@ namespace Graduation_Project.Services
     public interface ISettingsService
     {
         // Profile Tab
-        Task<SettingsProfileDto?> GetProfileDetailsAsync(int applicantId) ;
-        Task<bool> UpdateProfileAsync(int applicantId,UpdateProfileDto dto) ;
+        Task<SettingsProfileDto?> GetProfileDetailsAsync(Guid applicantId) ;
+        Task<bool> UpdateProfileAsync(Guid applicantId,UpdateProfileDto dto) ;
 
         // Contact Tab
-        Task<SettingsContactDto> GetContactDetailsAsync(int applicantId) ;
-        Task<bool> UpdateContactAsync(int applicantId,UpdateContactDto dto) ;
+        Task<SettingsContactDto> GetContactDetailsAsync(Guid applicantId) ;
+        Task<bool> UpdateContactAsync(Guid applicantId,UpdateContactDto dto) ;
     }
 }

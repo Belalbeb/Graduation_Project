@@ -4,7 +4,7 @@ namespace Graduation_Project.Dtos
 {
     public class ExperienceResponseDto
     {
-        public int ExperienceID { get; set; }
+        public Guid ExperienceID { get; set; }
         public string CompanyName { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
@@ -12,6 +12,6 @@ namespace Graduation_Project.Dtos
         public JobType JobType { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int ApplicantID { get; set; }
+        public Guid ApplicantID { get; set; }
     }
 }

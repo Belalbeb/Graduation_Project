@@ -30,7 +30,7 @@
 
     public class RecentJobPostsDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string JobTitle { get; set; }
         public string TotalApplication { get; set; }
         
@@ -38,7 +38,7 @@
     }
     public class ApplicantsDto
         {
-            public int ApplicantId { get; set; }
+            public Guid ApplicantId { get; set; }
             public  string ApplicantName { get; set; }
             public string JobAppliedFor { get; set; }
             public DateTime AppliedAt { get; set; }

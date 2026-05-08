@@ -18,7 +18,7 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpGet("{experienceId}")]
-        public async Task<IActionResult> GetExperienceById([FromRoute] int experienceId)
+        public async Task<IActionResult> GetExperienceById([FromRoute] Guid experienceId)
         {
             var result = await _experienceService.GetExperienceByIdAsync(experienceId) ;
             if (result == null)
@@ -31,7 +31,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _experienceService.GetAllAsync(applicantId) ;
@@ -46,7 +46,7 @@ namespace Graduation_Project.Controllers
                 return BadRequest() ;
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var experience = new Experience
@@ -71,7 +71,7 @@ namespace Graduation_Project.Controllers
 
         [HttpPut("{experienceId}")]
         [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> EditExperience([FromRoute] int experienceId, [FromBody] ExperienceDto experienceDto)
+        public async Task<IActionResult> EditExperience([FromRoute] Guid experienceId, [FromBody] ExperienceDto experienceDto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState) ;
@@ -92,11 +92,11 @@ namespace Graduation_Project.Controllers
 
         [HttpDelete("{experienceId}")]
         [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> RemoveExperience([FromRoute] int experienceId)
+        public async Task<IActionResult> RemoveExperience([FromRoute] Guid experienceId)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _experienceService.DeleteExperienceAsync(experienceId) ;

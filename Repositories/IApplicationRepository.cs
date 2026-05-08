@@ -5,6 +5,6 @@ namespace Graduation_Project.Repositories
 {
     public interface IApplicationRepository
     {
-        Task<List<ApplicationDto>> GetByApplicantIdAsync(int applicantId);
+        Task<List<ApplicationDto>> GetByApplicantIdAsync(Guid applicantId);
     }
 }

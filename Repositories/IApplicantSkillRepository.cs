@@ -6,10 +6,10 @@ namespace Graduation_Project.Repositories
     {
         Task<Skill?> GetSkillByNameAsync(string skillName);
         Task<Skill> AddSkillAsync(Skill skill);
-        Task<bool> ApplicantSkillExistsAsync(int applicantId, int skillId);
+        Task<bool> ApplicantSkillExistsAsync(Guid applicantId, Guid skillId);
         Task<ApplicantSkill> AddApplicantSkillAsync(ApplicantSkill applicantSkill);
-        Task<ApplicantSkill?> GetApplicantSkillAsync(int applicantSkillId, int applicantId);
-        Task<List<ApplicantSkill>> GetAllApplicantSkillsAsync(int applicantId);
+        Task<ApplicantSkill?> GetApplicantSkillAsync(Guid applicantSkillId, Guid applicantId);
+        Task<List<ApplicantSkill>> GetAllApplicantSkillsAsync(Guid applicantId);
         Task DeleteApplicantSkillAsync(ApplicantSkill applicantSkill);
     }
 }

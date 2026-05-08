@@ -38,7 +38,7 @@ namespace Graduation_Project.Services
             }
         }
 
-        public async Task<PublicProfileDto?> GetPublicProfileAsync(int applicantId)
+        public async Task<PublicProfileDto?> GetPublicProfileAsync(Guid applicantId)
         {
             var applicant = await _repository.GetPublicProfileAsync(applicantId);
             if (applicant == null) return null;

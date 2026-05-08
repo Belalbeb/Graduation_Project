@@ -1,8 +1,8 @@
-﻿namespace Graduation_Project.Models
+namespace Graduation_Project.Models
 {
     public class Skill
     {
-        public int SkillID { get; set; }
+        public Guid SkillID { get; set; } = Guid.NewGuid();
         public string SkillName { get; set; }
 
         // Navigation

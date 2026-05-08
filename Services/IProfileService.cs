@@ -7,6 +7,6 @@ namespace Graduation_Project.Services
     {
         Task<(string profileId, string profileType)> GetProfileAsync(ApplicationUser user);
 
-        Task<PublicProfileDto?> GetPublicProfileAsync(int applicantId);
+        Task<PublicProfileDto?> GetPublicProfileAsync(Guid applicantId);
     }
 }

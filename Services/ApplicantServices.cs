@@ -34,7 +34,7 @@ namespace Graduation_Project.Services
             return await _repository.CreateAsync(applicant);
         }
 
-        public async Task<bool> DeleteApplicantAsync(int id)
+        public async Task<bool> DeleteApplicantAsync(Guid id)
         {
             var applicant = await _repository.GetByIdAsync(id);
             if (applicant == null) return false;
@@ -43,7 +43,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        public async Task<Applicant> GetApplicantByIdAsync(int id)
+        public async Task<Applicant> GetApplicantByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
@@ -53,7 +53,7 @@ namespace Graduation_Project.Services
             return await _repository.GetAllAsync();
         }
 
-        public async Task<ApplicantDashboardResponseDto> GetDashboardAsync(int applicantId)
+        public async Task<ApplicantDashboardResponseDto> GetDashboardAsync(Guid applicantId)
         {
             var now = DateTime.UtcNow;
             var startOfYear = new DateTime(now.Year, 1, 1);
@@ -89,7 +89,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<bool> UpdateApplicantAsync(int id, ApplicantDto applicantDto)
+        public async Task<bool> UpdateApplicantAsync(Guid id, ApplicantDto applicantDto)
         {
             var applicant = await _repository.GetByIdAsync(id);
             if (applicant == null) return false;
@@ -103,7 +103,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        public async Task<List<SavedJobsResponseDto>> GetSavedsAsync(int id)
+        public async Task<List<SavedJobsResponseDto>> GetSavedsAsync(Guid id)
         {
             var applicant = await _repository.GetByIdAsync(id);
             if (applicant == null) return null;
@@ -116,7 +116,7 @@ namespace Graduation_Project.Services
             return savedJobs;
         }
 
-        public async Task<Resume> UploadResumeAsync(int applicantId, string fileName, string filePath)
+        public async Task<Resume> UploadResumeAsync(Guid applicantId, string fileName, string filePath)
         {
             await _repository.DeactivateAllResumesAsync(applicantId);
 
@@ -133,7 +133,7 @@ namespace Graduation_Project.Services
             return newResume;
         }
 
-        public async Task<string?> GetActiveResumePathAsync(int applicantId)
+        public async Task<string?> GetActiveResumePathAsync(Guid applicantId)
         {
             return await _repository.GetActiveResumePathAsync(applicantId);
         }

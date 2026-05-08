@@ -23,7 +23,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var projects = await _projectService.GetAllAsync(applicantId);
@@ -31,11 +31,11 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpGet("{projectId}")]
-        public async Task<IActionResult> GetProjectById(int projectId)
+        public async Task<IActionResult> GetProjectById(Guid projectId)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var project = await _projectService.GetByIdAsync(projectId,applicantId);
@@ -54,7 +54,7 @@ namespace Graduation_Project.Controllers
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim, out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _projectService.AddAsync(applicantId, dto);
@@ -67,14 +67,14 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpPut("{projectId}")]
-        public async Task<IActionResult> UpdateProject(int projectId,[FromBody] ProjectDto dto)
+        public async Task<IActionResult> UpdateProject(Guid projectId,[FromBody] ProjectDto dto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var success = await _projectService.UpdateAsync(projectId, applicantId, dto);
@@ -86,11 +86,11 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpDelete("{projectId}")]
-        public async Task<IActionResult> DeleteProject(int projectId)
+        public async Task<IActionResult> DeleteProject(Guid projectId)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var success = await _projectService.DeleteAsync(projectId, applicantId);

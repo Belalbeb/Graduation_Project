@@ -5,10 +5,10 @@ namespace Graduation_Project.Services
 {
     public interface IInterviewServices
     {
-        Task<InterviewStatisticsDto> GetStatisticsAsync(int applicantId);
-        Task<List<InterviewResponseDto>> GetUpcomingAsync(int applicantId);
-        Task<List<InterviewResponseDto>> GetCompletedAsync(int applicantId);
-        Task<List<InterviewResponseDto>> GetCancelledAsync(int applicantId);
-        Task<List<InterviewResponseDto>> GetAllAsync(int applicantId);
+        Task<InterviewStatisticsDto> GetStatisticsAsync(Guid applicantId);
+        Task<List<InterviewResponseDto>> GetUpcomingAsync(Guid applicantId);
+        Task<List<InterviewResponseDto>> GetCompletedAsync(Guid applicantId);
+        Task<List<InterviewResponseDto>> GetCancelledAsync(Guid applicantId);
+        Task<List<InterviewResponseDto>> GetAllAsync(Guid applicantId);
     }
 }

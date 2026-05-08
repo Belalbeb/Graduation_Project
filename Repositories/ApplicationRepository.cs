@@ -13,7 +13,7 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task<List<ApplicationDto>> GetByApplicantIdAsync(int applicantId)
+        public async Task<List<ApplicationDto>> GetByApplicantIdAsync(Guid applicantId)
         {
             return await _context.Applications
                 .Where(x => x.ApplicantID == applicantId)

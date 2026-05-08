@@ -12,7 +12,7 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<List<ApplicationDto>> GetApplicationByApplicant(int id)
+        public async Task<List<ApplicationDto>> GetApplicationByApplicant(Guid id)
         {
             return await _repository.GetByApplicantIdAsync(id);
         }

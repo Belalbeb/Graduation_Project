@@ -18,7 +18,7 @@ namespace Graduation_Project.Controllers
             this.companyServices = companyServices;
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCompanyById(int id)
+        public async Task<IActionResult> GetCompanyById(Guid id)
         {
             var company = await companyServices.GetCompanyByIdAsync(id);
             if (company == null) return NotFound();
@@ -55,7 +55,7 @@ namespace Graduation_Project.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCompany(int id, [FromBody] Company updatedCompany)
+        public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] Company updatedCompany)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -67,7 +67,7 @@ namespace Graduation_Project.Controllers
 
      
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCompany(int id)
+        public async Task<IActionResult> DeleteCompany(Guid id)
         {
             var result = await companyServices.DeleteCompanyAsync(id);
             if (!result) return NotFound();

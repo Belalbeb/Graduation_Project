@@ -12,12 +12,12 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task<Applicant?> GetApplicantByIdAsync(int applicantId)
+        public async Task<Applicant?> GetApplicantByIdAsync(Guid applicantId)
         {
             return await _context.Applicants.FindAsync(applicantId);
         }
 
-        public async Task<Resume?> GetActiveResumeAsync(int applicantId)
+        public async Task<Resume?> GetActiveResumeAsync(Guid applicantId)
         {
             return await _context.Resumes
                 .FirstOrDefaultAsync(r => r.ApplicantID == applicantId && r.IsActive);
@@ -29,7 +29,7 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeactivateAllResumesAsync(int applicantId)
+        public async Task DeactivateAllResumesAsync(Guid applicantId)
         {
             await _context.Resumes
                 .Where(r => r.ApplicantID == applicantId)

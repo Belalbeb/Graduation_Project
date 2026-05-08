@@ -25,7 +25,7 @@ namespace Graduation_Project.Repositories
             return skill;
         }
 
-        public async Task<bool> ApplicantSkillExistsAsync(int applicantId, int skillId)
+        public async Task<bool> ApplicantSkillExistsAsync(Guid applicantId, Guid skillId)
         {
             return await _context.ApplicantSkills
                 .AnyAsync(s => s.ApplicantID == applicantId && s.SkillID == skillId);
@@ -38,13 +38,13 @@ namespace Graduation_Project.Repositories
             return applicantSkill;
         }
 
-        public async Task<ApplicantSkill?> GetApplicantSkillAsync(int applicantSkillId, int applicantId)
+        public async Task<ApplicantSkill?> GetApplicantSkillAsync(Guid applicantSkillId, Guid applicantId)
         {
             return await _context.ApplicantSkills
                 .FirstOrDefaultAsync(s => s.ApplicantSkillID == applicantSkillId && s.ApplicantID == applicantId);
         }
 
-        public async Task<List<ApplicantSkill>> GetAllApplicantSkillsAsync(int applicantId)
+        public async Task<List<ApplicantSkill>> GetAllApplicantSkillsAsync(Guid applicantId)
         {
             return await _context.ApplicantSkills
                 .Where(s => s.ApplicantID == applicantId)

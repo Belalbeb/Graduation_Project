@@ -29,7 +29,7 @@ namespace Graduation_Project.Controllers
 
         
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             var job = await _service.GetJobByIdAsync(id);
             if (job == null) return NotFound("Job not found");
@@ -43,7 +43,7 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> GetByCompany()
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-            if (!int.TryParse(profileIdClaim, out int companyId))
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
             var jobs = await _service.GetJobsByCompanyAsync(companyId);
             if (jobs == null) return NotFound("no jobs founded for this company");
@@ -56,7 +56,7 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> Create([FromBody] CreateJobDto job)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-            if (!int.TryParse(profileIdClaim, out int companyId))
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             if (!ModelState.IsValid)
@@ -78,7 +78,7 @@ namespace Graduation_Project.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] JobPosting job)
+        public async Task<IActionResult> Update(Guid id, [FromBody] JobPosting job)
         {
             var updated = await _service.UpdateJobAsync(id, job);
             if (updated == null) return NotFound("Job not found");
@@ -87,7 +87,7 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await _service.DeleteJobAsync(id);
             if (!deleted) return NotFound("Job not found");
@@ -97,7 +97,7 @@ namespace Graduation_Project.Controllers
 
         
         [HttpPut("deactivate/{id}")]
-        public async Task<IActionResult> Deactivate(int id)
+        public async Task<IActionResult> Deactivate(Guid id)
         {
             var success = await _service.DeactivateJobAsync(id);
             if (!success) return NotFound("Job not found");

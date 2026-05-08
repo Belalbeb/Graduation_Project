@@ -17,7 +17,7 @@ namespace Graduation_Project.Repositories
             return await _context.JobPostings.Include(x => x.Company).ToListAsync();
         }
 
-        public async Task<JobPosting?> GetByIdAsync(int id)
+        public async Task<JobPosting?> GetByIdAsync(Guid id)
         {
             return await _context.JobPostings
                 .Include(j => j.Company)
@@ -25,7 +25,7 @@ namespace Graduation_Project.Repositories
                 .FirstOrDefaultAsync(j => j.JobID == id);
         }
 
-        public async Task<IEnumerable<JobPosting>> GetByCompanyAsync(int companyId)
+        public async Task<IEnumerable<JobPosting>> GetByCompanyAsync(Guid companyId)
         {
             return await _context.JobPostings
                 .Include(x=>x.Applications)
@@ -42,7 +42,7 @@ namespace Graduation_Project.Repositories
             return jobPosting;
         }
 
-        public async Task<JobPosting?> UpdateAsync(int id, JobPosting jobPosting)
+        public async Task<JobPosting?> UpdateAsync(Guid id, JobPosting jobPosting)
         {
             var existing = await _context.JobPostings.FindAsync(id);
             if (existing == null) return null;
@@ -58,7 +58,7 @@ namespace Graduation_Project.Repositories
             return existing;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var job = await _context.JobPostings.FindAsync(id);
             if (job == null) return false;
@@ -68,7 +68,7 @@ namespace Graduation_Project.Repositories
             return true;
         }
 
-        public async Task<bool> DeactivateAsync(int id)
+        public async Task<bool> DeactivateAsync(Guid id)
         {
             var job = await _context.JobPostings.FindAsync(id);
             if (job == null) return false;

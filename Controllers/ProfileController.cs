@@ -19,7 +19,7 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpGet("{applicantId}")]
-        public async Task<IActionResult> GetProfile(int applicantId)
+        public async Task<IActionResult> GetProfile(Guid applicantId)
         {
             //var currentUserApplicantId = GetCurrentApplicantIdFromClaims();
 
@@ -38,7 +38,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var profile = await _profileService.GetPublicProfileAsync(applicantId);

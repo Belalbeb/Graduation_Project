@@ -19,7 +19,7 @@ namespace Graduation_Project.Repositories
             return company;
         }
 
-        public async Task<Company?> GetByIdAsync(int id)
+        public async Task<Company?> GetByIdAsync(Guid id)
         {
             return await _context.Companies
                 .Include(c => c.User)
@@ -31,7 +31,7 @@ namespace Graduation_Project.Repositories
             return await _context.Companies.FirstOrDefaultAsync(c => c.UserId == userId);
         }
 
-        public async Task<Company?> GetWithJobPostingsAndApplicationsAsync(int companyId)
+        public async Task<Company?> GetWithJobPostingsAndApplicationsAsync(Guid companyId)
         {
             return await _context.Companies
                 .Include(c => c.JobPostings)
@@ -48,7 +48,7 @@ namespace Graduation_Project.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null) return false;

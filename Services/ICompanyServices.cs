@@ -6,11 +6,11 @@ namespace Graduation_Project.Services
     public interface ICompanyServices
     {
         Task<Company> AddCompanyAsync(Company company);
-        Task<Company?> GetCompanyByIdAsync(int id);
+        Task<Company?> GetCompanyByIdAsync(Guid id);
       
-        Task<bool> UpdateCompanyAsync(int id, Company updatedCompany);
-        Task<bool> DeleteCompanyAsync(int id);
-        public Task<CompanyResponseDto?> GetCompanyDashboardAsync(int userId);
+        Task<bool> UpdateCompanyAsync(Guid id, Company updatedCompany);
+        Task<bool> DeleteCompanyAsync(Guid id);
+        public Task<CompanyResponseDto?> GetCompanyDashboardAsync(Guid CompanyId);
         public Task<Company?> GetCompanyByUserIdAsync(string userid);
     }
 }

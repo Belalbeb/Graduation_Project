@@ -23,7 +23,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var stats = await _interviewService.GetStatisticsAsync(applicantId);
@@ -35,7 +35,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var interviews = await _interviewService.GetUpcomingAsync(applicantId);
@@ -47,7 +47,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var interviews = await _interviewService.GetCompletedAsync(applicantId);
@@ -59,7 +59,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var interviews = await _interviewService.GetCancelledAsync(applicantId);
@@ -71,7 +71,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var interviews = await _interviewService.GetAllAsync(applicantId);

@@ -12,7 +12,7 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<Resume> UploadNewResumeAsync(int applicantId, string fileName, string filePath)
+        public async Task<Resume> UploadNewResumeAsync(Guid applicantId, string fileName, string filePath)
         {
             await _repository.DeactivateAllAsync(applicantId);
 
@@ -28,7 +28,7 @@ namespace Graduation_Project.Services
             return await _repository.AddAsync(newResume);
         }
 
-        public async Task<string?> GetActiveResumeAsync(int applicantId)
+        public async Task<string?> GetActiveResumeAsync(Guid applicantId)
         {
             return await _repository.GetActivePathAsync(applicantId);
         }

@@ -4,9 +4,9 @@ namespace Graduation_Project.Repositories
 {
     public interface IResumeRepository
     {
-        Task DeactivateAllAsync(int applicantId);
+        Task DeactivateAllAsync(Guid applicantId);
         Task<Resume> AddAsync(Resume resume);
-        Task<string?> GetActivePathAsync(int applicantId);
+        Task<string?> GetActivePathAsync(Guid applicantId);
         Task<string?> GetActivePathByUserIdAsync(string userId);
     }
 }

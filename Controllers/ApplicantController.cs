@@ -34,7 +34,7 @@ namespace Graduation_Project.Controllers
             return Ok(applicantDashboard);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateApplicant([FromRoute]int id, [FromBody] ApplicantDto applicantDto)
+        public async Task<IActionResult> UpdateApplicant([FromRoute]Guid id, [FromBody] ApplicantDto applicantDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("invalid request");
@@ -45,7 +45,7 @@ namespace Graduation_Project.Controllers
             
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteApplicant([FromRoute] int id)
+        public async Task<IActionResult> DeleteApplicant([FromRoute] Guid id)
         {
           var result= await applicantServices.DeleteApplicantAsync(id);
             if (!result)
@@ -76,7 +76,7 @@ namespace Graduation_Project.Controllers
                 return BadRequest("Cloudinary URL and FileName are required.");
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var resume = await applicantServices.UploadResumeAsync(applicantId,resumeDto.FileName,resumeDto.CloudinaryUrl);
@@ -88,7 +88,7 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> GetActiveResume()
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var path = await applicantServices.GetActiveResumePathAsync(applicantId);

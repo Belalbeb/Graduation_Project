@@ -5,6 +5,6 @@ namespace Graduation_Project.Services
 {
     public interface IApplicationServivces
     {
-        Task<List<ApplicationDto>> GetApplicationByApplicant(int id);
+        Task<List<ApplicationDto>> GetApplicationByApplicant(Guid id);
     }
 }

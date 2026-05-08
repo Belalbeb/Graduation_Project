@@ -18,12 +18,12 @@ namespace Graduation_Project.Services
             return await _repository.GetAllAsync();
         }
 
-        public async Task<JobPosting> GetJobByIdAsync(int id)
+        public async Task<JobPosting> GetJobByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
 
-        public async Task<JobPostingDto> GetJobsByCompanyAsync(int companyId)
+        public async Task<JobPostingDto> GetJobsByCompanyAsync(Guid companyId)
         {
             var jobs = await _repository.GetByCompanyAsync(companyId);
             var jobsList = jobs.ToList();
@@ -56,7 +56,7 @@ namespace Graduation_Project.Services
             };
         }
      
-        public async Task<JobPosting> CreateJobAsync(CreateJobDto dto,int companyId)
+        public async Task<JobPosting> CreateJobAsync(CreateJobDto dto,Guid companyId)
         {
             
             var jobPosting = new JobPosting
@@ -103,17 +103,17 @@ namespace Graduation_Project.Services
             return await _repository.AddAsync(jobPosting);
         }
 
-        public async Task<JobPosting> UpdateJobAsync(int id, JobPosting jobPosting)
+        public async Task<JobPosting> UpdateJobAsync(Guid id, JobPosting jobPosting)
         {
             return await _repository.UpdateAsync(id, jobPosting);
         }
 
-        public async Task<bool> DeleteJobAsync(int id)
+        public async Task<bool> DeleteJobAsync(Guid id)
         {
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<bool> DeactivateJobAsync(int id)
+        public async Task<bool> DeactivateJobAsync(Guid id)
         {
             return await _repository.DeactivateAsync(id);
         }

@@ -4,9 +4,9 @@ namespace Graduation_Project.Repositories
 {
     public interface IInterviewRepository
     {
-        Task<int> CountByApplicantAsync(int applicantId);
-        Task<int> CountByApplicantAndStatusAsync(int applicantId, InterviewStatus status);
-        Task<List<Interview>> GetByApplicantAndStatusAsync(int applicantId, InterviewStatus status);
-        Task<List<Interview>> GetAllByApplicantAsync(int applicantId);
+        Task<int> CountByApplicantAsync(Guid applicantId);
+        Task<int> CountByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status);
+        Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status);
+        Task<List<Interview>> GetAllByApplicantAsync(Guid applicantId);
     }
 }

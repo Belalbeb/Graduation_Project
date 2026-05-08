@@ -12,18 +12,18 @@ namespace Graduation_Project.Repositories
             _context = context;
         }
 
-        public async Task<int> CountByApplicantAsync(int applicantId)
+        public async Task<int> CountByApplicantAsync(Guid applicantId)
         {
             return await _context.Interviews.CountAsync(i => i.ApplicantId == applicantId);
         }
 
-        public async Task<int> CountByApplicantAndStatusAsync(int applicantId, InterviewStatus status)
+        public async Task<int> CountByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status)
         {
             return await _context.Interviews
                 .CountAsync(i => i.ApplicantId == applicantId && i.Status == status);
         }
 
-        public async Task<List<Interview>> GetByApplicantAndStatusAsync(int applicantId, InterviewStatus status)
+        public async Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status)
         {
             return await _context.Interviews
                 .Where(i => i.ApplicantId == applicantId && i.Status == status)
@@ -33,7 +33,7 @@ namespace Graduation_Project.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Interview>> GetAllByApplicantAsync(int applicantId)
+        public async Task<List<Interview>> GetAllByApplicantAsync(Guid applicantId)
         {
             return await _context.Interviews
                 .Where(i => i.ApplicantId == applicantId)

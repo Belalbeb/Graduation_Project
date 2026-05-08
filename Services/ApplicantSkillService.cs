@@ -13,7 +13,7 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<SkillResponseDto?> AddSkillAsync(int applicantId, SkillDto dto)
+        public async Task<SkillResponseDto?> AddSkillAsync(Guid applicantId, SkillDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.SkillName))
                 return null;
@@ -45,7 +45,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<bool> DeleteSkillAsync(int applicantSkillId, int applicantId)
+        public async Task<bool> DeleteSkillAsync(Guid applicantSkillId, Guid applicantId)
         {
             var skill = await _repository.GetApplicantSkillAsync(applicantSkillId, applicantId);
             if (skill == null) return false;
@@ -54,7 +54,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        public async Task<List<SkillResponseDto>> GetAllSkillsAsync(int applicantId)
+        public async Task<List<SkillResponseDto>> GetAllSkillsAsync(Guid applicantId)
         {
             var skills = await _repository.GetAllApplicantSkillsAsync(applicantId);
 
@@ -66,7 +66,7 @@ namespace Graduation_Project.Services
             }).ToList();
         }
 
-        public async Task<SkillResponseDto?> GetSkillByIdAsync(int applicantSkillId, int applicantId)
+        public async Task<SkillResponseDto?> GetSkillByIdAsync(Guid applicantSkillId, Guid applicantId)
         {
             var skills = await _repository.GetAllApplicantSkillsAsync(applicantId);
             var skill = skills.FirstOrDefault(s => s.ApplicantSkillID == applicantSkillId);

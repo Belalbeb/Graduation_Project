@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Graduation_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,8 +56,7 @@ namespace Graduation_Project.Migrations
                 name: "Skills",
                 columns: table => new
                 {
-                    SkillID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SkillID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SkillName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -90,13 +89,20 @@ namespace Graduation_Project.Migrations
                 name: "Applicants",
                 columns: table => new
                 {
-                    ApplicantID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AboutMe = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CoverPhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProfilePicURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Linkedin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Github = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Facebook = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Portfolio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -106,7 +112,8 @@ namespace Graduation_Project.Migrations
                         name: "FK_Applicants_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,12 +205,13 @@ namespace Graduation_Project.Migrations
                 name: "Companies",
                 columns: table => new
                 {
-                    CompanyID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Industry = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WebsiteURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HeadquarterAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -220,10 +228,9 @@ namespace Graduation_Project.Migrations
                 name: "ApplicantSkills",
                 columns: table => new
                 {
-                    ApplicantSkillID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicantID = table.Column<int>(type: "int", nullable: false),
-                    SkillID = table.Column<int>(type: "int", nullable: false),
+                    ApplicantSkillID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProficiencyLevel = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -245,14 +252,15 @@ namespace Graduation_Project.Migrations
                 name: "Experiences",
                 columns: table => new
                 {
-                    ExperienceID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExperienceID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JobType = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ApplicantID = table.Column<int>(type: "int", nullable: false)
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -266,15 +274,58 @@ namespace Graduation_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProfileViews",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileViews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfileViews_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "ApplicantID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    ProjectID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProjectUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GithubRepoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.ProjectID);
+                    table.ForeignKey(
+                        name: "FK_Projects_Applicants_ApplicantID",
+                        column: x => x.ApplicantID,
+                        principalTable: "Applicants",
+                        principalColumn: "ApplicantID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Resumes",
                 columns: table => new
                 {
-                    ResumeID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResumeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicantID = table.Column<int>(type: "int", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -291,15 +342,20 @@ namespace Graduation_Project.Migrations
                 name: "JobPostings",
                 columns: table => new
                 {
-                    JobID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    JobID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SalaryRange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Responsibility = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    JobCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CompanyID = table.Column<int>(type: "int", nullable: false)
+                    JobTypes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WorkApproaches = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRemote = table.Column<bool>(type: "bit", nullable: false),
+                    CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,14 +371,13 @@ namespace Graduation_Project.Migrations
                 name: "Applications",
                 columns: table => new
                 {
-                    ApplicationID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApplicationID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicationStatus = table.Column<int>(type: "int", nullable: false),
                     AppliedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CoverLetter = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicantID = table.Column<int>(type: "int", nullable: false),
-                    JobPostingID = table.Column<int>(type: "int", nullable: false),
-                    ResumeID = table.Column<int>(type: "int", nullable: true)
+                    ApplicantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JobPostingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResumeID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -345,15 +400,44 @@ namespace Graduation_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Interviews",
+                columns: table => new
+                {
+                    InterviewId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JobPostingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScheduledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    InterviewerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Interviews", x => x.InterviewId);
+                    table.ForeignKey(
+                        name: "FK_Interviews_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "ApplicantID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Interviews_JobPostings_JobPostingId",
+                        column: x => x.JobPostingId,
+                        principalTable: "JobPostings",
+                        principalColumn: "JobID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JobMetrics",
                 columns: table => new
                 {
-                    MetricID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MetricID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Views = table.Column<int>(type: "int", nullable: false),
                     ApplicationCount = table.Column<int>(type: "int", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    JobID = table.Column<int>(type: "int", nullable: false)
+                    JobID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -365,11 +449,55 @@ namespace Graduation_Project.Migrations
                         principalColumn: "JobID");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "JobSkill",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JobPostingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobSkill", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobSkill_JobPostings_JobPostingId",
+                        column: x => x.JobPostingId,
+                        principalTable: "JobPostings",
+                        principalColumn: "JobID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SavedJobs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JobPostingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SavedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SavedJobs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SavedJobs_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "ApplicantID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SavedJobs_JobPostings_JobPostingId",
+                        column: x => x.JobPostingId,
+                        principalTable: "JobPostings",
+                        principalColumn: "JobID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Applicants_UserId",
                 table: "Applicants",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApplicantSkills_ApplicantID",
@@ -447,6 +575,16 @@ namespace Graduation_Project.Migrations
                 column: "ApplicantID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Interviews_ApplicantId",
+                table: "Interviews",
+                column: "ApplicantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Interviews_JobPostingId",
+                table: "Interviews",
+                column: "JobPostingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JobMetrics_JobID",
                 table: "JobMetrics",
                 column: "JobID",
@@ -458,9 +596,34 @@ namespace Graduation_Project.Migrations
                 column: "CompanyID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobSkill_JobPostingId",
+                table: "JobSkill",
+                column: "JobPostingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfileViews_ApplicantId",
+                table: "ProfileViews",
+                column: "ApplicantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_ApplicantID",
+                table: "Projects",
+                column: "ApplicantID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Resumes_ApplicantID",
                 table: "Resumes",
                 column: "ApplicantID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SavedJobs_ApplicantId",
+                table: "SavedJobs",
+                column: "ApplicantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SavedJobs_JobPostingId",
+                table: "SavedJobs",
+                column: "JobPostingId");
         }
 
         /// <inheritdoc />
@@ -491,7 +654,22 @@ namespace Graduation_Project.Migrations
                 name: "Experiences");
 
             migrationBuilder.DropTable(
+                name: "Interviews");
+
+            migrationBuilder.DropTable(
                 name: "JobMetrics");
+
+            migrationBuilder.DropTable(
+                name: "JobSkill");
+
+            migrationBuilder.DropTable(
+                name: "ProfileViews");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "SavedJobs");
 
             migrationBuilder.DropTable(
                 name: "Skills");

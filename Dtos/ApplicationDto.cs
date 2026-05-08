@@ -4,7 +4,7 @@ namespace Graduation_Project.Dtos
 {
     public class ApplicationDto
     {
-        public int ApplicationId { get; set; }
+        public Guid ApplicationId { get; set; }
 
         public string LogoUrl { get; set; }
         public string JobTitle { get; set; }

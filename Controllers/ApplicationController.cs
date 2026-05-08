@@ -37,7 +37,7 @@ namespace Graduation_Project.Controllers
             var result = await applicationServivces.GetApplicationByApplicant(applicant.ApplicantID);
 
             if (result == null || !result.Any())
-                return NotFound("No applications found");
+                return NotFound(new {Message= "No applications found" });
 
             return Ok(result);
         }

@@ -1,6 +1,8 @@
 
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
+using Graduation_Project.Seeds;
+
 
 //using Graduation_Project.Seeds;
 using Graduation_Project.Services;
@@ -88,8 +90,7 @@ namespace Graduation_Project
             app.MapControllers();
             //using (var scope = app.Services.CreateScope())
             //{
-            //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            //    await RoleSeeder.SeedRoles(roleManager);
+            //    await SeederRunner.Run(scope.ServiceProvider);
             //}
 
             app.Run();

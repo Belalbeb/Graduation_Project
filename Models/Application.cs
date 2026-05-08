@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Graduation_Project.Models
@@ -6,22 +6,23 @@ namespace Graduation_Project.Models
     public class Application
     {
         [Key]
-        public int ApplicationID { get; set; }
+        public Guid ApplicationID { get; set; } = Guid.NewGuid();
         public ApplicationStatus ApplicationStatus { get; set; } = ApplicationStatus.Pending;
         public DateTime AppliedDate { get; set; }
         public string CoverLetter { get; set; }
 
         // FKs
-        public int ApplicantID { get; set; }
+        public Guid ApplicantID { get; set; }
         public Applicant Applicant { get; set; }
 
         [ForeignKey("JobPosting")]
-        public int JobPostingID { get; set; }
+        public Guid JobPostingID { get; set; }
         public JobPosting JobPosting { get; set; }
 
-        public int? ResumeID { get; set; }
+        public Guid? ResumeID { get; set; }
         public Resume? Resume { get; set; }
     }
+
     public enum ApplicationStatus
     {
         Pending,
@@ -29,5 +30,4 @@ namespace Graduation_Project.Models
         Accepted,
         Rejected
     }
-
 }

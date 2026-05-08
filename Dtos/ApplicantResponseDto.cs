@@ -31,7 +31,7 @@ namespace Graduation_Project.Dtos
 
     public class RecentApplicationDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string CompanyName { get; set; }
         public string CompanyLogoUrl { get; set; }
         public string JobTitle { get; set; }

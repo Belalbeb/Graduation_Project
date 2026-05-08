@@ -1,8 +1,8 @@
-﻿namespace Graduation_Project.Models
+namespace Graduation_Project.Models
 {
     public class Project
     {
-        public int ProjectID { get; set; }
+        public Guid ProjectID { get; set; } = Guid.NewGuid();
 
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -14,7 +14,7 @@
         public DateTime? UpdatedAt { get; set; }
 
         // Foreign Key
-        public int ApplicantID { get; set; }
+        public Guid ApplicantID { get; set; }
         public Applicant Applicant { get; set; } = null!;
     }
 }

@@ -2,7 +2,7 @@
 {
     public class PublicProfileDto
     {
-        public int ApplicantID { get; set; }
+        public Guid ApplicantID { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;

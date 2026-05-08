@@ -13,7 +13,7 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
-        public async Task<SettingsProfileDto?> GetProfileDetailsAsync(int applicantId)
+        public async Task<SettingsProfileDto?> GetProfileDetailsAsync(Guid applicantId)
         {
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
             if (applicant == null) return null;
@@ -31,7 +31,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<SettingsContactDto> GetContactDetailsAsync(int applicantId)
+        public async Task<SettingsContactDto> GetContactDetailsAsync(Guid applicantId)
         {
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
 
@@ -47,7 +47,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<bool> UpdateProfileAsync(int applicantId, UpdateProfileDto dto)
+        public async Task<bool> UpdateProfileAsync(Guid applicantId, UpdateProfileDto dto)
         {
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
             if (applicant == null) return false;
@@ -101,7 +101,7 @@ namespace Graduation_Project.Services
             return false;
         }
 
-        public async Task<bool> UpdateContactAsync(int applicantId, UpdateContactDto dto)
+        public async Task<bool> UpdateContactAsync(Guid applicantId, UpdateContactDto dto)
         {
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
             if (applicant == null) return false;
@@ -118,7 +118,7 @@ namespace Graduation_Project.Services
             return true;
         }
 
-        private async Task UpdateActiveResumeAsync(int applicantId, string resumeUrl)
+        private async Task UpdateActiveResumeAsync(Guid applicantId, string resumeUrl)
         {
             await _repository.DeactivateAllResumesAsync(applicantId);
 

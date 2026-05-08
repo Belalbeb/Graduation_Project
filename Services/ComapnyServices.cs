@@ -18,12 +18,12 @@ namespace Graduation_Project.Services
             return await _repository.AddAsync(company);
         }
 
-        public async Task<bool> DeleteCompanyAsync(int id)
+        public async Task<bool> DeleteCompanyAsync(Guid id)
         {
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<Company?> GetCompanyByIdAsync(int id)
+        public async Task<Company?> GetCompanyByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
@@ -33,7 +33,7 @@ namespace Graduation_Project.Services
             return await _repository.GetByUserIdAsync(userId);
         }
 
-        public async Task<CompanyResponseDto?> GetCompanyDashboardAsync(int companyId)
+        public async Task<CompanyResponseDto?> GetCompanyDashboardAsync(Guid companyId)
         {
             var company = await _repository.GetWithJobPostingsAndApplicationsAsync(companyId);
             if (company == null) return null;
@@ -110,7 +110,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<bool> UpdateCompanyAsync(int id, Company updatedCompany)
+        public async Task<bool> UpdateCompanyAsync(Guid id, Company updatedCompany)
         {
             var company = await _repository.GetByIdAsync(id);
             if (company == null) return false;

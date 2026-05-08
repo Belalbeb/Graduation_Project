@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 
 namespace Graduation_Project.Models
 {
-    public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> contextOptions):base(contextOptions)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> contextOptions) : base(contextOptions)
         {
-            
         }
+
         public DbSet<Applicant> Applicants { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<JobPosting> JobPostings { get; set; }
@@ -22,16 +22,11 @@ namespace Graduation_Project.Models
         public DbSet<Interview> Interviews { get; set; }
         public DbSet<SavedJobs> SavedJobs { get; set; }
         public DbSet<ProfileView> ProfileViews { get; set; }
-        public DbSet<Project> Projects { get ; set ;}
+        public DbSet<Project> Projects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-       //     builder.Entity<Applicant>()
-       //.HasOne(a => a.User)
-       //.WithOne(u => u.Applicant)
-       //.HasForeignKey<Applicant>(a => a.UserId)
-       //.OnDelete(DeleteBehavior.NoAction);
 
             // Company ↔ User (One-to-One)
             builder.Entity<Company>()
@@ -97,17 +92,12 @@ namespace Graduation_Project.Models
                 .HasForeignKey(p => p.ApplicantID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //builder.Entity<Resume>()
-            //    .HasIndex(r => new { r.ApplicantID,r.IsActive })
-            //    .HasFilter("[IsActive] = 1")
-            //    .IsUnique();
-
             // Applicant ↔ Experience (One-To-Many)
             builder.Entity<Applicant>()
                 .HasMany(a => a.Experiences)
                 .WithOne(ex => ex.Applicant)
                 .HasForeignKey(ex => ex.ApplicantID)
-                .OnDelete(DeleteBehavior.Cascade) ;
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

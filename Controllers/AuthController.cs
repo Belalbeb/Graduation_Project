@@ -36,7 +36,7 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> Register([FromBody] ApplicantRegisterDto model)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
             var user = new ApplicationUser()
             {
                 UserName=model.Email,
@@ -49,7 +49,7 @@ namespace Graduation_Project.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-           await userManager.AddToRoleAsync(user, Roles.Applicant);
+            await userManager.AddToRoleAsync(user, Roles.Applicant);
 
             Applicant applicant = new Applicant()
             {
@@ -68,7 +68,7 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> Register(CompanyDto companyDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
             var user = new ApplicationUser()
             {
                 UserName = companyDto.Email,
@@ -89,8 +89,7 @@ namespace Graduation_Project.Controllers
                 WebsiteURL = companyDto.WebsiteURL,
                 Industry = companyDto.Industry,
                 HeadquarterAddress = companyDto.HeadquarterAddress,
-                Location=companyDto.Location,
-                LogoUrl=companyDto.Logo
+            
 
             };
             await CompanyServices.AddCompanyAsync(company);
@@ -102,10 +101,10 @@ namespace Graduation_Project.Controllers
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid username or password");
+                return BadRequest(new {error="Invalid username or password" });
            var user = (userManager.FindByEmailAsync(loginDto.Email)).Result;
             if (user == null)
-                return NotFound("user Not found");
+                return NotFound(new {error= "Invalid username or password" });
          bool VerfiyPass=   await userManager.CheckPasswordAsync(user, loginDto.password);
             if (VerfiyPass)
             {

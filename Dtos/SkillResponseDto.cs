@@ -2,8 +2,8 @@
 {
     public class SkillResponseDto
     {
-        public int ApplicantSkillID { get; set; }
-        public int SkillID { get; set; }
+        public Guid ApplicantSkillID { get; set; }
+        public Guid SkillID { get; set; }
         public string SkillName { get; set; } = string.Empty;
     }
 }

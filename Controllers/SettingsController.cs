@@ -26,7 +26,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var profile = await _settingsService.GetProfileDetailsAsync(applicantId);
@@ -45,7 +45,7 @@ namespace Graduation_Project.Controllers
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var success = await _settingsService.UpdateProfileAsync(applicantId, dto);
@@ -63,7 +63,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var contact = await _settingsService.GetContactDetailsAsync(applicantId);
@@ -78,7 +78,7 @@ namespace Graduation_Project.Controllers
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var success = await _settingsService.UpdateContactAsync(applicantId, dto);

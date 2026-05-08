@@ -24,7 +24,7 @@ namespace Graduation_Project.Controllers
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var skills = await _skillService.GetAllSkillsAsync(applicantId) ;
@@ -32,11 +32,11 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpGet("{skillId}")]
-        public async Task<IActionResult> GetSkillById(int skillId)
+        public async Task<IActionResult> GetSkillById(Guid skillId)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var skill = await _skillService.GetSkillByIdAsync(skillId, applicantId) ;
@@ -55,7 +55,7 @@ namespace Graduation_Project.Controllers
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _skillService.AddSkillAsync(applicantId, dto) ;
@@ -68,11 +68,11 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpDelete("{applicantSkillId}")]
-        public async Task<IActionResult> DeleteSkill(int applicantSkillId)
+        public async Task<IActionResult> DeleteSkill(Guid applicantSkillId)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var success = await _skillService.DeleteSkillAsync(applicantSkillId, applicantId) ;
