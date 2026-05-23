@@ -1,4 +1,5 @@
 
+using Graduation_Project.Middlewares;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 using Graduation_Project.Seeds;
@@ -8,9 +9,11 @@ using Graduation_Project.Seeds;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Stripe;
 using System;
 using System.Text;
 
@@ -31,6 +34,24 @@ namespace Graduation_Project
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                   .AddEntityFrameworkStores<ApplicationDbContext>()
                   .AddDefaultTokenProviders();
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    return new BadRequestObjectResult(new
+                    {
+                        errors,
+                        status = 400
+                    });
+                };
+            });
             builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
             builder.Services.AddScoped<IApplicantSkillRepository, ApplicantSkillRepository>();
             builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
@@ -42,6 +63,16 @@ namespace Graduation_Project
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
             builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
+            builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+            builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+            builder.Services.AddScoped<ISubscriptionService, Services.SubscriptionService>();
+
+            builder.Services.AddScoped<Icouponrepository, CouponRepository>();
+            builder.Services.AddScoped<ICouponService, Services.CouponService>();
 
             builder.Services.AddScoped<IApplicantServices, ApplicantServices>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
@@ -71,7 +102,17 @@ namespace Graduation_Project
                 };
             });
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    policy =>
+                    {
+                        policy
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -82,16 +123,18 @@ namespace Graduation_Project
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("AllowFrontend");
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseAuthentication();
 
             app.UseAuthorization();
             app.MapScalarApiReference();
 
             app.MapControllers();
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    await SeederRunner.Run(scope.ServiceProvider);
-            //}
+            using (var scope = app.Services.CreateScope())
+            {
+                await SeederRunner.Run(scope.ServiceProvider);
+            }
 
             app.Run();
         }

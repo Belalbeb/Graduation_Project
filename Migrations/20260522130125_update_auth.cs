@@ -5,13 +5,13 @@
 namespace Graduation_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class not_null : Migration
+    public partial class update_auth : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "LogoUrl",
+                name: "WebsiteURL",
                 table: "Companies",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -22,6 +22,24 @@ namespace Graduation_Project.Migrations
                 name: "Location",
                 table: "Companies",
                 type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HeadquarterAddress",
+                table: "Companies",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "PhoneNumber",
+                table: "Applicants",
+                type: "nvarchar(max)",
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -31,7 +49,7 @@ namespace Graduation_Project.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "LogoUrl",
+                name: "WebsiteURL",
                 table: "Companies",
                 type: "nvarchar(max)",
                 nullable: false,
@@ -43,6 +61,24 @@ namespace Graduation_Project.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "Location",
                 table: "Companies",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HeadquarterAddress",
+                table: "Companies",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "PhoneNumber",
+                table: "Applicants",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "",

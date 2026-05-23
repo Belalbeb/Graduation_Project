@@ -8,9 +8,12 @@ namespace Graduation_Project.Services
     {
         private readonly IJobPostingRepository _repository;
 
-        public JobPostingService(IJobPostingRepository repository)
+        public IInterviewRepository InterviewRepository { get; }
+
+        public JobPostingService(IJobPostingRepository repository,IInterviewRepository interviewRepository)
         {
             _repository = repository;
+            InterviewRepository = interviewRepository;
         }
 
         public async Task<IEnumerable<JobPosting>> GetAllJobsAsync()
@@ -101,6 +104,60 @@ namespace Graduation_Project.Services
             };
 
             return await _repository.AddAsync(jobPosting);
+        }
+        public async Task<JobInformationResponseDto> JobDetails(Guid jobId)
+        {
+            var job = await _repository.GetByIdAsync(jobId);
+
+            if (job == null)
+                return null;
+
+            var interviews = await InterviewRepository.GetByjobPostingId(jobId);
+
+            return new JobInformationResponseDto
+            {
+                Title = job.Title,
+                IsActive = job.IsActive,
+                Category = job.JobCategory,
+                PostedDate = job.PostedDate,
+
+                ApplicantsCount = job.Applications.Count,
+                InterviewCount = job.Interviews.Count,
+
+                Description = job.Description,
+                Responsibility = job.Responsibility,
+
+                RequiredSkill = job.Skills
+                    .Select(s => s.Name)
+                    .ToList(),
+
+                Location = job.Location,
+
+                MinSalary = job.MinSalary,
+                MaxSalary = job.MaxSalary,
+
+                ApplicantDetails = job.Applications
+                    .Select(x => new ApplicantDetail
+                    {
+                        ApplicantId=x.ApplicationID,
+                        ApplicantName = $"{x.Applicant.FirstName} {x.Applicant.LastName}",
+                        Email = x.Applicant.Email,
+                        ImageUrl = x.Applicant.ProfilePicURL,
+                        AppliedDate = x.AppliedDate,
+                        Status = x.ApplicationStatus.ToString()
+                    }).ToList(),
+
+                ApplicantInterviews = interviews
+                    .Select(i => new InterviewDetailDto
+                    {
+                        InterviewId=i.InterviewId,
+                        ApplicantName = $"{i.Applicant.FirstName} {i.Applicant.LastName}",
+                        Email = i.Applicant.Email,
+                        ImageUrl = i.Applicant.ProfilePicURL,
+                        InterviewDate = i.ScheduledAt,
+                        InterviewStatus = i.Status.ToString()
+                    }).ToList()
+            };
         }
 
         public async Task<JobPosting> UpdateJobAsync(Guid id, JobPosting jobPosting)

@@ -46,7 +46,38 @@ namespace Graduation_Project.Services
             var interviews = await _repository.GetByApplicantAndStatusAsync(applicantId, InterviewStatus.Cancelled);
             return MapToDto(interviews);
         }
+        public async Task<InterviewCompanyResponseDto> InterviewCompanyDetails(Guid InterviewId)
+        {
+            var interview =await _repository.GetInterviewById(InterviewId);
 
+            InterviewCompanyResponseDto responseDto = new InterviewCompanyResponseDto()
+            {
+                InterviewId=interview.InterviewId,
+                ApplicantName = $"{interview.Applicant?.FirstName} {interview.Applicant?.LastName}",
+
+                ImageUrl = interview.Applicant?.ProfilePicURL,
+
+                Email = interview.Applicant?.Email,
+
+                PositionTitle = interview.JobPosting?.Title,
+
+                ResumePath = interview.Applicant?
+        .Resumes?
+        .FirstOrDefault(x => x.IsActive)?
+        .FilePath,
+
+                InterviewStatus = interview.Status.ToString(),
+
+                InterviewDate = interview.ScheduledAt,
+
+                InterviewerName = interview.InterviewerName,
+
+                InterviewerPosition = interview.InterviewerPosition,
+
+                InterviewLink = interview.MeetingLink
+            };
+            return responseDto;
+        }
         public async Task<List<InterviewResponseDto>> GetAllAsync(Guid applicantId)
         {
             var interviews = await _repository.GetAllByApplicantAsync(applicantId);
@@ -69,5 +100,14 @@ namespace Graduation_Project.Services
                 Notes           = i.Notes
             }).ToList();
         }
+        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate)
+        {
+           return await _repository.ChangeInterviewDate(InterviewId, InterviewDate);
+                
+                
+
+
+        }
+
     }
 }

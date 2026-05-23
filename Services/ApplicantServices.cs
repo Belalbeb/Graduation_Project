@@ -45,7 +45,10 @@ namespace Graduation_Project.Services
 
         public async Task<Applicant> GetApplicantByIdAsync(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+
+            var Applicant= await _repository.GetByIdAsync(id);
+            return Applicant;
+         
         }
 
         public async Task<List<Applicant>> GetAllApplicantAsync()

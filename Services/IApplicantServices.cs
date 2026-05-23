@@ -7,7 +7,7 @@ namespace Graduation_Project.Services
     {
         Task<Applicant> CreateApplicantAsync(Applicant applicant);
         Task<List<Applicant>> GetAllApplicantAsync();
-        Task<Applicant> GetApplicantByIdAsync(Guid id);
+        public Task<Applicant> GetApplicantByIdAsync(Guid id);
         Task<bool> UpdateApplicantAsync(Guid id, ApplicantDto applicant);
         Task<bool> DeleteApplicantAsync(Guid id);
         Task<ApplicantDashboardResponseDto> GetDashboardAsync(Guid applicantId);

@@ -17,9 +17,9 @@ namespace Graduation_Project.Controllers
         {
             this.applicantServices = applicantServices;
         }
-        [HttpGet("GetMyDashboard")]
+        [HttpGet("get-my-dashboard")]
         [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> GetApplicantByUserId()
+        public async Task<IActionResult> GetApplicantDashboard()
         {
             //var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
@@ -33,6 +33,7 @@ namespace Graduation_Project.Controllers
                 return BadRequest();
             return Ok(applicantDashboard);
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateApplicant([FromRoute]Guid id, [FromBody] ApplicantDto applicantDto)
         {

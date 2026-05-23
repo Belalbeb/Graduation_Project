@@ -1,3 +1,4 @@
+using Graduation_Project.Dtos;
 using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,18 @@ namespace Graduation_Project.Repositories
 
         public async Task<IEnumerable<JobPosting>> GetAllAsync()
         {
-            return await _context.JobPostings.Include(x => x.Company).ToListAsync();
+            return await _context.JobPostings.Include(x => x.Company).Include(x=>x.Applications).Take(7).ToListAsync();
+        }
+        public async Task<int> TotalJobs()
+        {
+            var jobs= await _context.JobPostings.ToListAsync();
+
+            return jobs.Count();
+        }
+        public async Task<int> GetRejectedJobsCount()
+        {
+            var RejectedJobs= await _context.JobPostings.Where(x => x.Status == JobStatus.Rejected).ToListAsync();
+            return RejectedJobs.Count();
         }
 
         public async Task<JobPosting?> GetByIdAsync(Guid id)
@@ -22,9 +34,26 @@ namespace Graduation_Project.Repositories
             return await _context.JobPostings
                 .Include(j => j.Company)
                 .Include(j => j.Applications)
+                  .ThenInclude(j=>j.Applicant)
+                    .ThenInclude(j=>j.Resumes)
                 .FirstOrDefaultAsync(j => j.JobID == id);
         }
-
+        public async Task<bool> AcceptJobAsync(Guid jobId)
+        {
+            var job = await _context.JobPostings.FirstOrDefaultAsync(x => x.JobID == jobId);
+            if (job == null) return false;
+            job.Status = JobStatus.Approved;
+           await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> RejectJobAsync(Guid jobId)
+        {
+            var job = await _context.JobPostings.FirstOrDefaultAsync(x => x.JobID == jobId);
+            if (job == null) return false;
+            job.Status = JobStatus.Rejected;
+            await _context.SaveChangesAsync();
+            return true;
+        }
         public async Task<IEnumerable<JobPosting>> GetByCompanyAsync(Guid companyId)
         {
             return await _context.JobPostings
@@ -76,6 +105,38 @@ namespace Graduation_Project.Repositories
             job.IsActive = false;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<int> GetActiveJobsCountAsync()
+        {
+            return await _context.JobPostings.Where(x => x.IsActive).CountAsync();
+        }
+
+        public async Task<int> GetPendingJobsCountAsync()
+        {
+            return await _context.JobPostings.Where(x => x.Status==JobStatus.Pending).CountAsync();
+        }
+
+        public async Task<List<JobPosting>> GetLatestJobsAsync(int limit)
+        {
+            return await _context.JobPostings.Include(x=>x.Applications).Take(limit).ToListAsync();
+        }
+
+        public async Task<List<JobPosting>> GetPendingApprovalsAsync()
+        {
+            return await _context.JobPostings.Where(x => x.Status == JobStatus.Pending).Include(x=>x.Company).ToListAsync();
+        }
+        public Task<List<MonthlyStats>> GetMonthlyStatsAsync()
+        {
+            return _context.JobPostings
+                .GroupBy(x => new { x.PostedDate.Year, x.PostedDate.Month })
+                .Select(x => new MonthlyStats
+                {
+                    month = x.Key.Month,
+                    JobCount = x.Count(),
+                    ApplicationCount = x.Sum(j => j.Applications.Count)
+                })
+                .ToListAsync();
         }
     }
 }

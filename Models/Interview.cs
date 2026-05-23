@@ -15,6 +15,7 @@ namespace Graduation_Project.Models
         public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming;
 
         public string? InterviewerName { get; set; }
+        public string? InterviewerPosition { get; set; }
         public string? MeetingLink { get; set; }
         public string? Notes { get; set; }
     }

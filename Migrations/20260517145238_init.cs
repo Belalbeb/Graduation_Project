@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Graduation_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,27 @@ namespace Graduation_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Coupons",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Percentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalUsageLimit = table.Column<int>(type: "int", nullable: false),
+                    UsedCount = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    ApplicablePlans = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coupons", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Skills",
                 columns: table => new
                 {
@@ -62,6 +83,28 @@ namespace Graduation_Project.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Skills", x => x.SkillID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "subscriptionPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MonthlyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    YearlyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxJobPostsPerMonth = table.Column<int>(type: "int", nullable: false),
+                    FeaturedJobPostsPerMonth = table.Column<int>(type: "int", nullable: false),
+                    HasAiToolsAccess = table.Column<bool>(type: "bit", nullable: false),
+                    HasCandidateSearch = table.Column<bool>(type: "bit", nullable: false),
+                    HasPrioritySupport = table.Column<bool>(type: "bit", nullable: false),
+                    IsPublished = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_subscriptionPlans", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -210,8 +253,10 @@ namespace Graduation_Project.Migrations
                     Industry = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WebsiteURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HeadquarterAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MinEmployees = table.Column<int>(type: "int", nullable: false),
+                    MaxEmployees = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -339,6 +384,37 @@ namespace Graduation_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "companySubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SubscriptionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BillingCycle = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_companySubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_companySubscriptions_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "CompanyID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_companySubscriptions_subscriptionPlans_SubscriptionPlanId",
+                        column: x => x.SubscriptionPlanId,
+                        principalTable: "subscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JobPostings",
                 columns: table => new
                 {
@@ -352,10 +428,12 @@ namespace Graduation_Project.Migrations
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsFeatured = table.Column<bool>(type: "bit", nullable: false),
                     JobTypes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WorkApproaches = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsRemote = table.Column<bool>(type: "bit", nullable: false),
-                    CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -409,6 +487,7 @@ namespace Graduation_Project.Migrations
                     ScheduledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     InterviewerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InterviewerPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -570,6 +649,16 @@ namespace Graduation_Project.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_companySubscriptions_CompanyId",
+                table: "companySubscriptions",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_companySubscriptions_SubscriptionPlanId",
+                table: "companySubscriptions",
+                column: "SubscriptionPlanId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Experiences_ApplicantID",
                 table: "Experiences",
                 column: "ApplicantID");
@@ -651,6 +740,12 @@ namespace Graduation_Project.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "companySubscriptions");
+
+            migrationBuilder.DropTable(
+                name: "Coupons");
+
+            migrationBuilder.DropTable(
                 name: "Experiences");
 
             migrationBuilder.DropTable(
@@ -679,6 +774,9 @@ namespace Graduation_Project.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "subscriptionPlans");
 
             migrationBuilder.DropTable(
                 name: "JobPostings");

@@ -56,5 +56,10 @@ namespace Graduation_Project.Repositories
             _context.Companies.Remove(company);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<int> GetCompaniesCount()
+        {
+            return await _context.Companies.CountAsync();
+        }
     }
 }
