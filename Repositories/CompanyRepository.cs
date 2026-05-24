@@ -56,5 +56,17 @@ namespace Graduation_Project.Repositories
             _context.Companies.Remove(company);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Company?> GetCompanyForSettingsAsync(Guid companyId)
+        {
+            return await _context.Companies
+            .FirstOrDefaultAsync(c => c.CompanyID == companyId);
+        }
+
+        public async Task<bool> UpdateCompanyProfileAsync(Company company)
+        {
+            _context.Companies.Update(company);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

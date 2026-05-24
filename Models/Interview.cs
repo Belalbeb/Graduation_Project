@@ -16,13 +16,19 @@ namespace Graduation_Project.Models
 
         public string? InterviewerName { get; set; }
         public string? MeetingLink { get; set; }
+
+        public string? InterviewType { get ; set ;}
         public string? Notes { get; set; }
+
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 
     public enum InterviewStatus
     {
         Upcoming,
         Completed,
-        Cancelled
+        Cancelled,
+        Pending
     }
 }
