@@ -1,4 +1,5 @@
-﻿using Graduation_Project.Models;
+﻿using Graduation_Project.Dtos;
+using Graduation_Project.Models;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -40,6 +41,27 @@ namespace Graduation_Project.Controllers
                 return NotFound(new {Message= "No applications found" });
 
             return Ok(result);
+        }
+        [HttpGet("{ApplicationId}")]
+        public async Task<IActionResult> GetApplicantByApplicationID([FromRoute]Guid ApplicationId)
+        {
+            var result = await applicationServivces.GetApplicantByApplication(ApplicationId);
+            if (result == null) return NotFound(new { message = "no application found" });
+            return Ok(result);
+        }
+        [HttpPut("change-application-Status/{ApplicationId}")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> ChangeApplicationStatus(
+    Guid ApplicationId,
+    ChangeStatusDto dto)
+        {
+            var result = await applicationServivces
+                .ChangeApplicationStatus(ApplicationId, dto.Status);
+
+            if (!result)
+                return BadRequest();
+
+            return Ok();
         }
     }
 }

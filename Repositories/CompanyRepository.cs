@@ -51,7 +51,7 @@ namespace Graduation_Project.Repositories
         public async Task<bool> DeleteAsync(Guid id)
         {
             var company = await _context.Companies.FindAsync(id);
-            if (company == null) return false;
+            if(company == null) return false;
 
             _context.Companies.Remove(company);
             return await _context.SaveChangesAsync() > 0;
@@ -60,13 +60,18 @@ namespace Graduation_Project.Repositories
         public async Task<Company?> GetCompanyForSettingsAsync(Guid companyId)
         {
             return await _context.Companies
-            .FirstOrDefaultAsync(c => c.CompanyID == companyId);
+                .FirstOrDefaultAsync(c => c.CompanyID == companyId);
         }
 
         public async Task<bool> UpdateCompanyProfileAsync(Company company)
         {
             _context.Companies.Update(company);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<int> GetCompaniesCount()
+        {
+            return await _context.Companies.CountAsync();
         }
     }
 }

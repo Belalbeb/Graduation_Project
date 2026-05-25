@@ -31,5 +31,17 @@ namespace Graduation_Project.Repositories
                 })
                 .ToListAsync();
         }
+        public async Task<Application> GetApplicationByIdAsync(Guid ApplicationId)
+        {
+            return await _context.Applications.Include(x=>x.Applicant).Include(x=>x.Resume).FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
+
+        }
+        public async Task<bool> ChangeApplicationStatus(Guid ApplicationId, ApplicationStatus status)
+        {
+            var Application =await _context.Applications.FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
+            if (Application == null) return false;
+            Application.ApplicationStatus = status;
+            return true;
+        }
     }
 }

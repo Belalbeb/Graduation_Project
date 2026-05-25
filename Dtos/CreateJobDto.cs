@@ -5,7 +5,7 @@ namespace Graduation_Project.Dtos
     public class CreateJobDto
     {
         public JobBasicDataDto JobBasicData { get; set; }
-        public JobDetailsDto JobDetails { get; set; }
+        public JobDetailsResponseDto JobDetails { get; set; }
     }
 
     public class JobBasicDataDto
@@ -25,7 +25,7 @@ namespace Graduation_Project.Dtos
         public List<string> WorkApproach { get; set; }
     }
 
-    public class JobDetailsDto
+    public class JobDetailsResponseDto
     {
         [MinLength(20)]
         [Required]

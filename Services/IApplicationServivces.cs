@@ -6,5 +6,7 @@ namespace Graduation_Project.Services
     public interface IApplicationServivces
     {
         Task<List<ApplicationDto>> GetApplicationByApplicant(Guid id);
+        public Task<ApplicantCompanyDto> GetApplicantByApplication(Guid ApplicationId);
+        public Task<bool> ChangeApplicationStatus(Guid ApplicationId, ApplicationStatus status);
     }
 }

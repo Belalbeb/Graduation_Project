@@ -23,7 +23,9 @@ namespace Graduation_Project.Models
         public DateTime PostedDate { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
 
+        public bool IsFeatured { get; set; } = false;
         // Employment Type (Full-time, Part-time)
+       
         public List<JobType> JobTypes { get; set; } = new();
 
         // Work Approach (On-site, Remote, Hybrid)
@@ -41,6 +43,7 @@ namespace Graduation_Project.Models
         // Navigation
         public ICollection<Application> Applications { get; set; } = new List<Application>();
         public ICollection<Interview> Interviews { get; set; } = new List<Interview>();
+        public JobStatus Status { get; set; } = JobStatus.Pending;
         public JobMetric JobMetric { get; set; }
     }
 
@@ -55,6 +58,12 @@ namespace Graduation_Project.Models
         OnSite = 0,
         Hybrid = 1,
         Remote = 2
+    }
+    public enum JobStatus
+    {
+        Pending = 0,
+        Approved = 1,
+        Rejected = 2
     }
 
     public class JobSkill

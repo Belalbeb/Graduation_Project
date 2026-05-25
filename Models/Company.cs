@@ -3,6 +3,7 @@ namespace Graduation_Project.Models
     public class Company
     {
         public Guid CompanyID { get; set; } = Guid.NewGuid();
+<<<<<<< HEAD
 
         public string Name { get; set; } = string.Empty;
         public string Industry { get; set; } = string.Empty;
@@ -24,6 +25,16 @@ namespace Graduation_Project.Models
         public string? Facebook { get; set; }
         public string? Twitter { get; set; }
         public string? Linkedin { get ; set ;}
+=======
+        public string Name { get; set; }
+        public string Industry { get; set; }
+        public string ?WebsiteURL { get; set; }
+        public string ?HeadquarterAddress { get; set; }
+        public string Location { get; set; }
+        public string? LogoUrl { get; set; }
+        public int MinEmployees { get; set; }
+        public int MaxEmployees { get; set; }
+>>>>>>> master
 
         // FK to Identity User
         public string UserId { get; set; } = string.Empty;

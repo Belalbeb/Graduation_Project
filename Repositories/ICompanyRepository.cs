@@ -10,8 +10,12 @@ namespace Graduation_Project.Repositories
         Task<Company?> GetWithJobPostingsAndApplicationsAsync(Guid companyId);
         Task<bool> UpdateAsync(Company company);
         Task<bool> DeleteAsync(Guid id);
+<<<<<<< HEAD
 
         Task<Company?> GetCompanyForSettingsAsync(Guid companyId);
         Task<bool> UpdateCompanyProfileAsync(Company company);
+=======
+        Task<int> GetCompaniesCount();
+>>>>>>> master
     }
 }

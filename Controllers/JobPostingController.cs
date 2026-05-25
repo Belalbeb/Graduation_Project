@@ -75,9 +75,18 @@ namespace Graduation_Project.Controllers
             var newJob = await _service.CreateJobAsync(job, companyId);
             return Created();
         }
+        [HttpGet("job-details/{jobId}")]
+        public async Task<IActionResult> GetJobDetails(Guid jobId)
+        {
+            if (jobId == Guid.Empty) return BadRequest(new { message = "jobId is Required" });
+            var jobs =await _service.JobDetails(jobId);
+            if (jobs == null) return NotFound(new { message = "no job found for this company" });
+            return Ok(jobs);
 
+        }
 
         [HttpPut("{id}")]
+        [Authorize(Roles=Roles.Company)]
         public async Task<IActionResult> Update(Guid id, [FromBody] JobPosting job)
         {
             var updated = await _service.UpdateJobAsync(id, job);

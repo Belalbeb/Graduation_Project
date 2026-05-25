@@ -1,15 +1,13 @@
 ﻿using Graduation_Project.Dtos;
 using Graduation_Project.Models;
 using Graduation_Project.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Graduation_Project.Controllers
 {
@@ -24,7 +22,12 @@ namespace Graduation_Project.Controllers
         public IApplicantServices ApplicantServices { get; }
         public ICompanyServices CompanyServices { get; }
 
-        public AuthController(UserManager<ApplicationUser> userManager,IApplicantServices applicantServices,ICompanyServices companyServices,IConfiguration configuration,IProfileService profileService)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            IApplicantServices applicantServices,
+            ICompanyServices companyServices,
+            IConfiguration configuration,
+            IProfileService profileService)
         {
             this.userManager = userManager;
             ApplicantServices = applicantServices;
@@ -32,126 +35,231 @@ namespace Graduation_Project.Controllers
             this.configuration = configuration;
             this.profileService = profileService;
         }
+
+
+        [HttpGet("user-details")]
+        [Authorize]
+        public async Task<IActionResult> GetUserDetails()
+        {
+            var userId =(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user =await userManager.FindByIdAsync(userId);
+            var roles = await userManager.GetRolesAsync(user);
+            return Ok(new { userId = userId, email = user.Email, roles = roles });
+
+
+        }
         [HttpPost("register/applicant")]
-        public async Task<IActionResult> Register([FromBody] ApplicantRegisterDto model)
+        public async Task<IActionResult> Register(
+            [FromBody] ApplicantRegisterDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var user = new ApplicationUser()
             {
-                UserName=model.Email,
+                UserName = model.Email,
                 Email = model.Email,
-                CreatedAt=DateTime.Now
-
+                CreatedAt = DateTime.Now
             };
-         var result=await userManager.CreateAsync(user, model.Password);
 
+            var result = await userManager.CreateAsync(
+                user,
+                model.Password);
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            {
+                var errors = result.Errors.Select(e =>
+                {
+                    return e.Code switch
+                    {
+                        "DuplicateUserName" => "Email already exists",
+                        "PasswordTooShort" => "Password is too weak",
+                        _ => e.Description
+                    };
+                }).ToList();
+
+                return BadRequest(new
+                {
+                    errors,
+                    status = 400
+                });
+            }
 
             await userManager.AddToRoleAsync(user, Roles.Applicant);
 
             Applicant applicant = new Applicant()
             {
-                UserId=user.Id,
+                UserId = user.Id,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Location = model.Location,
-                PhoneNumber = model.PhoneNumber
             };
+
             await ApplicantServices.CreateApplicantAsync(applicant);
-            return Ok(new { message = "Applicant registered successfully" });
 
+            var token = await GenerateJwtToken(user);
 
+            return Ok(token);
         }
+
         [HttpPost("register/company")]
-        public async Task<IActionResult> Register(CompanyDto companyDto)
+        public async Task<IActionResult> Register(
+            [FromBody] CompanyDto companyDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var user = new ApplicationUser()
             {
                 UserName = companyDto.Email,
                 Email = companyDto.Email,
                 CreatedAt = DateTime.Now
-
             };
-          var result=  await userManager.CreateAsync(user,companyDto.Password);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
 
-   
-            await userManager.AddToRoleAsync(user, "Company");
+            var result = await userManager.CreateAsync(
+                user,
+                companyDto.Password);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e =>
+                {
+                    return e.Code switch
+                    {
+                        "DuplicateUserName" => "Email already exists",
+                        "PasswordTooShort" => "Password is too weak",
+                        _ => e.Description
+                    };
+                }).ToList();
+
+                return BadRequest(new
+                {
+                    errors,
+                    status = 400
+                });
+            }
+
+            await userManager.AddToRoleAsync(user, Roles.Company);
+
             Company company = new Company()
             {
-                UserId=user.Id,
+                UserId = user.Id,
                 Name = companyDto.Name,
-                WebsiteURL = companyDto.WebsiteURL,
                 Industry = companyDto.Industry,
-                HeadquarterAddress = companyDto.HeadquarterAddress,
-            
-
+                Location = companyDto.Location
             };
-            await CompanyServices.AddCompanyAsync(company);
-            return Ok(new {message="company register successfully"});
 
+            await CompanyServices.AddCompanyAsync(company);
+
+            var token = await GenerateJwtToken(user);
+
+            return Ok(token);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login(
+            [FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new {error="Invalid username or password" });
-           var user = (userManager.FindByEmailAsync(loginDto.Email)).Result;
+                return BadRequest(new
+                {
+                    error = "Invalid username or password"
+                });
+
+            var user = await userManager.FindByEmailAsync(
+                loginDto.Email);
+
             if (user == null)
-                return NotFound(new {error= "Invalid username or password" });
-         bool VerfiyPass=   await userManager.CheckPasswordAsync(user, loginDto.password);
-            if (VerfiyPass)
+                return Unauthorized(new
+                {
+                    error = "Invalid username or password"
+                });
+
+            bool verifyPass = await userManager.CheckPasswordAsync(
+                user,
+                loginDto.password);
+
+            if (!verifyPass)
             {
-                //generate token
-                var (profileId, profileType) = await profileService.GetProfileAsync(user);
-
-                List<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.Name, user.Email));
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                claims.Add(new Claim(ClaimTypes.Email, user.Email));
-                var roles = await userManager.GetRolesAsync(user);
-                foreach (var item in roles)
+                return Unauthorized(new
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, item));
-
-                }
-                if (profileId != null)
-                    claims.Add(new Claim(CustomClaims.ProfileId, profileId));
-
-                if (profileType != null)
-                    claims.Add(new Claim(CustomClaims.ProfileType, profileType));
-
-                claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
-                SigningCredentials signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha512);
-
-                JwtSecurityToken token = new JwtSecurityToken(
-                    issuer: configuration["Jwt:Issuer"],
-                    audience: configuration["Jwt:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(1),
-                    signingCredentials:signingCredentials
-
-                    );
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                    userId=user.Id
+                    error = "Invalid username or password"
                 });
             }
-            else
+
+            var token = await GenerateJwtToken(user);
+
+            return Ok(token);
+        }
+     
+
+        private async Task<object> GenerateJwtToken(
+            ApplicationUser user)
+        {
+            var (profileId, profileType) =
+                await profileService.GetProfileAsync(user);
+
+            List<Claim> claims = new List<Claim>()
             {
-                return Unauthorized("Incorrect Username or password");
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(
+                    JwtRegisteredClaimNames.Jti,
+                    Guid.NewGuid().ToString())
+            };
+
+            var roles = await userManager.GetRolesAsync(user);
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-        }
+            if (profileId != null)
+                claims.Add(new Claim(
+                    CustomClaims.ProfileId,
+                    profileId));
 
+            if (profileType != null)
+                claims.Add(new Claim(
+                    CustomClaims.ProfileType,
+                    profileType));
+
+            var key = configuration["Jwt:Key"];
+
+            if (string.IsNullOrEmpty(key))
+                throw new Exception("JWT Key is missing");
+
+            SymmetricSecurityKey symmetricSecurityKey =
+                new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(key));
+
+            SigningCredentials signingCredentials =
+                new SigningCredentials(
+                    symmetricSecurityKey,
+                    SecurityAlgorithms.HmacSha512);
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                issuer: configuration["Jwt:Issuer"],
+                audience: configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: signingCredentials
+            );
+
+            return new
+            {
+                token = new JwtSecurityTokenHandler()
+                    .WriteToken(token),
+
+                expiration = token.ValidTo,
+
+                userId = user.Id,
+
+                email = user.Email,
+
+                roles = roles
+            };
+        }
     }
 }

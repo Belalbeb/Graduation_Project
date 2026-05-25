@@ -16,44 +16,45 @@ namespace Graduation_Project.Seeds
             // 1. IDENTITY
             // =======================
             await RoleSeeder.SeedRoles(roleManager);
-            await UserSeeder.SeedUsers(userManager);
-            await UserRoleSeeder.Seed(userManager);
 
-            // =======================
-            // 2. CORE DATA
-            // =======================
-            await SkillSeeder.Seed(context);
+            //await UserSeeder.SeedUsers(userManager);
+            //await UserRoleSeeder.Seed(userManager);
 
-            // =======================
-            // 3. USERS PROFILES
-            // =======================
-            await CompanySeeder.Seed(context,userManager);
-            await ApplicantSeeder.Seed(context,userManager);
+            //// =======================
+            //// 2. CORE DATA
+            //// =======================
+            //await SkillSeeder.Seed(context);
 
-            // =======================
-            // 4. APPLICANT DETAILS
-            // =======================
-            await ExperienceSeeder.Seed(context);
-            await ProjectSeeder.Seed(context);
-            await ResumeSeeder.Seed(context);
+            //// =======================
+            //// 3. USERS PROFILES
+            //// =======================
+            //await CompanySeeder.Seed(context,userManager);
+            //await ApplicantSeeder.Seed(context,userManager);
 
-            // =======================
-            // 5. JOB SYSTEM
-            // =======================
-            await JobPostingSeeder.Seed(context);
-            await JobMetricSeeder.Seed(context);
+            //// =======================
+            //// 4. APPLICANT DETAILS
+            //// =======================
+            //await ExperienceSeeder.Seed(context);
+            //await ProjectSeeder.Seed(context);
+            //await ResumeSeeder.Seed(context);
 
-            // =======================
-            // 6. RELATIONS
-            // =======================
-            await ApplicantSkillSeeder.Seed(context);
-            await SavedJobsSeeder.Seed(context);
+            //// =======================
+            //// 5. JOB SYSTEM
+            //// =======================
+            //await JobPostingSeeder.Seed(context);
+            //await JobMetricSeeder.Seed(context);
 
-            // =======================
-            // 7. TRANSACTIONS
-            // =======================
-            await ApplicationSeeder.Seed(context);
-            await InterviewSeeder.Seed(context);
+            //// =======================
+            //// 6. RELATIONS
+            //// =======================
+            //await ApplicantSkillSeeder.Seed(context);
+            //await SavedJobsSeeder.Seed(context);
+
+            //// =======================
+            //// 7. TRANSACTIONS
+            //// =======================
+            //await ApplicationSeeder.Seed(context);
+            //await InterviewSeeder.Seed(context);
         }
     }
 }

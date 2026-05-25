@@ -23,6 +23,9 @@ namespace Graduation_Project.Models
         public DbSet<SavedJobs> SavedJobs { get; set; }
         public DbSet<ProfileView> ProfileViews { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<SubscriptionPlan> subscriptionPlans { get; set; }
+        public DbSet<CompanySubscription> companySubscriptions { get; set; }
+        public DbSet<Coupon> Coupons => Set<Coupon>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

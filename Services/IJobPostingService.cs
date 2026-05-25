@@ -12,5 +12,6 @@ namespace Graduation_Project.Services
         Task<JobPosting> UpdateJobAsync(Guid id, JobPosting jobPosting);
         Task<bool> DeleteJobAsync(Guid id);
         Task<bool> DeactivateJobAsync(Guid id);
+        public Task<JobInformationResponseDto> JobDetails(Guid jobId);
     }
 }
