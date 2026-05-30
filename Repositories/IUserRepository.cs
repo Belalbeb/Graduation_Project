@@ -3,5 +3,6 @@
     public interface IUserRepository
     {
         Task<int> GetUserCountAsync();
+        Task<int> GetTotalUsersCountAsync();
     }
 }

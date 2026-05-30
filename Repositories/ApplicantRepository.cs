@@ -156,5 +156,44 @@ namespace Graduation_Project.Repositories
                 .Select(r => r.FilePath)
                 .FirstOrDefaultAsync();
         }
+
+
+
+        public async Task<List<Applicant>> GetAllApplicantsWithDetailsAsync()
+        {
+            return await _context.Applicants
+                .Include(a => a.User)
+                .Include(a => a.ApplicantSkills)
+                    .ThenInclude(s => s.Skill)
+                .Include(a => a.Applications)
+                .Include(a => a.Projects)
+                .Include(a => a.Resumes)
+                .OrderByDescending(a => a.User.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Applicant?> GetApplicantWithAllDetailsAsync(Guid applicantId)
+        {
+            return await _context.Applicants
+                .Include(a => a.User)
+                .Include(a => a.ApplicantSkills)
+                    .ThenInclude(s => s.Skill)
+                .Include(a => a.Applications)
+                .Include(a => a.Projects)
+                .Include(a => a.Resumes)
+                .FirstOrDefaultAsync(a => a.ApplicantID == applicantId);
+        }
+
+        public async Task<int> CountBlockedApplicantsAsync()
+        {
+            return await _context.Applicants.CountAsync(a => a.IsBlocked == true);
+        }
+
+        public async Task<int> CountNewApplicantsThisMonthAsync()
+        {
+            var startOfMonth = new DateTime(DateTime.UtcNow.Year,DateTime.UtcNow.Month,1);
+            return await _context.Applicants
+                .CountAsync(a => a.User.CreatedAt >= startOfMonth);
+        }
     }
 }

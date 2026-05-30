@@ -1,4 +1,5 @@
 ﻿using Graduation_Project.Dtos;
+using Graduation_Project.Dtos.Company.Profile;
 using Graduation_Project.Models;
 
 namespace Graduation_Project.Services
@@ -12,5 +13,6 @@ namespace Graduation_Project.Services
         Task<bool> DeleteCompanyAsync(Guid id);
         public Task<CompanyResponseDto?> GetCompanyDashboardAsync(Guid CompanyId);
         public Task<Company?> GetCompanyByUserIdAsync(string userid);
+        Task<CompanyPublicProfileDto?> GetCompanyProfileAsync(Guid companyId);
     }
 }
