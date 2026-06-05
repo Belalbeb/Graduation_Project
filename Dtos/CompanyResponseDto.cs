@@ -2,6 +2,7 @@
 {
     public class CompanyResponseDto
     {
+        public string CompanyName { get; set; }
         public StatisticsDto Statistics { get; set; }
 
         // Bar Chart - Applications and Interviews per month
@@ -39,7 +40,10 @@
     public class ApplicantsDto
         {
             public Guid ApplicantId { get; set; }
+            public string ImageUrl { get; set; }
+
             public  string ApplicantName { get; set; }
+            public Guid JobId { get; set; }
             public string JobAppliedFor { get; set; }
             public DateTime AppliedAt { get; set; }
         }

@@ -1,4 +1,5 @@
 
+using Graduation_Project.Configurations;
 using Graduation_Project.Middlewares;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
@@ -52,6 +53,11 @@ namespace Graduation_Project
                     });
                 };
             });
+            builder.Services.Configure<CloudinarySettings>(
+                 builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.AddScoped<CloudinaryService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddMemoryCache();
             builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
             builder.Services.AddScoped<IApplicantSkillRepository, ApplicantSkillRepository>();
             builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
@@ -70,6 +76,7 @@ namespace Graduation_Project
             builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, Services.SubscriptionService>();
+            builder.Services.AddScoped<IResumeServices, ResumeService>();
 
             builder.Services.AddScoped<Icouponrepository, CouponRepository>();
             builder.Services.AddScoped<ICouponService, Services.CouponService>();
@@ -131,10 +138,10 @@ namespace Graduation_Project
             app.MapScalarApiReference();
 
             app.MapControllers();
-            using (var scope = app.Services.CreateScope())
-            {
-                await SeederRunner.Run(scope.ServiceProvider);
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    await SeederRunner.Run(scope.ServiceProvider);
+            //}
 
             app.Run();
         }

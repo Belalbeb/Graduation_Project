@@ -11,5 +11,8 @@ namespace Graduation_Project.Services
         // Contact Tab
         Task<SettingsContactDto> GetContactDetailsAsync(Guid applicantId) ;
         Task<bool> UpdateContactAsync(Guid applicantId,UpdateContactDto dto) ;
+        public Task<bool> UpdateResume(Guid applicantId, IFormFile resume,string resumeName);
+        public  Task<bool> updatePhoto(Guid applicantId, IFormFile photo);
+        public Task<bool> UpdateCoverPhoto(Guid applicantId, IFormFile coverPhoto);
     }
 }

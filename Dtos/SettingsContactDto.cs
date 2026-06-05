@@ -9,5 +9,9 @@
         public string Github { get ; set ;}
         public string Facebook { get ; set ;}
         public string Portfolio { get ; set ;}
+        public string Behance { get; set; }
+        public string Dribble { get; set; }
+
+
     }
 }

@@ -31,7 +31,16 @@ namespace Graduation_Project.Migrations
                     b.Property<string>("AboutMe")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Behance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CoverPhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dribble")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -122,7 +131,6 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CoverLetter")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("JobPostingID")
@@ -389,7 +397,14 @@ namespace Graduation_Project.Migrations
                     b.Property<Guid>("ApplicantId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("InterviewDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("InterviewerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InterviewerPosition")
@@ -399,15 +414,19 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MeetingLink")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("interviewType")
                         .HasColumnType("int");
 
                     b.HasKey("InterviewId");

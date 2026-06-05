@@ -11,6 +11,6 @@ namespace Graduation_Project.Repositories
         Task<List<Interview>> GetAllByApplicantAsync(Guid applicantId);
         public Task<List<Interview>> GetByjobPostingId(Guid jobId);
         public Task<Interview> GetInterviewById(Guid InterviewId);
-        public Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate);
+        public Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate);
     }
 }

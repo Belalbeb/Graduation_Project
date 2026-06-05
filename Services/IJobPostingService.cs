@@ -5,7 +5,7 @@ namespace Graduation_Project.Services
 {
     public interface IJobPostingService
     {
-        Task<IEnumerable<JobPosting>> GetAllJobsAsync();
+        Task<IEnumerable<JobCardDto>> GetAllJobsAsync(Guid currentUserId);
         Task<JobPosting> GetJobByIdAsync(Guid id);
         Task <JobPostingDto> GetJobsByCompanyAsync(Guid companyId);
         Task<JobPosting> CreateJobAsync(CreateJobDto dto,Guid companyId);

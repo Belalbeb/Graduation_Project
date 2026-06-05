@@ -7,5 +7,6 @@ namespace Graduation_Project.Services
         Task<Resume> UploadNewResumeAsync(Guid applicantId, string fileName, string filePath) ;
         Task<string?> GetActiveResumeAsync(Guid applicantId) ;
         Task<string?> GetActiveResumePathByUserIdAsync(string userId) ;
+        public Task<bool> DeleteCV(Guid ResumeId);
     }
 }

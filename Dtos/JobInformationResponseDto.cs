@@ -33,7 +33,7 @@
         public string ApplicantName { get; set; }
         public string Email { get; set; }
         public string ImageUrl { get; set; }
-        public DateTime InterviewDate { get; set; }
+        public DateOnly InterviewDate { get; set; }
         public string InterviewStatus { get; set; }
 
     }

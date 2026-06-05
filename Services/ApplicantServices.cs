@@ -60,7 +60,8 @@ namespace Graduation_Project.Services
         {
             var now = DateTime.UtcNow;
             var startOfYear = new DateTime(now.Year, 1, 1);
-
+            var applicant          = await _repository.GetByIdAsync(applicantId);
+            if (applicant == null) return null;
             var appliedCount       = await _repository.CountApplicationsAsync(applicantId);
             var savedCount         = await _repository.CountSavedJobsAsync(applicantId);
             var upcomingInterviews = await _repository.CountUpcomingInterviewsAsync(applicantId);
@@ -80,8 +81,11 @@ namespace Graduation_Project.Services
 
             return new ApplicantDashboardResponseDto
             {
+                FirstName=applicant?.FirstName,
+                LastName=applicant?.LastName,
                 Statistics = new StatisticsDto
                 {
+                   
                     AppliedJobsCount       = appliedCount,
                     SavedJobsCount         = savedCount,
                     UpcomingInterviewsCount = upcomingInterviews,
@@ -112,9 +116,6 @@ namespace Graduation_Project.Services
             if (applicant == null) return null;
 
             var savedJobs = await _repository.GetSavedJobsAsync(id);
-
-            foreach (var job in savedJobs)
-                job.TimeAgo = GetTimeAgo(job.SavedAt);
 
             return savedJobs;
         }

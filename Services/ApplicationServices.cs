@@ -41,5 +41,16 @@ namespace Graduation_Project.Services
             return true;
 
         }
+        public async Task<Application> CreateApplication(Guid ApplicantId, CreateApplicationDto createApplicationDto)
+        {
+            Application application = new Application()
+            {
+                ApplicantID = ApplicantId,
+                ResumeID = createApplicationDto.ResumeID,
+                JobPostingID = createApplicationDto.JobPostingID
+            };
+            await _repository.AddApplication(application);
+            return application;
+        }
     }
 }

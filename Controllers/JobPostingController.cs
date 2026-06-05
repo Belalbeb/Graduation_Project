@@ -23,7 +23,10 @@ namespace Graduation_Project.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var jobs = await _service.GetAllJobsAsync();
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            Guid.TryParse(profileIdClaim, out Guid ApplicantId);
+               
+            var jobs = await _service.GetAllJobsAsync(ApplicantId);
             return Ok(jobs);
         }
 

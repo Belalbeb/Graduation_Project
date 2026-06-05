@@ -37,5 +37,9 @@ namespace Graduation_Project.Services
         {
             return await _repository.GetActivePathByUserIdAsync(userId);
         }
+        public async Task<bool> DeleteCV(Guid ResumeId)
+        {
+          return await _repository.DeleteCV(ResumeId);
+        }
     }
 }

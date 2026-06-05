@@ -11,6 +11,6 @@ namespace Graduation_Project.Services
         Task<List<InterviewResponseDto>> GetCancelledAsync(Guid applicantId);
         Task<List<InterviewResponseDto>> GetAllAsync(Guid applicantId);
         public Task<InterviewCompanyResponseDto> InterviewCompanyDetails(Guid InterviewId);
-        public  Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate);
+        public  Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate);
     }
 }

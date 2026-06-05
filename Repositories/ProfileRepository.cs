@@ -29,6 +29,7 @@ namespace Graduation_Project.Repositories
                 .Include(a => a.ApplicantSkills)
                     .ThenInclude(s => s.Skill)
                 .Include(a => a.Projects)
+                .Include(a=>a.Resumes)
                 .FirstOrDefaultAsync(a => a.ApplicantID == applicantId);
         }
     }

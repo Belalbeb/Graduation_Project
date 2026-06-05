@@ -8,7 +8,7 @@ namespace Graduation_Project.Models
         public string ?WebsiteURL { get; set; }
         public string ?HeadquarterAddress { get; set; }
         public string Location { get; set; }
-        public string? LogoUrl { get; set; }
+        public string LogoUrl { get; set; } = DefaultImage.CompanyImage;
         public int MinEmployees { get; set; }
         public int MaxEmployees { get; set; }
 

@@ -43,5 +43,12 @@ namespace Graduation_Project.Repositories
                 .Select(r => r.FilePath)
                 .FirstOrDefaultAsync();
         }
+        public async Task<bool> DeleteCV(Guid ResumeId)
+        {
+            var resume =await _context.Resumes.FirstOrDefaultAsync(x => x.ResumeID == ResumeId);
+            _context.Resumes.Remove(resume);
+          await  _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

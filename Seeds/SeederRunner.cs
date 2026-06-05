@@ -15,21 +15,21 @@ namespace Graduation_Project.Seeds
             // =======================
             // 1. IDENTITY
             // =======================
-            await RoleSeeder.SeedRoles(roleManager);
+            //await RoleSeeder.SeedRoles(roleManager);
 
             //await UserSeeder.SeedUsers(userManager);
             //await UserRoleSeeder.Seed(userManager);
 
-            //// =======================
-            //// 2. CORE DATA
-            //// =======================
+            // =======================
+            // 2. CORE DATA
+            // =======================
             //await SkillSeeder.Seed(context);
 
             //// =======================
             //// 3. USERS PROFILES
             //// =======================
-            //await CompanySeeder.Seed(context,userManager);
-            //await ApplicantSeeder.Seed(context,userManager);
+            //await CompanySeeder.Seed(context, userManager);
+            //await ApplicantSeeder.Seed(context, userManager);
 
             //// =======================
             //// 4. APPLICANT DETAILS
@@ -54,7 +54,7 @@ namespace Graduation_Project.Seeds
             //// 7. TRANSACTIONS
             //// =======================
             //await ApplicationSeeder.Seed(context);
-            //await InterviewSeeder.Seed(context);
+            await InterviewSeeder.Seed(context);
         }
     }
 }

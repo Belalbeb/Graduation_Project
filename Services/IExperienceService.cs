@@ -8,7 +8,7 @@ namespace Graduation_Project.Services
         Task<Experience?> GetExperienceByIdAsync(Guid experienceId) ;
         Task<List<ExperienceResponseDto>> GetAllAsync(Guid applicantId) ;
         Task<ExperienceResponseDto?> AddExperienceAsync(Experience experience) ;
-        Task<int> UpdateExperienceAsync(Guid experienceId, ExperienceDto experienceDto) ;
+        Task<int> UpdateExperienceAsync(Guid experienceId, UpdateExperienceDto experienceDto) ;
         Task<bool> DeleteExperienceAsync(Guid experienceId) ;
     }
 }

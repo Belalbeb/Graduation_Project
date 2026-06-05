@@ -68,7 +68,7 @@ namespace Graduation_Project.Services
 
                 InterviewStatus = interview.Status.ToString(),
 
-                InterviewDate = interview.ScheduledAt,
+                InterviewDate = interview.InterviewDate,
 
                 InterviewerName = interview.InterviewerName,
 
@@ -81,26 +81,37 @@ namespace Graduation_Project.Services
         public async Task<List<InterviewResponseDto>> GetAllAsync(Guid applicantId)
         {
             var interviews = await _repository.GetAllByApplicantAsync(applicantId);
-            return MapToDto(interviews);
+            var InterviewStatisticsDto = await GetStatisticsAsync(applicantId);
+          
+              var result=MapToDto(interviews);
+
+            return result;
+
         }
 
         private static List<InterviewResponseDto> MapToDto(List<Interview> interviews)
         {
-            return interviews.Select(i => new InterviewResponseDto
+            
+            return interviews.Select( i => new InterviewResponseDto
             {
                 InterviewId     = i.InterviewId,
-                JobPostingId    = i.JobPostingId,
+                
+                JobId=i.JobPostingId,
+
                 JobTitle        = i.JobPosting.Title,
                 CompanyName     = i.JobPosting.Company.Name,
                 CompanyLogoUrl  = i.JobPosting.Company.LogoUrl,
-                ScheduledAt     = i.ScheduledAt,
-                Status          = i.Status,
+                Date            =i.InterviewDate,
+                StartAt         =i.StartTime,
+                EndAt           =i.EndTime,
+                Status          = i.Status.ToString(),
+                interviewType   =i.interviewType.ToString(),
                 InterviewerName = i.InterviewerName,
                 MeetingLink     = i.MeetingLink,
                 Notes           = i.Notes
             }).ToList();
         }
-        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate)
+        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate)
         {
            return await _repository.ChangeInterviewDate(InterviewId, InterviewDate);
                 

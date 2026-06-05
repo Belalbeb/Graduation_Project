@@ -10,13 +10,21 @@ namespace Graduation_Project.Models
         public Guid JobPostingId { get; set; }
         public JobPosting JobPosting { get; set; }
 
-        public DateTime ScheduledAt { get; set; }
+        
+        public DateOnly InterviewDate { get; set; }
+
+     
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
         public InterviewStatus Status { get; set; } = InterviewStatus.Upcoming;
 
-        public string? InterviewerName { get; set; }
+        
+        public InterviewType interviewType { get; set; } = InterviewType.Technical;
+
+        public string InterviewerName { get; set; }
         public string? InterviewerPosition { get; set; }
-        public string? MeetingLink { get; set; }
+        public string MeetingLink { get; set; }
         public string? Notes { get; set; }
     }
 
@@ -25,5 +33,13 @@ namespace Graduation_Project.Models
         Upcoming,
         Completed,
         Cancelled
+    }
+
+    public enum InterviewType
+    {
+        Technical,
+        HR,
+        Behavioral,
+        Final
     }
 }

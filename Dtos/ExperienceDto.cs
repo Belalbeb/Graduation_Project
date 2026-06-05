@@ -8,7 +8,7 @@ namespace Graduation_Project.Dtos
         public string Location { get; set; }
         public string JobTitle { get; set; }
         public string Description { get; set; }
-        public JobType JobType { get; set; }
+        public string JobType { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }

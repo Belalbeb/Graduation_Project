@@ -79,9 +79,9 @@ namespace Graduation_Project.Controllers
 
             if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
-
+            var InterviewStatisticsDto = await _interviewService.GetStatisticsAsync(applicantId);
             var interviews = await _interviewService.GetAllAsync(applicantId);
-            return Ok(interviews);
+            return Ok(new {stats= InterviewStatisticsDto, interviews =interviews });
         }
         [HttpGet("{id}")]
         [Authorize(Roles =Roles.Company)]

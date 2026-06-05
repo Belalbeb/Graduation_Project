@@ -55,11 +55,15 @@ namespace Graduation_Project.Controllers
                 Location = experienceDto.Location,
                 JobTitle = experienceDto.JobTitle,
                 Description = experienceDto.Description,
-                JobType = experienceDto.JobType,
                 StartDate = experienceDto.StartDate,
                 EndDate = experienceDto.EndDate,
                 ApplicantID = applicantId
             } ;
+            if (!string.IsNullOrWhiteSpace(experienceDto.JobType) &&
+           Enum.TryParse<JobType>(experienceDto.JobType, true, out var jobType))
+            {
+                experience.JobType = jobType;
+            }
 
             var result = await _experienceService.AddExperienceAsync(experience) ;
             if (result == null)
@@ -71,14 +75,14 @@ namespace Graduation_Project.Controllers
 
         [HttpPut("{experienceId}")]
         [Authorize(Roles = Roles.Applicant)]
-        public async Task<IActionResult> EditExperience([FromRoute] Guid experienceId, [FromBody] ExperienceDto experienceDto)
+        public async Task<IActionResult> EditExperience([FromRoute] Guid experienceId, [FromBody] UpdateExperienceDto experienceDto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState) ;
 
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!int.TryParse(profileIdClaim,out int applicantId))
+            if(!Guid.TryParse(profileIdClaim,out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _experienceService.UpdateExperienceAsync(experienceId, experienceDto) ;
@@ -100,7 +104,7 @@ namespace Graduation_Project.Controllers
                 return Unauthorized("Invalid or missing ProfileId");
 
             var result = await _experienceService.DeleteExperienceAsync(experienceId) ;
-            return result ? NoContent() : NotFound() ;
+            return result ? Ok(new {message="Deleted success"}) : NotFound(new {mesage="Applicant not found"}) ;
         }
     }
 }

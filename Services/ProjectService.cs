@@ -7,10 +7,12 @@ namespace Graduation_Project.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _repository;
+        private readonly CloudinaryService cloudinaryService;
 
-        public ProjectService(IProjectRepository repository)
+        public ProjectService(IProjectRepository repository,CloudinaryService cloudinaryService)
         {
             _repository = repository;
+            this.cloudinaryService = cloudinaryService;
         }
 
         public async Task<List<ProjectResponseDto>> GetAllAsync(Guid applicantId)
@@ -25,7 +27,7 @@ namespace Graduation_Project.Services
             return project == null ? null : MapToDto(project);
         }
 
-        public async Task<ProjectResponseDto?> AddAsync(Guid applicantId, ProjectDto dto)
+        public async Task<ProjectResponseDto?> AddAsync(Guid applicantId, CreateProjectDto dto)
         {
             var project = new Project
             {
@@ -33,7 +35,7 @@ namespace Graduation_Project.Services
                 Description   = dto.Description,
                 ProjectUrl    = dto.ProjectUrl,
                 GithubRepoUrl = dto.GithubRepoUrl,
-                ImageUrl      = dto.ImageUrl,
+                ImageUrl      = await cloudinaryService.UploadImageAsync(dto.Image),
                 CreatedAt     = DateTime.UtcNow,
                 ApplicantID   = applicantId
             };
@@ -45,16 +47,35 @@ namespace Graduation_Project.Services
         public async Task<bool> UpdateAsync(Guid projectId, Guid applicantId, ProjectDto dto)
         {
             var project = await _repository.GetByIdAsync(projectId, applicantId);
-            if (project == null) return false;
 
-            project.Title         = dto.Title;
-            project.Description   = dto.Description;
-            project.ProjectUrl    = dto.ProjectUrl;
-            project.GithubRepoUrl = dto.GithubRepoUrl;
-            project.ImageUrl      = dto.ImageUrl;
-            project.UpdatedAt     = DateTime.UtcNow;
+            if (project == null)
+                return false;
+
+            
+            if (!string.IsNullOrWhiteSpace(dto.Title))
+                project.Title = dto.Title;
+
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+                project.Description = dto.Description;
+
+            if (!string.IsNullOrWhiteSpace(dto.ProjectUrl))
+                project.ProjectUrl = dto.ProjectUrl;
+
+            if (!string.IsNullOrWhiteSpace(dto.GithubRepoUrl))
+                project.GithubRepoUrl = dto.GithubRepoUrl;
+
+            if (dto.Image != null)
+            {
+                var imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+
+                if (!string.IsNullOrEmpty(imageUrl))
+                    project.ImageUrl = imageUrl;
+            }
+
+            project.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(project);
+
             return true;
         }
 

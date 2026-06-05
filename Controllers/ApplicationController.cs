@@ -23,7 +23,7 @@ namespace Graduation_Project.Controllers
         }
 
 
-        [HttpGet("GetMyApplications")]
+        [HttpGet("get-my-applications")]
         [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> GetApplicationByApplicant()
         {
@@ -62,6 +62,18 @@ namespace Graduation_Project.Controllers
                 return BadRequest();
 
             return Ok();
+        }
+        [HttpPost]
+        [Authorize(Roles =Roles.Applicant)]
+        public async Task<IActionResult> CreateApplication(CreateApplicationDto createApplicationDto)
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(profileIdClaim, out Guid applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+          var result=  await applicationServivces.CreateApplication(applicantId, createApplicationDto);
+            return Ok(new {message="created success", applicationId=result.ApplicationID});
+
         }
     }
 }

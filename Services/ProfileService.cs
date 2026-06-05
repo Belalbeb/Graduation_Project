@@ -45,52 +45,59 @@ namespace Graduation_Project.Services
 
             return new PublicProfileDto
             {
-                ApplicantID   = applicant.ApplicantID,
-                FullName      = $"{applicant.FirstName} {applicant.LastName}".Trim(),
-                JobTitle      = applicant.JobTitle ?? string.Empty,
-                Location      = applicant.Location ?? string.Empty,
-                AboutMe       = applicant.AboutMe,
+                ApplicantID = applicant.ApplicantID,
+                FullName = $"{applicant.FirstName} {applicant.LastName}".Trim(),
+                JobTitle = applicant.JobTitle ?? string.Empty,
+                Location = applicant.Location ?? string.Empty,
+                AboutMe = applicant.AboutMe,
                 ProfilePicUrl = applicant.ProfilePicURL,
                 CoverPhotoUrl = applicant.CoverPhotoUrl,
-                Email         = applicant.Email,
-                PhoneNumber   = applicant.PhoneNumber,
-                Linkedin      = applicant.Linkedin,
-                Github        = applicant.Github,
-                Facebook      = applicant.Facebook,
-                Portfolio     = applicant.Portfolio,
+                Email = applicant.Email,
+                PhoneNumber = applicant.PhoneNumber,
+                Address = applicant.Address,
+                Linkedin = applicant.Linkedin,
+                Github = applicant.Github,
+                Facebook = applicant.Facebook,
+                Portfolio = applicant.Portfolio,
+
+                Behance = applicant.Behance,
+                Dribbble = applicant.Dribble,
+                Resumes = applicant.Resumes.Select(x =>  new ResumeDto {ResumeId=x.ResumeID, Name = x.FileName, Url = x.FilePath }).ToList(),
 
                 Experiences = applicant.Experiences
                     .OrderByDescending(e => e.StartDate)
                     .Select(e => new ExperienceResponseDto
                     {
                         ExperienceID = e.ExperienceID,
-                        CompanyName  = e.CompanyName,
-                        Location     = e.Location ?? "",
-                        JobTitle     = e.JobTitle,
-                        Description  = e.Description,
-                        JobType      = e.JobType,
-                        StartDate    = e.StartDate
+                        CompanyName = e.CompanyName,
+                        Location = e.Location ?? "",
+                        JobTitle = e.JobTitle,
+                        Description = e.Description,
+                        JobType = e.JobType.ToString(),
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate
+
                     }).ToList(),
 
                 Skills = applicant.ApplicantSkills
                     .Select(s => new SkillResponseDto
                     {
                         ApplicantSkillID = s.ApplicantSkillID,
-                        SkillID          = s.SkillID,
-                        SkillName        = s.Skill.SkillName
+                        SkillID = s.SkillID,
+                        SkillName = s.Skill.SkillName
                     }).ToList(),
 
                 Projects = applicant.Projects
                     .OrderByDescending(p => p.CreatedAt)
                     .Select(p => new ProjectResponseDto
                     {
-                        ProjectID     = p.ProjectID,
-                        Title         = p.Title,
-                        Description   = p.Description,
-                        ProjectUrl    = p.ProjectUrl,
+                        ProjectID = p.ProjectID,
+                        Title = p.Title,
+                        Description = p.Description,
+                        ProjectUrl = p.ProjectUrl,
                         GithubRepoUrl = p.GithubRepoUrl,
-                        ImageUrl      = p.ImageUrl,
-                        CreatedAt     = p.CreatedAt
+                        ImageUrl = p.ImageUrl,
+                        CreatedAt = p.CreatedAt
                     }).ToList()
             };
         }
