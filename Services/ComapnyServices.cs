@@ -50,7 +50,7 @@ namespace Graduation_Project.Services
                 TotalApplicants     = allApplications.Count(),
                 ScheduledInterviews = allJobPostings
                     .SelectMany(jp => jp.Interviews)
-                    .Count(i => i.ScheduledAt >= now)
+                    .Count(i => i.InterviewDate >= DateOnly.FromDateTime(now))
             };
 
             var monthlyStats = Enumerable.Range(0, 12)
@@ -96,7 +96,10 @@ namespace Graduation_Project.Services
                 .Select(a => new CompanyResponseDto.ApplicantsDto
                 {
                     ApplicantId   = a.ApplicantID,
+                    ImageUrl=a.Applicant.ProfilePicURL,
+
                     ApplicantName = $"{a.Applicant.FirstName} {a.Applicant.LastName}",
+                    JobId=a.JobPostingID,
                     JobAppliedFor = a.JobPosting.Title,
                     AppliedAt     = a.AppliedDate
                 })
@@ -104,6 +107,7 @@ namespace Graduation_Project.Services
 
             return new CompanyResponseDto
             {
+                CompanyName=company.Name,
                 Statistics       = statistics,
                 MonthlyStats     = monthlyStats,
                 RecentJobPosting = recentJobPosts,

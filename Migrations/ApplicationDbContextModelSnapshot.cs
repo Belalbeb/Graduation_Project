@@ -114,7 +114,16 @@ namespace Graduation_Project.Migrations
                     b.Property<string>("AboutMe")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Behance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CoverPhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dribble")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -154,6 +163,7 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePicURL")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -211,7 +221,6 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CoverLetter")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("JobPostingID")
@@ -302,6 +311,55 @@ namespace Graduation_Project.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("Graduation_Project.Models.Company", b =>
+                {
+                    b.Property<Guid>("CompanyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HeadquarterAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("WebsiteURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CompanyID");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Companies");
+                });
+
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
             modelBuilder.Entity("Graduation_Project.Models.CompanySubscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -433,13 +491,22 @@ namespace Graduation_Project.Migrations
                     b.Property<Guid>("ApplicantId")
                         .HasColumnType("uniqueidentifier");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("InterviewType")
                         .HasColumnType("nvarchar(max)");
+=======
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("InterviewDate")
+                        .HasColumnType("date");
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
 
                     b.Property<string>("InterviewerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InterviewerPosition")
@@ -449,19 +516,25 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MeetingLink")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
+=======
+                    b.Property<int>("interviewType")
+                        .HasColumnType("int");
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
 
                     b.HasKey("InterviewId");
 
@@ -532,8 +605,14 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaxExperience")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("MaxSalary")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MinExperience")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("MinSalary")
                         .HasColumnType("decimal(18,2)");
@@ -580,7 +659,7 @@ namespace Graduation_Project.Migrations
 
                     b.HasIndex("JobPostingId");
 
-                    b.ToTable("JobSkill");
+                    b.ToTable("JobSkills");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.ProfileView", b =>
@@ -1007,7 +1086,7 @@ namespace Graduation_Project.Migrations
                     b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
                         .WithOne("JobMetric")
                         .HasForeignKey("Graduation_Project.Models.JobMetric", "JobID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("JobPosting");

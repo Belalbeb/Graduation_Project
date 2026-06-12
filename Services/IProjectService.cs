@@ -6,7 +6,7 @@ namespace Graduation_Project.Services
     {
         Task<List<ProjectResponseDto>> GetAllAsync(Guid applicantId);
         Task<ProjectResponseDto?> GetByIdAsync(Guid projectId,Guid applicantId);
-        Task<ProjectResponseDto?> AddAsync(Guid applicantId,ProjectDto dto);
+        Task<ProjectResponseDto?> AddAsync(Guid applicantId,CreateProjectDto dto);
         Task<bool> UpdateAsync(Guid projectId,Guid applicantId,ProjectDto dto);
         Task<bool> DeleteAsync(Guid projectId,Guid applicantId);
     }

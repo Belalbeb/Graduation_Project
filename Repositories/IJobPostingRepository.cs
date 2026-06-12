@@ -9,7 +9,7 @@ namespace Graduation_Project.Repositories
         Task<JobPosting?> GetByIdAsync(Guid id);
         Task<IEnumerable<JobPosting>> GetByCompanyAsync(Guid companyId);
         Task<JobPosting> AddAsync(JobPosting jobPosting);
-        Task<JobPosting?> UpdateAsync(Guid id, JobPosting jobPosting);
+        Task<bool> UpdateAsync( JobPosting jobPosting);
         Task<bool> DeleteAsync(Guid id);
         Task<bool> DeactivateAsync(Guid id);
         Task<int> GetActiveJobsCountAsync();
@@ -21,6 +21,7 @@ namespace Graduation_Project.Repositories
         Task<int> GetRejectedJobsCount();
         Task<bool> AcceptJobAsync(Guid jobId);
         Task<bool> RejectJobAsync(Guid jobId);
+        public Task ReplaceSkillsAsync(Guid jobId, List<string> skills);
 
     }
 }

@@ -9,6 +9,7 @@ namespace Graduation_Project.Models
 
         public Guid ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
+    
 
         public DateTime SavedAt { get; set; } = DateTime.UtcNow;
     }

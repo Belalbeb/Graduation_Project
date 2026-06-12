@@ -1,6 +1,7 @@
 using Graduation_Project.Dtos;
 using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Graduation_Project.Repositories
 {
@@ -33,6 +34,7 @@ namespace Graduation_Project.Repositories
         {
             return await _context.JobPostings
                 .Include(j => j.Company)
+                .Include(i=>i.Skills)
                 .Include(j => j.Applications)
                   .ThenInclude(j=>j.Applicant)
                     .ThenInclude(j=>j.Resumes)
@@ -70,21 +72,30 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
             return jobPosting;
         }
-
-        public async Task<JobPosting?> UpdateAsync(Guid id, JobPosting jobPosting)
+        public async Task ReplaceSkillsAsync(Guid jobId, List<string> skills)
         {
-            var existing = await _context.JobPostings.FindAsync(id);
-            if (existing == null) return null;
+            var existingSkills = _context.JobSkills
+                .Where(s => s.JobPostingId == jobId);
 
-            existing.Title = jobPosting.Title;
-            existing.Description = jobPosting.Description;
-            existing.Responsibility = jobPosting.Responsibility;
-            existing.MinSalary = jobPosting.MinSalary;
-            existing.MaxSalary = jobPosting.MaxSalary;
-            existing.IsActive = jobPosting.IsActive;
+            _context.JobSkills.RemoveRange(existingSkills);
 
+            var newSkills = skills.Select(s => new JobSkill
+            {
+                Id = Guid.NewGuid(),
+                Name = s,
+                JobPostingId = jobId
+            });
+
+            await _context.JobSkills.AddRangeAsync(newSkills);
+        }
+        public async Task<bool> UpdateAsync( JobPosting jobPosting)
+        {
+          
+
+            _context.JobPostings.Update(jobPosting);
             await _context.SaveChangesAsync();
-            return existing;
+            return true;
+            
         }
 
         public async Task<bool> DeleteAsync(Guid id)

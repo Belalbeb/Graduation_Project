@@ -32,7 +32,7 @@ namespace Graduation_Project.Repositories
                 .Where(i => i.ApplicantId == applicantId && i.Status == status)
                 .Include(i => i.JobPosting)
                     .ThenInclude(j => j.Company)
-                .OrderBy(i => i.ScheduledAt)
+                .OrderBy(i => i.InterviewDate)
                 .ToListAsync();
         }
 
@@ -42,7 +42,7 @@ namespace Graduation_Project.Repositories
                 .Where(i => i.ApplicantId == applicantId)
                 .Include(i => i.JobPosting)
                     .ThenInclude(j => j.Company)
-                .OrderBy(i => i.ScheduledAt)
+                .OrderBy(i => i.InterviewDate)
                 .ToListAsync();
         }
 
@@ -133,13 +133,19 @@ namespace Graduation_Project.Repositories
                 .FirstOrDefaultAsync(i => i.InterviewId == InterviewId);
         }
 
-        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate)
+        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate)
         {
             var Interview = await _context.Interviews.FirstOrDefaultAsync(x => x.InterviewId == InterviewId);
             if(Interview == null) return false;
 
+<<<<<<< HEAD
             Interview.ScheduledAt = InterviewDate;
             await _context.SaveChangesAsync();
+=======
+            if (Interview == null) return false;
+            Interview.InterviewDate = InterviewDate;
+           await _context.SaveChangesAsync();
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
             return true;
         }
     }

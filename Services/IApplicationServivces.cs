@@ -8,5 +8,6 @@ namespace Graduation_Project.Services
         Task<List<ApplicationDto>> GetApplicationByApplicant(Guid id);
         public Task<ApplicantCompanyDto> GetApplicantByApplication(Guid ApplicationId);
         public Task<bool> ChangeApplicationStatus(Guid ApplicationId, ApplicationStatus status);
+        public Task<Application> CreateApplication(Guid ApplicantId, CreateApplicationDto createApplicationDto);
     }
 }

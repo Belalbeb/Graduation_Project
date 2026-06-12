@@ -27,7 +27,8 @@ namespace Graduation_Project.Services
                 Name = $"{application.Applicant.FirstName} {application.Applicant.LastName}",
                 Email = application.Applicant.Email,
                 PortfolioLink = application.Applicant.ProfilePicURL,
-                //CvPath = application.Resume.FilePath,
+                CvPath = application.Resume.FilePath,
+                CVName=application.Resume.FileName,
                 ApplicationStatus = application.ApplicationStatus.ToString()
 
 
@@ -40,6 +41,17 @@ namespace Graduation_Project.Services
             if (!result) return false;
             return true;
 
+        }
+        public async Task<Application> CreateApplication(Guid ApplicantId, CreateApplicationDto createApplicationDto)
+        {
+            Application application = new Application()
+            {
+                ApplicantID = ApplicantId,
+                ResumeID = createApplicationDto.ResumeID,
+                JobPostingID = createApplicationDto.JobPostingID
+            };
+            await _repository.AddApplication(application);
+            return application;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Graduation_Project.Dtos
         public List<string> JobType { get; set; }
         public DateTime PostedAt { get; set; }
         public int ApplicationCount { get; set; }
-        public bool IsActive { get; set; }
+        public string JobStatus { get; set; }
 
     }
 }

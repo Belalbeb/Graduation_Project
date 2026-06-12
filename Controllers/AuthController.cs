@@ -44,7 +44,20 @@ namespace Graduation_Project.Controllers
             var userId =(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user =await userManager.FindByIdAsync(userId);
             var roles = await userManager.GetRolesAsync(user);
-            return Ok(new { userId = userId, email = user.Email, roles = roles });
+            string? photoUrl = null;
+
+            if (roles.Contains(Roles.Applicant))
+            {
+                var applicant = await ApplicantServices.GetApplicantByUserIdAsync(userId);
+                photoUrl = applicant?.ProfilePicURL;
+            }
+            else if (roles.Contains(Roles.Company))
+            {
+                var company = await CompanyServices.GetCompanyByUserIdAsync(userId);
+                photoUrl = company?.LogoUrl; 
+            }
+
+            return Ok(new { userId = userId, email = user.Email, roles = roles,photoUrl });
 
 
         }
@@ -243,7 +256,7 @@ namespace Graduation_Project.Controllers
                 issuer: configuration["Jwt:Issuer"],
                 audience: configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(3),
                 signingCredentials: signingCredentials
             );
 

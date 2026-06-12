@@ -1,6 +1,7 @@
 ﻿using Bogus;
-using Microsoft.AspNetCore.Identity;
 using Graduation_Project.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Graduation_Project.Seeds
 {
@@ -10,7 +11,7 @@ namespace Graduation_Project.Seeds
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager)
         {
-            if (context.Companies.Any())
+            if (await context.Companies.AnyAsync())
                 return;
 
             var companyUsers = await userManager.GetUsersInRoleAsync(Roles.Company);
@@ -18,12 +19,39 @@ namespace Graduation_Project.Seeds
             if (!companyUsers.Any())
                 return;
 
-            var faker = new Faker<Company>()
-                .RuleFor(c => c.Name, f => f.Company.CompanyName())
-                .RuleFor(c => c.HeadquarterAddress, f => f.Address.FullAddress())
-                .RuleFor(c => c.Location, f => f.Address.City())
-                .RuleFor(c => c.Industry,
-                    f => f.PickRandom(new[]
+            var faker = new Faker();
+
+            // real domains that always have logos
+            var domains = new[]
+            {
+                "google.com",
+                "microsoft.com",
+                "amazon.com",
+                "netflix.com",
+                "spotify.com",
+                "uber.com",
+                "airbnb.com",
+                "intel.com",
+                "ibm.com",
+                "oracle.com",
+                "adobe.com",
+                "nvidia.com",
+                "paypal.com"
+            };
+
+            var companies = companyUsers.Select(user =>
+            {
+                var domain = faker.PickRandom(domains);
+
+                return new Company
+                {
+                    Name = faker.Company.CompanyName(),
+
+                    HeadquarterAddress = faker.Address.FullAddress(),
+
+                    Location = faker.Address.City(),
+
+                    Industry = faker.PickRandom(new[]
                     {
                         "Software",
                         "Finance",
@@ -35,16 +63,19 @@ namespace Graduation_Project.Seeds
                         "Gaming",
                         "Marketing",
                         "AI / Data Science"
-                    }))
-                .RuleFor(c => c.WebsiteURL, f => f.Internet.Url())
-                .RuleFor(c => c.LogoUrl,
-                    f => $"https://logo.clearbit.com/{f.Internet.DomainName()}")
-                .RuleFor(c => c.UserId,
-                    f => f.PickRandom(companyUsers).Id);
+                    }),
 
-            var data = faker.Generate(companyUsers.Count);
+                    WebsiteURL = $"https://{domain}",
 
-            context.Companies.AddRange(data);
+                    // working logo source (returns real logos)
+                    LogoUrl = $"https://geticon.dev/?url={domain}",
+
+                    UserId = user.Id
+                };
+            }).ToList();
+
+            await context.Companies.AddRangeAsync(companies);
+
             await context.SaveChangesAsync();
         }
     }

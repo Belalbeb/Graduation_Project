@@ -8,5 +8,6 @@ namespace Graduation_Project.Repositories
         Task<Resume> AddAsync(Resume resume);
         Task<string?> GetActivePathAsync(Guid applicantId);
         Task<string?> GetActivePathByUserIdAsync(string userId);
+        public  Task<bool> DeleteCV(Guid ResumeId);
     }
 }

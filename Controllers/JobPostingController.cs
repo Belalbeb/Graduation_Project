@@ -23,7 +23,10 @@ namespace Graduation_Project.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var jobs = await _service.GetAllJobsAsync();
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            Guid.TryParse(profileIdClaim, out Guid ApplicantId);
+               
+            var jobs = await _service.GetAllJobsAsync(ApplicantId);
             return Ok(jobs);
         }
 
@@ -86,22 +89,23 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles=Roles.Company)]
-        public async Task<IActionResult> Update(Guid id, [FromBody] JobPosting job)
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody] UpdateJobDto job)
         {
             var updated = await _service.UpdateJobAsync(id, job);
-            if (updated == null) return NotFound("Job not found");
+            if (!updated) return NotFound("Job not found");
 
-            return Ok(updated);
+            return Ok(new { message ="Updated Succefully"});
+
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete([FromRoute]Guid id)
         {
             var deleted = await _service.DeleteJobAsync(id);
             if (!deleted) return NotFound("Job not found");
 
-            return Ok("Job deleted");
+            return Ok(new {message= "Job deleted" });
         }
 
         

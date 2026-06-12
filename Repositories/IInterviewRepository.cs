@@ -11,6 +11,7 @@ namespace Graduation_Project.Repositories
         Task<int> CountByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status);
         Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status);
         Task<List<Interview>> GetAllByApplicantAsync(Guid applicantId);
+<<<<<<< HEAD
 
         Task<CompanyInterviewStatisticsDto> GetCompanyStatisticsAsync(Guid companyId);
         Task<List<Interview>> GetCompanyInterviewsAsync(Guid companyId,string? search = null,string? status = null);
@@ -20,5 +21,10 @@ namespace Graduation_Project.Repositories
         Task<List<Interview>> GetByjobPostingId(Guid jobId);
         Task<Interview> GetInterviewById(Guid InterviewId);
         Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate);
+=======
+        public Task<List<Interview>> GetByjobPostingId(Guid jobId);
+        public Task<Interview> GetInterviewById(Guid InterviewId);
+        public Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate);
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
     }
 }

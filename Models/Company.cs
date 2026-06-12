@@ -2,9 +2,23 @@ using Graduation_Project.Models;
 
 public class Company
 {
+<<<<<<< HEAD
     public Guid CompanyID { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public string Industry { get; set; } = string.Empty;
+=======
+    public class Company
+    {
+        public Guid CompanyID { get; set; } = Guid.NewGuid();
+        public string Name { get; set; }
+        public string Industry { get; set; }
+        public string ?WebsiteURL { get; set; }
+        public string ?HeadquarterAddress { get; set; }
+        public string Location { get; set; }
+        public string LogoUrl { get; set; } = DefaultImage.CompanyImage;
+        public int MinEmployees { get; set; }
+        public int MaxEmployees { get; set; }
+>>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
 
     public int MinEmployees { get; set; }
     public int MaxEmployees { get; set; }

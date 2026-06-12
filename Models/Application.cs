@@ -9,7 +9,7 @@ namespace Graduation_Project.Models
         public Guid ApplicationID { get; set; } = Guid.NewGuid();
         public ApplicationStatus ApplicationStatus { get; set; } = ApplicationStatus.Pending;
         public DateTime AppliedDate { get; set; }
-        public string CoverLetter { get; set; }
+        public string ?CoverLetter { get; set; }
 
         // FKs
         public Guid ApplicantID { get; set; }

@@ -60,7 +60,7 @@ namespace Graduation_Project.Repositories
         public async Task<int> CountUpcomingInterviewsAsync(Guid applicantId)
         {
             return await _context.Interviews
-                .CountAsync(i => i.ApplicantId == applicantId && i.ScheduledAt >= DateTime.UtcNow);
+                .CountAsync(i => i.ApplicantId == applicantId && i.InterviewDate >= DateOnly.FromDateTime(DateTime.UtcNow));
         }
 
         public async Task<int> CountProfileViewsAsync(Guid applicantId)
@@ -81,10 +81,19 @@ namespace Graduation_Project.Repositories
 
         public async Task<List<dynamic>> GetMonthlyInterviewsAsync(Guid applicantId, DateTime startOfYear)
         {
+            var startDate = DateOnly.FromDateTime(startOfYear);
+
             return (await _context.Interviews
-                .Where(i => i.ApplicantId == applicantId && i.ScheduledAt >= startOfYear)
-                .GroupBy(i => i.ScheduledAt.Month)
-                .Select(g => new { Month = g.Key, Count = g.Count() })
+                .Where(i =>
+                    i.ApplicantId == applicantId &&
+                    i.InterviewDate >= startDate
+                )
+                .GroupBy(i => i.InterviewDate.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    Count = g.Count()
+                })
                 .ToListAsync())
                 .Cast<dynamic>()
                 .ToList();
@@ -109,19 +118,33 @@ namespace Graduation_Project.Repositories
 
         public async Task<List<SavedJobsResponseDto>> GetSavedJobsAsync(Guid applicantId)
         {
+            var appliedJobIds = await _context.Applications
+                .Where(a => a.ApplicantID == applicantId)
+                .Select(a => a.JobPostingID)
+                .ToListAsync();
+
             return await _context.SavedJobs
                 .Where(x => x.ApplicantId == applicantId)
                 .Select(item => new SavedJobsResponseDto
                 {
+                    jobId=item.JobPostingId,
                     JobTitle = item.JobPosting.Title,
                     JobDescription = item.JobPosting.Description,
                     JobRequirement = item.JobPosting.Responsibility,
-                    SavedAt = item.SavedAt,
+                    TimeAgo=item.JobPosting.PostedDate,
+
                     CompanyLogoUrl = item.JobPosting.Company.LogoUrl,
                     CompanyLocation = item.JobPosting.Company.Location,
                     CompanyName = item.JobPosting.Company.Name,
-                    JobType = item.JobPosting.JobTypes.Select(x=>x.ToString()).ToList(),
-                    SalaryRange = $"{item.JobPosting.MinSalary}-{item.JobPosting.MaxSalary}"
+
+                    JobType = item.JobPosting.JobTypes
+                        .Select(x => x.ToString())
+                        .ToList(),
+
+                    minSalary=item.JobPosting.MinSalary,
+                    maxSalary=item.JobPosting.MaxSalary,
+
+                    isApplied = appliedJobIds.Contains(item.JobPostingId)
                 })
                 .ToListAsync();
         }

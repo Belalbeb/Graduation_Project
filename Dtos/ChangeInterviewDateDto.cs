@@ -2,6 +2,6 @@
 {
     public class ChangeInterviewDateDto
     {
-        public DateTime InterviewDate { get; set; }
+        public DateOnly InterviewDate { get; set; }
     }
 }

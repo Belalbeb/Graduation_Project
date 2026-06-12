@@ -47,7 +47,7 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProject([FromBody] ProjectDto dto)
+        public async Task<IActionResult> AddProject([FromForm] CreateProjectDto dto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -67,7 +67,7 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpPut("{projectId}")]
-        public async Task<IActionResult> UpdateProject(Guid projectId,[FromBody] ProjectDto dto)
+        public async Task<IActionResult> UpdateProject(Guid projectId,[FromForm] ProjectDto dto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -98,7 +98,7 @@ namespace Graduation_Project.Controllers
             if(!success)
                 return NotFound("Project not found.");
 
-            return NoContent();
+            return Ok(new {message="deleted succcess"});
         }
     }
 }

@@ -2,11 +2,10 @@
 {
     public class UpdateProfileDto
     {
-        public string FullName { get; set; } = string.Empty ;
-        public string JobTitle { get; set; } = string.Empty ;
-        public string AboutMe { get; set; } = string.Empty ;
-        public string? ProfilePicUrl { get; set; }
-        public string? CoverPhotoUrl { get; set; }
-        public string? ResumeUrl { get; set; }
+        public string? FullName { get; set; }  
+        public string ?JobTitle { get; set; } 
+        public string? AboutMe { get; set; }
+        public string ?Country { get; set; }
+ 
     }
 }

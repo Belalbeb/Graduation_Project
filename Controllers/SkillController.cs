@@ -61,7 +61,7 @@ namespace Graduation_Project.Controllers
             var result = await _skillService.AddSkillAsync(applicantId, dto) ;
 
             if(result == null)
-                return BadRequest("This skill has already been added to your profile.") ;
+                return BadRequest(new { message = "This skill has already been added to your profile." }) ;
 
             return CreatedAtAction(nameof(GetSkillById),
                 new { skillId = result.ApplicantSkillID }, result);
@@ -80,7 +80,7 @@ namespace Graduation_Project.Controllers
             if(!success)
                 return NotFound($"Skill with ID {applicantSkillId} not found") ;
 
-            return NoContent();
+            return Ok(new {message="deleted success"});
         }
     }
 }

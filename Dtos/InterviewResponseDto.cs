@@ -4,16 +4,20 @@ namespace Graduation_Project.Dtos
 {
     public class InterviewResponseDto
     {
+       
         public Guid InterviewId { get; set; }
-        public Guid JobPostingId { get; set; }
+        public Guid JobId { get; set; }
+
         public string JobTitle { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string? CompanyLogoUrl { get; set; }
 
-        public DateTime ScheduledAt { get; set; }
-        public string TimeZone { get; set; } = "EST" ;
+        public DateOnly Date { get; set; }
+        public TimeOnly StartAt { get; set; }
+        public TimeOnly EndAt { get; set; }
+        public string interviewType { get; set; }
 
-        public InterviewStatus Status { get; set; }
+        public string Status { get; set; }
         public string? InterviewerName { get; set; }
         public string? MeetingLink { get; set; }
         public string? Notes { get; set; }

@@ -26,6 +26,7 @@ namespace Graduation_Project.Models
         public DbSet<SubscriptionPlan> subscriptionPlans { get; set; }
         public DbSet<CompanySubscription> companySubscriptions { get; set; }
         public DbSet<Coupon> Coupons => Set<Coupon>();
+        public DbSet<JobSkill>  JobSkills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -50,7 +51,7 @@ namespace Graduation_Project.Models
                 .HasOne(jm => jm.JobPosting)
                 .WithOne(jp => jp.JobMetric)
                 .HasForeignKey<JobMetric>(jm => jm.JobID)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Application ↔ JobPosting (Many-to-One)
             builder.Entity<Application>()

@@ -9,7 +9,7 @@
         public string Email { get; set; }
         public string ResumePath { get; set; }
         public string InterviewStatus { get; set; }
-        public DateTime InterviewDate { get; set; }
+        public DateOnly InterviewDate { get; set; }
         public string InterviewerName { get; set; }
         public string InterviewerPosition { get; set; }
         public string InterviewLink { get; set; }

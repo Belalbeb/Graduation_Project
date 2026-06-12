@@ -4,13 +4,14 @@ namespace Graduation_Project.Dtos
 {
     public class ApplicantDashboardResponseDto
     {
-        // Statistics Cards
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public StatisticsDto Statistics { get; set; }
 
-        // Bar Chart - Applications and Interviews per month
+       
         public List<MonthlyStatDto> MonthlyStats { get; set; }
 
-        // Recently Applied Jobs Table
+     
         public List<RecentApplicationDto> RecentApplications { get; set; }
     }
 

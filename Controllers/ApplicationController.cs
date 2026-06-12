@@ -23,7 +23,7 @@ namespace Graduation_Project.Controllers
         }
 
 
-        [HttpGet("GetMyApplications")]
+        [HttpGet("get-my-applications")]
         [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> GetApplicationByApplicant()
         {
@@ -49,19 +49,43 @@ namespace Graduation_Project.Controllers
             if (result == null) return NotFound(new { message = "no application found" });
             return Ok(result);
         }
-        [HttpPut("change-application-Status/{ApplicationId}")]
+        [HttpPut("accept-application/{applicationId}")]
         [Authorize(Roles = Roles.Company)]
-        public async Task<IActionResult> ChangeApplicationStatus(
-    Guid ApplicationId,
-    ChangeStatusDto dto)
+        public async Task<IActionResult> AcceptApplication(Guid applicationId)
         {
             var result = await applicationServivces
-                .ChangeApplicationStatus(ApplicationId, dto.Status);
+                .ChangeApplicationStatus(applicationId, ApplicationStatus.Accepted);
 
             if (!result)
                 return BadRequest();
 
             return Ok();
         }
+        [HttpPut("reject-application/{applicationId}")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> RejectApplication(Guid applicationId)
+        {
+            var result = await applicationServivces
+                .ChangeApplicationStatus(applicationId, ApplicationStatus.Rejected);
+
+            if (!result)
+                return BadRequest();
+
+            return Ok();
+        }
+    
+        [HttpPost]
+        [Authorize(Roles =Roles.Applicant)]
+        public async Task<IActionResult> CreateApplication(CreateApplicationDto createApplicationDto)
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(profileIdClaim, out Guid applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+          var result=  await applicationServivces.CreateApplication(applicantId, createApplicationDto);
+            return Ok(new {message="created success", applicationId=result.ApplicationID});
+
+        }
+
     }
 }

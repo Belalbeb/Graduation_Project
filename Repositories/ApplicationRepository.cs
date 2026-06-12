@@ -43,5 +43,11 @@ namespace Graduation_Project.Repositories
             Application.ApplicationStatus = status;
             return true;
         }
+        public async Task AddApplication(Application application)
+        {
+            await _context.Applications.AddAsync(application);
+            await _context.SaveChangesAsync();
+            ;
+        }
     }
 }
