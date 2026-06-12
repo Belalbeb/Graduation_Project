@@ -1,4 +1,7 @@
 ﻿using Graduation_Project.Dtos;
+using Graduation_Project.Dtos.Admin.Applicant;
+using Graduation_Project.Dtos.Admin.Company;
+using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 
 namespace Graduation_Project.Services
@@ -10,14 +13,19 @@ namespace Graduation_Project.Services
         private readonly IUserRepository userRepository;
         private readonly ICompanyRepository companyRepository;
         private readonly IJobPostingRepository jobPostingRepository;
+        private readonly IApplicantRepository _applicantRepository ;
 
-        public AdminServices(IAdminRepository adminRepository,IUserRepository userRepository,ICompanyRepository companyRepository,IJobPostingRepository jobPostingRepository)
+        public AdminServices(IAdminRepository adminRepository,IUserRepository userRepository,ICompanyRepository companyRepository,IJobPostingRepository jobPostingRepository,
+            IApplicantRepository applicantRepository)
         {
             this.adminRepository = adminRepository;
             this.userRepository = userRepository;
             this.companyRepository = companyRepository;
             this.jobPostingRepository = jobPostingRepository;
+            this._applicantRepository = applicantRepository ;
         }
+
+        #region Belal
         public async Task<AdminDashboardResponseDto> GetAdminDashboardAsync()
         {
             var userCounts =await userRepository.GetUserCountAsync();
@@ -161,5 +169,247 @@ namespace Graduation_Project.Services
 
             return $"{(int)span.TotalDays / 30} month ago";
         }
+        #endregion
+
+        // ======================= Applicants =============================
+        #region Applicants
+        public async Task<AdminUserStatsDto> GetUserStatsAsync()
+        {
+            return new AdminUserStatsDto
+            {
+                TotalUsers = await userRepository.GetTotalUsersCountAsync(),
+                NewUsersThisMonth = await _applicantRepository.CountNewApplicantsThisMonthAsync(),
+                BlockedUsers = await _applicantRepository.CountBlockedApplicantsAsync()
+            };
+        }
+
+        public async Task<List<AdminUserListDto>> GetAllApplicantsAsync()
+        {
+            var applicants = await _applicantRepository.GetAllApplicantsWithDetailsAsync();
+
+            return applicants.Select(a => new AdminUserListDto
+            {
+                ApplicantId = a.ApplicantID,
+                FullName = $"{a.FirstName} {a.LastName}",
+                Email = a.User?.Email ?? a.Email ?? string.Empty,
+                JobTitle = a.JobTitle,
+                Status = a.IsBlocked ? "Blocked" : a.Status.ToString(),
+                Location = a.Location,
+                JoinedDate = a.User?.CreatedAt ?? DateTime.UtcNow
+            }).ToList();
+        }
+
+        public async Task<AdminUserDetailsDto?> GetApplicantDetailsAsync(Guid applicantId)
+        {
+            var applicant = await _applicantRepository.GetApplicantWithAllDetailsAsync(applicantId);
+            if(applicant == null) return null;
+
+            var activeResume = applicant.Resumes?.FirstOrDefault(r => r.IsActive);
+
+            return new AdminUserDetailsDto
+            {
+                // Basic Info
+                ApplicantId = applicant.ApplicantID,
+                FullName = $"{applicant.FirstName} {applicant.LastName}",
+                JobTitle = applicant.JobTitle,
+                Status = applicant.IsBlocked ? "Blocked" : applicant.Status.ToString(),
+                JoinedDate = applicant.User?.CreatedAt ?? DateTime.UtcNow,
+
+                // Contact Info
+                Email = applicant.User?.Email ?? applicant.Email,
+                PhoneNumber = applicant.PhoneNumber,
+                Location = applicant.Location,
+
+                // Statistics
+                ApplicationsCount = applicant.Applications?.Count ?? 0,
+                SavedJobsCount = await _applicantRepository.CountSavedJobsAsync(applicantId),
+                InterviewsCount = await _applicantRepository.CountUpcomingInterviewsAsync(applicantId),
+                ProjectsCount = applicant.Projects?.Count ?? 0,
+
+                // Skills
+                Skills = applicant.ApplicantSkills?.Select(s => s.Skill.SkillName).ToList() ?? new List<string>(),
+
+                // Social Links & CV
+                CvUrl = activeResume?.FilePath,
+                Portfolio = applicant.Portfolio,
+                Facebook = applicant.Facebook,
+                Linkedin = applicant.Linkedin,
+                Github = applicant.Github
+            };
+        }
+
+        public async Task<bool> BlockApplicantAsync(Guid applicantId)
+        {
+            var applicant = await _applicantRepository.GetByIdAsync(applicantId);
+            if(applicant == null) return false;
+
+            applicant.IsBlocked = true;
+            applicant.Status = UserStatus.Blocked;
+            await _applicantRepository.UpdateAsync(applicant);
+            return true;
+        }
+
+        public async Task<bool> UnblockApplicantAsync(Guid applicantId)
+        {
+            var applicant = await _applicantRepository.GetByIdAsync(applicantId);
+            if(applicant == null) return false;
+
+            applicant.IsBlocked = false;
+            applicant.Status = UserStatus.Active;
+            await _applicantRepository.UpdateAsync(applicant);
+            return true;
+        }
+
+        public async Task<bool> ApproveApplicantAsync(Guid applicantId)
+        {
+            var applicant = await _applicantRepository.GetByIdAsync(applicantId);
+            if(applicant == null) return false;
+
+            applicant.Status = UserStatus.Active;
+            await _applicantRepository.UpdateAsync(applicant);
+            return true;
+        }
+
+        public async Task<bool> DeleteApplicantAsync(Guid applicantId)
+        {
+            var applicant = await _applicantRepository.GetByIdAsync(applicantId);
+            if(applicant == null) return false;
+
+            await _applicantRepository.DeleteAsync(applicant);
+            return true;
+        }
+
+        #endregion
+
+        // ======================= Company ===========================
+        #region Company
+        // Get company statistics for admin dashboard
+        public async Task<AdminCompanyStatsDto> GetCompanyStatsAsync()
+        {
+            return new AdminCompanyStatsDto
+            {
+                TotalCompanies = await companyRepository.CountTotalCompaniesAsync(),
+                VerifiedCompanies = await companyRepository.CountVerifiedCompaniesAsync(),
+                VerificationRequests = await companyRepository.CountPendingCompaniesAsync()
+            };
+        }
+
+        // Get all companies for the companies list page
+        public async Task<List<AdminCompanyListDto>> GetAllCompaniesAsync()
+        {
+            var companies = await companyRepository.GetAllCompaniesForAdminAsync();
+            var result = new List<AdminCompanyListDto>();
+
+            foreach(var company in companies)
+            {
+                var totalJobs = await companyRepository.CountCompanyJobsAsync(company.CompanyID);
+                var subscriptionPlan = await companyRepository.GetCompanyActiveSubscriptionPlanAsync(company.CompanyID);
+
+                result.Add(new AdminCompanyListDto
+                {
+                    CompanyId = company.CompanyID,
+                    Name = company.Name,
+                    Location = company.Location,
+                    Country = company.Country,
+                    Email = company.User?.Email ?? string.Empty,
+                    Industry = company.Industry,
+                    TotalJobs = totalJobs,
+                    Status = company.IsBlocked ? "Blocked" : company.Status.ToString(),
+                    JoinedDate = company.User?.CreatedAt ?? DateTime.UtcNow,
+                    SubscriptionPlan = subscriptionPlan ?? "Free"
+                });
+            }
+
+            return result;
+        }
+
+        // Get detailed information for a single company
+        public async Task<AdminCompanyDetailsDto?> GetCompanyDetailsAsync(Guid companyId)
+        {
+            var company = await companyRepository.GetCompanyWithDetailsForAdminAsync(companyId);
+            if(company == null) return null;
+
+            var totalJobs = await companyRepository.CountCompanyJobsAsync(companyId);
+            var activeJobs = await companyRepository.CountCompanyActiveJobsAsync(companyId);
+            var totalApplicants = await companyRepository.CountCompanyApplicantsAsync(companyId);
+            var totalInterviews = await companyRepository.CountCompanyInterviewsAsync(companyId);
+            var subscriptionPlan = await companyRepository.GetCompanyActiveSubscriptionPlanAsync(companyId);
+
+            return new AdminCompanyDetailsDto
+            {
+                // Basic Info
+                CompanyId = company.CompanyID,
+                Name = company.Name,
+                Description = company.Description,
+                LogoUrl = company.LogoUrl,
+                CoverLogoUrl = company.CoverLogoUrl,
+
+                // Contact & Info
+                Email = company.User?.Email ?? string.Empty,
+                Industry = company.Industry,
+                Location = company.Location,
+                Country = company.Country,
+                CompanySize = company.CompanySize,
+
+                // Status
+                Status = company.IsBlocked ? "Blocked" : company.Status.ToString(),
+                IsBlocked = company.IsBlocked,
+
+                // Subscription
+                SubscriptionPlan = subscriptionPlan ?? "Free",
+
+                // Statistics
+                TotalJobs = totalJobs,
+                ActiveJobs = activeJobs,
+                TotalApplicants = totalApplicants,
+                TotalInterviews = totalInterviews
+            };
+        }
+
+        // Verify/Approve a company (change status from Pending to Verified)
+        public async Task<bool> VerifyCompanyAsync(Guid companyId)
+        {
+            var company = await companyRepository.GetByIdAsync(companyId);
+            if(company == null) return false;
+
+            company.Status = CompanyStatus.Verified;
+            await companyRepository.UpdateAsync(company);
+            return true;
+        }
+
+        // Block a company (prevents posting new jobs)
+        public async Task<bool> BlockCompanyAsync(Guid companyId)
+        {
+            var company = await companyRepository.GetByIdAsync(companyId);
+            if(company == null) return false;
+
+            company.IsBlocked = true;
+            company.Status = CompanyStatus.Blocked;
+            await companyRepository.UpdateAsync(company);
+            return true;
+        }
+
+        // Unblock a company
+        public async Task<bool> UnblockCompanyAsync(Guid companyId)
+        {
+            var company = await companyRepository.GetByIdAsync(companyId);
+            if(company == null) return false;
+
+            company.IsBlocked = false;
+            company.Status = CompanyStatus.Verified;
+            await companyRepository.UpdateAsync(company);
+            return true;
+        }
+
+        // Delete a company permanently
+        public async Task<bool> DeleteCompanyAsync(Guid companyId)
+        {
+            var company = await companyRepository.GetByIdAsync(companyId);
+            if(company == null) return false;
+
+            await companyRepository.DeleteAsync(companyId);
+            return true;
+        }
+        #endregion
     }
 }

@@ -74,5 +74,22 @@ namespace Graduation_Project.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("my-profile")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> GetMyProfile()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if(!Guid.TryParse(profileIdClaim,out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var profile = await companyServices.GetCompanyProfileAsync(companyId);
+
+            if(profile == null)
+                return NotFound("Company profile not found");
+
+            return Ok(profile);
+        }
     }
 }

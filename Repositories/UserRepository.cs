@@ -19,5 +19,13 @@ namespace Graduation_Project.Repositories
         {
             return await userManager.Users.CountAsync();
         }
+
+
+
+
+        public async Task<int> GetTotalUsersCountAsync()
+        {
+            return await dbContext.Applicants.CountAsync();
+        }
     }
 }

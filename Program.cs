@@ -91,6 +91,8 @@ namespace Graduation_Project
             builder.Services.AddScoped<IApplicantSkillService, ApplicantSkillService>() ;
             builder.Services.AddScoped<ISettingsService, SettingsServices>() ;
             builder.Services.AddScoped<IProjectService, ProjectService>() ;
+            builder.Services.AddScoped<ICompanySettingsService,CompanySettingsService>();
+            builder.Services.AddScoped<ICompanyInterviewService,CompanyInterviewService>();
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

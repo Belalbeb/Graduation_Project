@@ -1,4 +1,5 @@
 using Graduation_Project.Dtos;
+using Graduation_Project.Dtos.Company.Profile;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 
@@ -125,6 +126,59 @@ namespace Graduation_Project.Services
             company.HeadquarterAddress = updatedCompany.HeadquarterAddress;
 
             return await _repository.UpdateAsync(company);
+        }
+
+        public async Task<CompanyPublicProfileDto?> GetCompanyProfileAsync(Guid companyId)
+        {
+            var company = await _repository.GetByIdAsync(companyId);
+            if(company == null) return null;
+
+            var jobs = await _repository.GetJobPostingsByCompanyIdAsync(companyId);
+
+            var activeJobs = jobs.Where(j => j.IsActive && j.Status == JobStatus.Approved).ToList();
+            var totalJobs = jobs.Count;
+
+            return new CompanyPublicProfileDto
+            {
+                CompanyId = company.CompanyID,
+                Name = company.Name,
+                LogoUrl = company.LogoUrl,
+                CoverLogoUrl = company.CoverLogoUrl,
+                Tagline = company.ProfileBio,
+                About = company.Description,
+                Location = company.Location,
+                Country = company.Country,
+                Industry = company.Industry,
+                CompanySize = company.CompanySize,
+                FoundedYear = company.FoundedYear,
+
+                SocialLinks = new CompanySocialLinksDto
+                {
+                    Facebook = company.Facebook,
+                    Linkedin = company.Linkedin,
+                    Instagram = company.Instagram,
+                    Twitter = company.Twitter
+                },
+
+                Stats = new CompanyStatsDto
+                {
+                    TotalJobs = totalJobs,
+                    ActiveJobs = activeJobs.Count
+                },
+
+                OpenVacancies = activeJobs.Select(job => new CompanyVacancyDto
+                {
+                    JobId = job.JobID,
+                    Title = job.Title,
+                    Description = job.Description,
+                    MinSalary = job.MinSalary,
+                    MaxSalary = job.MaxSalary,
+                    SalaryCurrency = "USD",
+                    JobType = job.JobTypes.FirstOrDefault().ToString(),
+                    WorkApproach = job.WorkApproaches.FirstOrDefault().ToString(),
+                    PostedAt = job.PostedDate
+                }).ToList()
+            };
         }
     }
 }

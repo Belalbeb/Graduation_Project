@@ -16,6 +16,7 @@ namespace Graduation_Project.Controllers
         {
             this.adminServices = adminServices;
         }
+        #region Belal
         [HttpGet("dashboard-overview")]
         [Authorize(Roles =Roles.Admin)]
         public async Task<IActionResult> GetAdminDashboard()
@@ -75,5 +76,146 @@ namespace Graduation_Project.Controllers
 
 
         }
+        #endregion
+
+        #region Applicants
+        // ==================== USER MANAGEMENT ENDPOINTS ====================
+
+        [HttpGet("users/stats")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetUserStats()
+        {
+            var stats = await adminServices.GetUserStatsAsync();
+            return Ok(stats);
+        }
+
+        [HttpGet("users")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetAllApplicants()
+        {
+            var applicants = await adminServices.GetAllApplicantsAsync();
+            return Ok(applicants);
+        }
+
+        [HttpGet("users/{applicantId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetApplicantDetails(Guid applicantId)
+        {
+            var details = await adminServices.GetApplicantDetailsAsync(applicantId);
+            if(details == null)
+                return NotFound(new { message = "Applicant not found" });
+            return Ok(details);
+        }
+
+        [HttpPut("users/{applicantId}/block")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> BlockUser(Guid applicantId)
+        {
+            var result = await adminServices.BlockApplicantAsync(applicantId);
+            if(!result)
+                return NotFound(new { message = "Applicant not found" });
+            return Ok(new { message = "User blocked successfully" });
+        }
+
+        [HttpPut("users/{applicantId}/unblock")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UnblockUser(Guid applicantId)
+        {
+            var result = await adminServices.UnblockApplicantAsync(applicantId);
+            if(!result)
+                return NotFound(new { message = "Applicant not found" });
+            return Ok(new { message = "User unblocked successfully" });
+        }
+
+        [HttpPut("users/{applicantId}/approve")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> ApproveUser(Guid applicantId)
+        {
+            var result = await adminServices.ApproveApplicantAsync(applicantId);
+            if(!result)
+                return NotFound(new { message = "Applicant not found" });
+            return Ok(new { message = "User approved successfully" });
+        }
+
+        [HttpDelete("users/{applicantId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> DeleteUser(Guid applicantId)
+        {
+            var result = await adminServices.DeleteApplicantAsync(applicantId);
+            if(!result)
+                return NotFound(new { message = "Applicant not found" });
+            return Ok(new { message = "User deleted successfully" });
+        }
+        #endregion
+
+        #region Company
+        // ==================== COMPANY MANAGEMENT ENDPOINTS ====================
+
+        [HttpGet("companies/stats")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetCompanyStats()
+        {
+            var stats = await adminServices.GetCompanyStatsAsync();
+            return Ok(stats);
+        }
+
+        [HttpGet("companies")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetAllCompanies()
+        {
+            var companies = await adminServices.GetAllCompaniesAsync();
+            return Ok(companies);
+        }
+
+        [HttpGet("companies/{companyId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetCompanyDetails(Guid companyId)
+        {
+            var details = await adminServices.GetCompanyDetailsAsync(companyId);
+            if(details == null)
+                return NotFound(new { message = "Company not found" });
+            return Ok(details);
+        }
+
+        [HttpPut("companies/{companyId}/verify")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> VerifyCompany(Guid companyId)
+        {
+            var result = await adminServices.VerifyCompanyAsync(companyId);
+            if(!result)
+                return NotFound(new { message = "Company not found" });
+            return Ok(new { message = "Company verified successfully" });
+        }
+
+        [HttpPut("companies/{companyId}/block")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> BlockCompany(Guid companyId)
+        {
+            var result = await adminServices.BlockCompanyAsync(companyId);
+            if(!result)
+                return NotFound(new { message = "Company not found" });
+            return Ok(new { message = "Company blocked successfully" });
+        }
+
+        [HttpPut("companies/{companyId}/unblock")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UnblockCompany(Guid companyId)
+        {
+            var result = await adminServices.UnblockCompanyAsync(companyId);
+            if(!result)
+                return NotFound(new { message = "Company not found" });
+            return Ok(new { message = "Company unblocked successfully" });
+        }
+
+        [HttpDelete("companies/{companyId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> DeleteCompany(Guid companyId)
+        {
+            var result = await adminServices.DeleteCompanyAsync(companyId);
+            if(!result)
+                return NotFound(new { message = "Company not found" });
+            return Ok(new { message = "Company deleted successfully" });
+        }
+        #endregion
     }
 }

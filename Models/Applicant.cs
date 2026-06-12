@@ -22,6 +22,9 @@ namespace Graduation_Project.Models
         public string? Dribble { get; set; }
         public string? Portfolio { get; set; }
 
+        public UserStatus Status { get; set; } = UserStatus.Pending;
+        public bool IsBlocked { get; set; } = false;
+
         // FK to Identity User
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
@@ -32,5 +35,12 @@ namespace Graduation_Project.Models
         public ICollection<Application> Applications { get; set; }
         public ICollection<ApplicantSkill> ApplicantSkills { get; set; }
         public ICollection<Project> Projects { get; set; }
+    }
+
+    public enum UserStatus
+    {
+        Pending = 0,   // Waiting for admin approval
+        Active = 1,    // Approved and active
+        Blocked = 2    // Blocked by admin
     }
 }

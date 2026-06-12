@@ -29,5 +29,11 @@ namespace Graduation_Project.Repositories
         Task AddResumeAsync(Resume resume);
         Task<string?> GetActiveResumePathAsync(Guid applicantId);
         Task<string?> GetActiveResumePathByUserIdAsync(string userId);
+
+
+        Task<List<Applicant>> GetAllApplicantsWithDetailsAsync();
+        Task<Applicant?> GetApplicantWithAllDetailsAsync(Guid applicantId);
+        Task<int> CountBlockedApplicantsAsync();
+        Task<int> CountNewApplicantsThisMonthAsync();
     }
 }
