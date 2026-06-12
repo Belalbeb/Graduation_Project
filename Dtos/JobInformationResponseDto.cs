@@ -3,8 +3,13 @@
     public class JobInformationResponseDto
     {
         public string Title { get; set; }
-        public bool IsActive { get; set; }
+        public string JobStatus { get; set; }
         public string Category { get; set; }
+        public bool IsActive { get; set; }
+        public int MinExper { get; set; }
+        public int MaxExper { get; set; }
+        public List<string> WorkApproaches { get; set; }
+        public List<string> JobTypes { get; set; }
         public DateTime PostedDate { get; set; }
         public int ApplicantsCount { get; set; }
         public int InterviewCount { get; set; }
@@ -20,7 +25,7 @@
     }
     public class ApplicantDetail
     {
-        public Guid ApplicantId { get; set; }
+        public Guid ApplicantionId { get; set; }
         public string ApplicantName { get; set; }
         public string Email { get; set; }
         public string ImageUrl { get; set; }

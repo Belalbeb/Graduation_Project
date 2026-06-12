@@ -27,7 +27,8 @@ namespace Graduation_Project.Services
                 Name = $"{application.Applicant.FirstName} {application.Applicant.LastName}",
                 Email = application.Applicant.Email,
                 PortfolioLink = application.Applicant.ProfilePicURL,
-                //CvPath = application.Resume.FilePath,
+                CvPath = application.Resume.FilePath,
+                CVName=application.Resume.FileName,
                 ApplicationStatus = application.ApplicationStatus.ToString()
 
 

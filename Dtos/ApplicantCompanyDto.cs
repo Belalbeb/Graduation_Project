@@ -7,6 +7,7 @@
         public string PortfolioLink { get; set; }
         public string ImageUrl { get; set; }
         public string CvPath { get; set; }
+        public string CVName { get; set; }
         public string ApplicationStatus { get; set; }
        
     }

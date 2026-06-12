@@ -4,6 +4,7 @@ using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260605144127_make minmax")]
+    partial class makeminmax
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -554,7 +557,7 @@ namespace Graduation_Project.Migrations
 
                     b.HasIndex("JobPostingId");
 
-                    b.ToTable("JobSkills");
+                    b.ToTable("JobSkill");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.ProfileView", b =>
@@ -981,7 +984,7 @@ namespace Graduation_Project.Migrations
                     b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
                         .WithOne("JobMetric")
                         .HasForeignKey("Graduation_Project.Models.JobMetric", "JobID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("JobPosting");

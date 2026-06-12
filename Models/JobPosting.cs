@@ -39,6 +39,8 @@ namespace Graduation_Project.Models
         // FK
         public Guid CompanyID { get; set; }
         public Company Company { get; set; }
+        public int MinExperience { get; set; }
+        public int MaxExperience { get; set; }
 
         // Navigation
         public ICollection<Application> Applications { get; set; } = new List<Application>();

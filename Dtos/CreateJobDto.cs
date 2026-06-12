@@ -16,11 +16,14 @@ namespace Graduation_Project.Dtos
         public string JobCategory { get; set; }
         [Required]
         [MinLength(3)]
+     
         public string JobTitle { get; set; }
         [Required]
         public string Location { get; set; }
         public decimal SalaryMax { get; set; }
         public decimal SalaryMin { get; set; }
+        public int MinExperience { get; set; }
+        public int MaxExperience { get; set; }
         [Required]
         public List<string> WorkApproach { get; set; }
     }

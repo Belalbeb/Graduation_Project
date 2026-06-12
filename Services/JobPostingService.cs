@@ -83,7 +83,7 @@ namespace Graduation_Project.Services
             {
                 JobId = job.JobID,
                 JobTitle = job.Title,
-                IsActive = job.IsActive,
+                JobStatus=job.Status.ToString(),
                 Location = job.Location,
                 PostedAt = job.PostedDate,
                 JobType = job.JobTypes.Select(x=>x.ToString()).ToList(),
@@ -107,6 +107,8 @@ namespace Graduation_Project.Services
                 Title = dto.JobBasicData.JobTitle,
                 Description = dto.JobDetails.JobDescription,
                 Responsibility = dto.JobDetails.Responsibilities,
+                MaxExperience=dto.JobBasicData.MaxExperience,
+                MinExperience=dto.JobBasicData.MinExperience,
 
                 MinSalary = dto.JobBasicData.SalaryMin,
                 MaxSalary = dto.JobBasicData.SalaryMax,
@@ -157,7 +159,13 @@ namespace Graduation_Project.Services
             return new JobInformationResponseDto
             {
                 Title = job.Title,
-                IsActive = job.IsActive,
+                JobStatus=job.Status.ToString(),
+                WorkApproaches=job.WorkApproaches.Select(x=>x.ToString()).ToList(),
+                JobTypes=job.JobTypes.Select(x=>x.ToString()).ToList(),
+                IsActive=job.IsActive,
+                MaxExper=job.MaxExperience,
+                MinExper=job.MinExperience,
+
                 Category = job.JobCategory,
                 PostedDate = job.PostedDate,
 
@@ -179,7 +187,7 @@ namespace Graduation_Project.Services
                 ApplicantDetails = job.Applications
                     .Select(x => new ApplicantDetail
                     {
-                        ApplicantId=x.ApplicationID,
+                        ApplicantionId=x.ApplicationID,
                         ApplicantName = $"{x.Applicant.FirstName} {x.Applicant.LastName}",
                         Email = x.Applicant.Email,
                         ImageUrl = x.Applicant.ProfilePicURL,
@@ -200,9 +208,39 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<JobPosting> UpdateJobAsync(Guid id, JobPosting jobPosting)
+        public async Task<bool> UpdateJobAsync(Guid id, UpdateJobDto dto)
         {
-            return await _repository.UpdateAsync(id, jobPosting);
+            var job = await _repository.GetByIdAsync(id);
+
+            if (job == null)
+                return false;
+
+            job.IsActive = dto.IsActive;
+            job.Title = dto.JobBasicData.JobTitle;
+            job.JobCategory = dto.JobBasicData.JobCategory;
+            job.Location = dto.JobBasicData.Location;
+            job.MinSalary = dto.JobBasicData.SalaryMin;
+            job.MaxSalary = dto.JobBasicData.SalaryMax;
+            job.MinExperience = dto.JobBasicData.MinExperience;
+            job.MaxExperience = dto.JobBasicData.MaxExperience;
+
+            job.Description = dto.JobDetails.JobDescription;
+            job.Responsibility = dto.JobDetails.Responsibilities;
+
+            job.JobTypes = dto.JobBasicData.EmploymentType
+                .Select(e => Enum.Parse<JobType>(e.Replace("-", "").Replace(" ", ""), true))
+                .ToList();
+
+            job.WorkApproaches = dto.JobBasicData.WorkApproach
+                .Select(w => Enum.Parse<WorkApproach>(w.Replace("-", "").Replace(" ", ""), true))
+                .ToList();
+
+            job.IsRemote = dto.JobBasicData.WorkApproach
+                .Any(w => w.Equals("Remote", StringComparison.OrdinalIgnoreCase));
+
+            await _repository.ReplaceSkillsAsync(job.JobID, dto.JobDetails.Skills);
+
+            return await _repository.UpdateAsync(job);
         }
 
         public async Task<bool> DeleteJobAsync(Guid id)
