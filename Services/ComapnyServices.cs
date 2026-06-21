@@ -143,14 +143,16 @@ namespace Graduation_Project.Services
                 CompanyId = company.CompanyID,
                 Name = company.Name,
                 LogoUrl = company.LogoUrl,
+                WebsiteUrl=company.WebsiteURL,
                 CoverLogoUrl = company.CoverLogoUrl,
                 Tagline = company.ProfileBio,
                 About = company.Description,
-                Location = company.Location,
+                Address = company.HeadquarterAddress,
                 Country = company.Country,
                 Industry = company.Industry,
                 CompanySize = company.CompanySize,
                 FoundedYear = company.FoundedYear,
+                Phone=company.PhoneNumber,
 
                 SocialLinks = new CompanySocialLinksDto
                 {

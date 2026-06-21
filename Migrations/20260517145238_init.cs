@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Graduation_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -140,14 +140,12 @@ namespace Graduation_Project.Migrations
                     ProfilePicURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CoverPhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Linkedin = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Github = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Facebook = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Portfolio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    IsBlocked = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -253,25 +251,12 @@ namespace Graduation_Project.Migrations
                     CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Industry = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinEmployees = table.Column<int>(type: "int", nullable: false),
-                    MaxEmployees = table.Column<int>(type: "int", nullable: false),
-                    WebsiteURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HeadquarterAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WebsiteURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HeadquarterAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CoverLogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FoundedYear = table.Column<int>(type: "int", nullable: true),
-                    ProfileBio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Linkedin = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Instagram = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Facebook = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Twitter = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    IsBlocked = table.Column<bool>(type: "bit", nullable: false),
+                    MinEmployees = table.Column<int>(type: "int", nullable: false),
+                    MaxEmployees = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -504,10 +489,7 @@ namespace Graduation_Project.Migrations
                     InterviewerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InterviewerPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InterviewType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

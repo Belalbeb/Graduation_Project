@@ -11,9 +11,9 @@
         public string? Country { get; set; }
         public string? CompanySize { get; set; }
         public int? FoundedYear { get; set; }
-        public string WebsiteURL { get; set; } = string.Empty;
+
         public string? ProfileBio { get; set; }
         public string? Description { get; set; }
-        public string? HeadquarterAddress { get; set; }
+    
     }
 }

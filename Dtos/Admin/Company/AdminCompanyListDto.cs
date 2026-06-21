@@ -4,6 +4,7 @@
     {
         public Guid CompanyId { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string? Logo { get; set; }
         public string? Location { get; set; }
         public string? Country { get; set; }
         public string Email { get; set; } = string.Empty;

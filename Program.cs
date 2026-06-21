@@ -77,9 +77,13 @@ namespace Graduation_Project
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, Services.SubscriptionService>();
             builder.Services.AddScoped<IResumeServices, ResumeService>();
+            builder.Services.AddScoped<ICompanyVerificationRepository, CompanyVerificationRepository>();
+            builder.Services.AddScoped<ICompanyVerificationService, CompanyVerificationService>();
 
             builder.Services.AddScoped<Icouponrepository, CouponRepository>();
             builder.Services.AddScoped<ICouponService, Services.CouponService>();
+            builder.Services.AddScoped<IWebsiteSettingsRepository, WebsiteSettingsRepository>();
+            builder.Services.AddScoped<IWebsiteSettingsService, WebsiteSettingsService>();
 
             builder.Services.AddScoped<IApplicantServices, ApplicantServices>();
             builder.Services.AddScoped<IProfileService, ProfileService>();

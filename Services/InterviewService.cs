@@ -72,8 +72,10 @@ namespace Graduation_Project.Services
 
                 InterviewerName = interview.InterviewerName,
 
-                InterviewerPosition = interview.InterviewerPosition,
-
+                InterviewType=interview.interviewType.ToString(),
+                StartTime=interview.StartTime,
+                EndTime=interview.EndTime,
+                Notes=interview.Notes,
                 InterviewLink = interview.MeetingLink
             };
             return responseDto;
@@ -119,6 +121,7 @@ namespace Graduation_Project.Services
 
 
         }
+       
 
     }
 }

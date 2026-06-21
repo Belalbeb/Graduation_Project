@@ -49,29 +49,35 @@ namespace Graduation_Project.Controllers
             if (result == null) return NotFound(new { message = "no application found" });
             return Ok(result);
         }
-        [HttpPut("accept-application/{applicationId}")]
+        [HttpPut("reviewed-application/{applicationId}")]
         [Authorize(Roles = Roles.Company)]
         public async Task<IActionResult> AcceptApplication(Guid applicationId)
         {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
             var result = await applicationServivces
-                .ChangeApplicationStatus(applicationId, ApplicationStatus.Accepted);
+                .ChangeApplicationStatus(applicationId,companyId ,ApplicationStatus.Reviewed);
 
             if (!result)
-                return BadRequest();
+                return BadRequest(new {message="sorry, you don't have access"});
 
-            return Ok();
+            return Ok(new {message="updated success"});
         }
         [HttpPut("reject-application/{applicationId}")]
         [Authorize(Roles = Roles.Company)]
         public async Task<IActionResult> RejectApplication(Guid applicationId)
         {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
             var result = await applicationServivces
-                .ChangeApplicationStatus(applicationId, ApplicationStatus.Rejected);
+                .ChangeApplicationStatus(applicationId, companyId,ApplicationStatus.Rejected);
 
             if (!result)
-                return BadRequest();
+                return BadRequest(new { message = "sorry, you don't have access" });
 
-            return Ok();
+            return Ok(new { message = "updated success" });
         }
     
         [HttpPost]

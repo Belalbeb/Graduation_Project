@@ -36,11 +36,12 @@ namespace Graduation_Project.Repositories
             return await _context.Applications.Include(x=>x.Applicant).Include(x=>x.Resume).FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
 
         }
-        public async Task<bool> ChangeApplicationStatus(Guid ApplicationId, ApplicationStatus status)
+        public async Task<bool> ChangeApplicationStatus(Guid ApplicationId,Guid companyId ,ApplicationStatus status)
         {
-            var Application =await _context.Applications.FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
+            var Application =await _context.Applications.FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId &&x.JobPosting.CompanyID==companyId);
             if (Application == null) return false;
             Application.ApplicationStatus = status;
+            await _context.SaveChangesAsync();
             return true;
         }
         public async Task AddApplication(Application application)

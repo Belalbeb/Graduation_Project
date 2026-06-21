@@ -6,10 +6,12 @@ namespace Graduation_Project.Services
     public class CompanySettingsService : ICompanySettingsService
     {
         private readonly ICompanyRepository _companyRepository ;
+        private readonly CloudinaryService cloudinaryService;
 
-        public CompanySettingsService(ICompanyRepository companyRepository)
+        public CompanySettingsService(ICompanyRepository companyRepository,CloudinaryService cloudinaryService)
         {
             _companyRepository = companyRepository ;
+            this.cloudinaryService = cloudinaryService;
         }
         public async Task<CompanyProfileSettingsDto?> GetProfileDetailsAsync(Guid companyId)
         {
@@ -26,10 +28,10 @@ namespace Graduation_Project.Services
                 Country = company.Country,
                 CompanySize = company.CompanySize,
                 FoundedYear = company.FoundedYear,
-                WebsiteURL = company.WebsiteURL,
+             
                 ProfileBio = company.ProfileBio,
                 Description = company.Description,
-                HeadquarterAddress = company.HeadquarterAddress
+               
             };
         }
 
@@ -39,20 +41,40 @@ namespace Graduation_Project.Services
             if(company == null) return false;
 
             company.Name = dto.Name;
-            company.LogoUrl = dto.LogoUrl;
-            company.CoverLogoUrl = dto.CoverLogoUrl;
+          
             company.Industry = dto.Industry;
             company.Country = dto.Country;
             company.CompanySize = dto.CompanySize;
             company.FoundedYear = dto.FoundedYear;
-            company.WebsiteURL = dto.WebsiteURL;
+       
             company.ProfileBio = dto.ProfileBio;
             company.Description = dto.Description;
-            company.HeadquarterAddress = dto.HeadquarterAddress;
+         
 
             return await _companyRepository.UpdateCompanyProfileAsync(company);
         }
+        public async Task<bool> UpdateCoverImage(Guid CompanyId,IFormFile cover)
+        {
+            var company = await _companyRepository.GetCompanyForSettingsAsync(CompanyId);
+            if (company == null) return false;
+            var coverLink = await cloudinaryService.UploadImageAsync(cover);
+            if (coverLink == null) return false;
+            company.CoverLogoUrl = coverLink;
+            return await _companyRepository.UpdateCompanyProfileAsync(company);
+           
 
+        }
+        public async Task<bool> UpdateLogo(Guid CompanyId, IFormFile logo)
+        {
+            var company = await _companyRepository.GetCompanyForSettingsAsync(CompanyId);
+            if (company == null) return false;
+            var logoLink = await cloudinaryService.UploadImageAsync(logo);
+            if (logoLink == null) return false;
+            company.LogoUrl = logoLink;
+            return await _companyRepository.UpdateCompanyProfileAsync(company);
+
+
+        }
         // ====================== Socials Tab ======================
 
         public async Task<CompanySocialsSettingsDto?> GetSocialsDetailsAsync(Guid companyId)
@@ -64,7 +86,7 @@ namespace Graduation_Project.Services
             {
                 PhoneNumber = company.PhoneNumber,
                 HeadquarterAddress = company.HeadquarterAddress,
-                Country = company.Country,
+       
                 Linkedin = company.Linkedin,
                 Instagram = company.Instagram,
                 Facebook = company.Facebook,
@@ -80,7 +102,7 @@ namespace Graduation_Project.Services
 
             company.PhoneNumber = dto.PhoneNumber;
             company.HeadquarterAddress = dto.HeadquarterAddress;
-            company.Country = dto.Country;
+       
             company.Linkedin = dto.Linkedin;
             company.Instagram = dto.Instagram;
             company.Facebook = dto.Facebook;

@@ -61,7 +61,7 @@ namespace Graduation_Project.Controllers
             var success = await _settingsService.UpdateProfileAsync(applicantId, dto);
 
             if(!success)
-                return BadRequest(new {message="no thing to update" });
+                return BadRequest(new {message="no thing to update or you dont have access" });
 
             return Ok(new { message = "Profile updated successfully" });
         }

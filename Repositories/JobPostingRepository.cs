@@ -16,7 +16,7 @@ namespace Graduation_Project.Repositories
 
         public async Task<IEnumerable<JobPosting>> GetAllAsync()
         {
-            return await _context.JobPostings.Include(x => x.Company).Include(x=>x.Applications).Take(7).ToListAsync();
+            return await _context.JobPostings.Include(x => x.Company).Include(x=>x.Applications).Take(10).ToListAsync();
         }
         public async Task<int> TotalJobs()
         {
@@ -120,7 +120,7 @@ namespace Graduation_Project.Repositories
 
         public async Task<int> GetActiveJobsCountAsync()
         {
-            return await _context.JobPostings.Where(x => x.IsActive).CountAsync();
+            return await _context.JobPostings.Where(x => x.Status==JobStatus.Approved).CountAsync();
         }
 
         public async Task<int> GetPendingJobsCountAsync()
@@ -135,7 +135,7 @@ namespace Graduation_Project.Repositories
 
         public async Task<List<JobPosting>> GetPendingApprovalsAsync()
         {
-            return await _context.JobPostings.Where(x => x.Status == JobStatus.Pending).Include(x=>x.Company).ToListAsync();
+            return await _context.JobPostings.Where(x => x.Status == JobStatus.Pending).Include(x=>x.Company).OrderBy(x=>x.PostedDate).Take(5).ToListAsync();
         }
         public Task<List<MonthlyStats>> GetMonthlyStatsAsync()
         {
@@ -143,6 +143,7 @@ namespace Graduation_Project.Repositories
                 .GroupBy(x => new { x.PostedDate.Year, x.PostedDate.Month })
                 .Select(x => new MonthlyStats
                 {
+                    year = x.Key.Year,
                     month = x.Key.Month,
                     JobCount = x.Count(),
                     ApplicationCount = x.Sum(j => j.Applications.Count)

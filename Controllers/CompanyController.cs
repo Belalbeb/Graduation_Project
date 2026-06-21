@@ -1,8 +1,10 @@
-﻿using Graduation_Project.Models;
+﻿using Graduation_Project.Dtos;
+using Graduation_Project.Models;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System.Security.Claims;
 
 namespace Graduation_Project.Controllers
@@ -12,10 +14,12 @@ namespace Graduation_Project.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyServices companyServices;
+        private readonly ICompanyVerificationService companyVerificationService;
 
-        public CompanyController(ICompanyServices companyServices)
+        public CompanyController(ICompanyServices companyServices,ICompanyVerificationService companyVerificationService)
         {
             this.companyServices = companyServices;
+            this.companyVerificationService = companyVerificationService;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCompanyById(Guid id)
@@ -90,6 +94,21 @@ namespace Graduation_Project.Controllers
                 return NotFound("Company profile not found");
 
             return Ok(profile);
+        }
+        [HttpPost("verification-request")]
+        public async Task<IActionResult> CreateRequest([FromForm] CreateVerificationRequestDto dto)
+        {
+            var companyIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(companyIdClaim, out Guid companyId))
+                return Unauthorized();
+
+            var result = await companyVerificationService.CreateRequestAsync(companyId, dto.Documents);
+
+            if (!result)
+                return BadRequest("Failed to create request");
+
+            return Ok("Verification request submitted");
         }
     }
 }

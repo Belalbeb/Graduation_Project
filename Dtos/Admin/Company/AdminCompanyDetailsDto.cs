@@ -18,7 +18,7 @@
 
         // Status
         public string Status { get; set; } = string.Empty;
-        public bool IsBlocked { get; set; }
+   
 
         // Subscription
         public string SubscriptionPlan { get; set; } = string.Empty;

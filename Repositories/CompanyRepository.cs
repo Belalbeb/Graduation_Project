@@ -122,7 +122,7 @@ namespace Graduation_Project.Repositories
         // Count pending companies (verification requests)
         public async Task<int> CountPendingCompaniesAsync()
         {
-            return await _context.Companies.CountAsync(c => c.Status == CompanyStatus.Pending);
+            return await _context.Companies.CountAsync(c => c.Status == CompanyStatus.Active);
         }
 
         // Count total jobs for a company

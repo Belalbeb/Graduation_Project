@@ -23,8 +23,8 @@
         // Company block
         public string CompanyName { get; set; }
         public string? CompanyLogoUrl { get; set; }
-        public int MinEmployees { get; set; }
-        public int MaxEmployees { get; set; }
+        public string ?CompanySize { get; set; }
+
         public string CompanyIndustry { get; set; }
         public Guid CompanyID { get; set; }
         public List<CandidateDto> candidates { get; set; } = new();

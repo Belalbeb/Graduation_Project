@@ -54,7 +54,7 @@ namespace Graduation_Project.Seeds
             //// 7. TRANSACTIONS
             //// =======================
             //await ApplicationSeeder.Seed(context);
-            await InterviewSeeder.Seed(context);
+            //await InterviewSeeder.Seed(context);
         }
     }
 }

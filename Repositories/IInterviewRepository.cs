@@ -8,23 +8,32 @@ namespace Graduation_Project.Repositories
     {
         // Applicant side methods
         Task<int> CountByApplicantAsync(Guid applicantId);
-        Task<int> CountByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status);
-        Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status);
+        Task<int> CountByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status);
+        Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status);
         Task<List<Interview>> GetAllByApplicantAsync(Guid applicantId);
-<<<<<<< HEAD
 
+        // Company side methods
         Task<CompanyInterviewStatisticsDto> GetCompanyStatisticsAsync(Guid companyId);
-        Task<List<Interview>> GetCompanyInterviewsAsync(Guid companyId,string? search = null,string? status = null);
-        Task<Interview?> GetCompanyInterviewByIdAsync(Guid interviewId,Guid companyId);
+
+        Task<List<Interview>> GetCompanyInterviewsAsync(
+            Guid companyId,
+            string? search = null,
+            string? status = null);
+
+        Task<Interview?> GetCompanyInterviewByIdAsync(
+            Guid interviewId,
+            Guid companyId);
+
         Task UpdateAsync(Interview interview);
 
+        // Shared methods
         Task<List<Interview>> GetByjobPostingId(Guid jobId);
-        Task<Interview> GetInterviewById(Guid InterviewId);
-        Task<bool> ChangeInterviewDate(Guid InterviewId,DateTime InterviewDate);
-=======
-        public Task<List<Interview>> GetByjobPostingId(Guid jobId);
-        public Task<Interview> GetInterviewById(Guid InterviewId);
-        public Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate);
->>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
+        Task<Interview> GetInterviewById(Guid interviewId);
+
+        Task<bool> ChangeInterviewDate(
+            Guid interviewId,
+            DateOnly interviewDate);
+        Task<Interview> AddAsync(Interview interview);
+        
     }
 }

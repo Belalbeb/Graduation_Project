@@ -4,9 +4,10 @@
     {
         public Guid ApplicantId { get; set; }
         public string FullName { get; set; } = string.Empty;
+        public string? ProfilePic { get; set; }
         public string Email { get; set; } = string.Empty;
         public string? JobTitle { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public bool IsBlocked { get; set; } 
         public string Location { get; set; } = string.Empty;
         public DateTime JoinedDate { get; set; }
     }

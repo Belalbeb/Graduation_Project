@@ -1,4 +1,6 @@
-﻿namespace Graduation_Project.Dtos
+﻿using Graduation_Project.Models;
+
+namespace Graduation_Project.Dtos
 {
     public class InterviewCompanyResponseDto
     {
@@ -10,8 +12,12 @@
         public string ResumePath { get; set; }
         public string InterviewStatus { get; set; }
         public DateOnly InterviewDate { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public string InterviewerName { get; set; }
-        public string InterviewerPosition { get; set; }
+        public string InterviewType { get; set; }
+
+        public string Notes { get; set; }
         public string InterviewLink { get; set; }
 
     }

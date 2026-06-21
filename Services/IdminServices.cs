@@ -18,7 +18,7 @@ namespace Graduation_Project.Services
         Task<AdminUserDetailsDto?> GetApplicantDetailsAsync(Guid applicantId);
         Task<bool> BlockApplicantAsync(Guid applicantId);
         Task<bool> UnblockApplicantAsync(Guid applicantId);
-        Task<bool> ApproveApplicantAsync(Guid applicantId);
+   
         Task<bool> DeleteApplicantAsync(Guid applicantId);
 
         // ================= Company ====================

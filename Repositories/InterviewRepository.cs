@@ -15,24 +15,26 @@ namespace Graduation_Project.Repositories
         }
 
         // ==================== Applicant Methods ====================
+
         public async Task<int> CountByApplicantAsync(Guid applicantId)
         {
             return await _context.Interviews.CountAsync(i => i.ApplicantId == applicantId);
         }
 
-        public async Task<int> CountByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status)
+        public async Task<int> CountByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status)
         {
             return await _context.Interviews
                 .CountAsync(i => i.ApplicantId == applicantId && i.Status == status);
         }
 
-        public async Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId,InterviewStatus status)
+        public async Task<List<Interview>> GetByApplicantAndStatusAsync(Guid applicantId, InterviewStatus status)
         {
             return await _context.Interviews
                 .Where(i => i.ApplicantId == applicantId && i.Status == status)
                 .Include(i => i.JobPosting)
                     .ThenInclude(j => j.Company)
                 .OrderBy(i => i.InterviewDate)
+                .ThenBy(i => i.StartTime)
                 .ToListAsync();
         }
 
@@ -43,71 +45,79 @@ namespace Graduation_Project.Repositories
                 .Include(i => i.JobPosting)
                     .ThenInclude(j => j.Company)
                 .OrderBy(i => i.InterviewDate)
+                .ThenBy(i => i.StartTime)
                 .ToListAsync();
         }
 
         // ==================== Company Methods ====================
+
         public async Task<CompanyInterviewStatisticsDto> GetCompanyStatisticsAsync(Guid companyId)
         {
-            var now = DateTime.UtcNow.Date;
+            var todayDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
             var total = await _context.Interviews
                 .CountAsync(i => i.JobPosting.CompanyID == companyId);
 
             var today = await _context.Interviews
                 .CountAsync(i => i.JobPosting.CompanyID == companyId &&
-                                 i.ScheduledAt.Date == now);
+                                 i.InterviewDate == todayDate);
 
             var completed = await _context.Interviews
                 .CountAsync(i => i.JobPosting.CompanyID == companyId &&
                                  i.Status == InterviewStatus.Completed);
 
-            var pending = await _context.Interviews
+            var upcoming = await _context.Interviews
                 .CountAsync(i => i.JobPosting.CompanyID == companyId &&
-                                 (i.Status == InterviewStatus.Pending || i.Status == InterviewStatus.Upcoming));
+                                 i.Status == InterviewStatus.Upcoming);
 
             return new CompanyInterviewStatisticsDto
             {
                 TotalInterviews = total,
                 TodaysInterviews = today,
                 CompletedInterviews = completed,
-                PendingInterviews = pending
+                PendingInterviews = upcoming
             };
         }
 
-        public async Task<List<Interview>> GetCompanyInterviewsAsync(Guid companyId,string? search = null,string? status = null)
+        public async Task<List<Interview>> GetCompanyInterviewsAsync(
+            Guid companyId,
+            string? search = null,
+            string? status = null)
         {
             var query = _context.Interviews
                 .Include(i => i.Applicant)
                 .Include(i => i.JobPosting)
                 .Where(i => i.JobPosting.CompanyID == companyId);
 
-            if(!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrWhiteSpace(status))
             {
-                if(Enum.TryParse<InterviewStatus>(status,true,out var statusEnum))
+                if (Enum.TryParse<InterviewStatus>(status, true, out var statusEnum))
                 {
                     query = query.Where(i => i.Status == statusEnum);
                 }
             }
 
-            if(!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                query = query.Where(i => i.Applicant.FirstName.Contains(search) ||
-                                         i.Applicant.LastName.Contains(search));
+                query = query.Where(i =>
+                    i.Applicant.FirstName.Contains(search) ||
+                    i.Applicant.LastName.Contains(search));
             }
 
             return await query
-                .OrderByDescending(i => i.ScheduledAt)
+                .OrderByDescending(i => i.InterviewDate)
+                .ThenByDescending(i => i.StartTime)
                 .ToListAsync();
         }
 
-        public async Task<Interview?> GetCompanyInterviewByIdAsync(Guid interviewId,Guid companyId)
+        public async Task<Interview?> GetCompanyInterviewByIdAsync(Guid interviewId, Guid companyId)
         {
             return await _context.Interviews
                 .Include(i => i.Applicant)
                 .Include(i => i.JobPosting)
-                .FirstOrDefaultAsync(i => i.InterviewId == interviewId &&
-                                          i.JobPosting.CompanyID == companyId);
+                .FirstOrDefaultAsync(i =>
+                    i.InterviewId == interviewId &&
+                    i.JobPosting.CompanyID == companyId);
         }
 
         public async Task UpdateAsync(Interview interview)
@@ -116,37 +126,45 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
         }
 
+        // ==================== Shared Methods ====================
+
         public async Task<List<Interview>> GetByjobPostingId(Guid jobId)
         {
             return await _context.Interviews
                 .Where(i => i.JobPostingId == jobId)
-                .Include(x => x.Applicant)
+                .Include(i => i.Applicant)
                 .ToListAsync();
         }
 
-        public async Task<Interview> GetInterviewById(Guid InterviewId)
+        public async Task<Interview> GetInterviewById(Guid interviewId)
         {
             return await _context.Interviews
-                .Include(x => x.JobPosting)
-                .Include(x => x.Applicant)
-                    .ThenInclude(x => x.Resumes)
-                .FirstOrDefaultAsync(i => i.InterviewId == InterviewId);
+                .Include(i => i.JobPosting)
+                .Include(i => i.Applicant)
+                    .ThenInclude(a => a.Resumes)
+                .FirstOrDefaultAsync(i => i.InterviewId == interviewId);
         }
 
-        public async Task<bool> ChangeInterviewDate(Guid InterviewId,DateOnly InterviewDate)
+        public async Task<bool> ChangeInterviewDate(Guid interviewId, DateOnly interviewDate)
         {
-            var Interview = await _context.Interviews.FirstOrDefaultAsync(x => x.InterviewId == InterviewId);
-            if(Interview == null) return false;
+            var interview = await _context.Interviews
+                .FirstOrDefaultAsync(i => i.InterviewId == interviewId);
 
-<<<<<<< HEAD
-            Interview.ScheduledAt = InterviewDate;
+            if (interview == null)
+                return false;
+
+            interview.InterviewDate = interviewDate;
+
             await _context.SaveChangesAsync();
-=======
-            if (Interview == null) return false;
-            Interview.InterviewDate = InterviewDate;
-           await _context.SaveChangesAsync();
->>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
+
             return true;
+        }
+
+        public async Task<Interview> AddAsync(Interview interview)
+        {
+            await _context.Interviews.AddAsync(interview);
+            await _context.SaveChangesAsync();
+            return interview;
         }
     }
 }

@@ -15,20 +15,23 @@ namespace Graduation_Project.Dtos
     }
     public class MonthlyJobStatsDto
     {
-        public int Month { get; set; }
+        
+        public string Month { get; set; } 
         public int JobPosts { get; set; }
         public int Applications { get; set; }
     }
     public class LatestJobDto
     {
+        public Guid JobId { get; set; }
         public string JobTitle { get; set; }
         public int TotalApplications { get; set; }
         public DateTime PostedAt { get; set; }
     }
     public class PendingApprovalDto
     {
+        public Guid JobId { get; set; }
         public string JobTitle { get; set; }
-        public string CompanyName { get; set; }
+        public string Logo { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

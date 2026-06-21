@@ -5,14 +5,16 @@
         public Guid CompanyId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? LogoUrl { get; set; }
+        public string? WebsiteUrl { get; set; }
         public string? CoverLogoUrl { get; set; }
         public string? Tagline { get; set; }  // ProfileBio
         public string? About { get; set; }     // Description
-        public string? Location { get; set; }
+        public string? Address { get; set; }
         public string? Country { get; set; }
         public string Industry { get; set; } = string.Empty;
         public string? CompanySize { get; set; }
         public int? FoundedYear { get; set; }
+        public string? Phone { get; set; }
 
         public CompanySocialLinksDto? SocialLinks { get; set; }
         public CompanyStatsDto Stats { get; set; } = new();

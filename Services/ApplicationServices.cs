@@ -26,7 +26,8 @@ namespace Graduation_Project.Services
             {
                 Name = $"{application.Applicant.FirstName} {application.Applicant.LastName}",
                 Email = application.Applicant.Email,
-                PortfolioLink = application.Applicant.ProfilePicURL,
+                ApplicantId  = application.ApplicantID,
+                ImageUrl=application.Applicant.ProfilePicURL,
                 CvPath = application.Resume.FilePath,
                 CVName=application.Resume.FileName,
                 ApplicationStatus = application.ApplicationStatus.ToString()
@@ -35,9 +36,9 @@ namespace Graduation_Project.Services
             };
             return applicantCompanyDto;
         }
-        public async Task<bool> ChangeApplicationStatus(Guid ApplicationId,ApplicationStatus status)
+        public async Task<bool> ChangeApplicationStatus(Guid ApplicationId, Guid companyId, ApplicationStatus status)
         {
-            var result =await _repository.ChangeApplicationStatus(ApplicationId, status);
+            var result =await _repository.ChangeApplicationStatus(ApplicationId, companyId, status);
             if (!result) return false;
             return true;
 

@@ -27,6 +27,8 @@ namespace Graduation_Project.Models
         public DbSet<CompanySubscription> companySubscriptions { get; set; }
         public DbSet<Coupon> Coupons => Set<Coupon>();
         public DbSet<JobSkill>  JobSkills { get; set; }
+        public DbSet<CompanyVerificationRequest> companyVerificationRequests { get; set; }
+        public DbSet<WebsiteSettings> WebsiteSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

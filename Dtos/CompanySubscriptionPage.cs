@@ -9,9 +9,6 @@ namespace Graduation_Project.Dtos
         public BillingHistoryDto BillingHistory { get; set; } = null!;
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  1. CURRENT PLAN DETAILS  (top card)
-    // ═══════════════════════════════════════════════════════════════════
 
     public class CurrentPlanDetailsDto
     {

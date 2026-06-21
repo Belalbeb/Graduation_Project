@@ -18,6 +18,7 @@ namespace Graduation_Project.Models
         [ForeignKey("JobPosting")]
         public Guid JobPostingID { get; set; }
         public JobPosting JobPosting { get; set; }
+        public int MatchScore { get; set; }
 
         public Guid? ResumeID { get; set; }
         public Resume? Resume { get; set; }

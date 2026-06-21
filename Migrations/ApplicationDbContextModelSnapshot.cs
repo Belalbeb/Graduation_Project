@@ -56,9 +56,6 @@ namespace Graduation_Project.Migrations
                     b.Property<string>("Instagram")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsBlocked")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Linkedin")
                         .HasColumnType("nvarchar(max)");
 
@@ -166,9 +163,6 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -226,6 +220,9 @@ namespace Graduation_Project.Migrations
                     b.Property<Guid>("JobPostingID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("MatchScore")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("ResumeID")
                         .HasColumnType("uniqueidentifier");
 
@@ -260,6 +257,9 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastLogin")
@@ -311,55 +311,6 @@ namespace Graduation_Project.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-<<<<<<< HEAD
-=======
-            modelBuilder.Entity("Graduation_Project.Models.Company", b =>
-                {
-                    b.Property<Guid>("CompanyID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("HeadquarterAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Industry")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LogoUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaxEmployees")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MinEmployees")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("WebsiteURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CompanyID");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Companies");
-                });
-
->>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
             modelBuilder.Entity("Graduation_Project.Models.CompanySubscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -397,6 +348,31 @@ namespace Graduation_Project.Migrations
                     b.HasIndex("SubscriptionPlanId");
 
                     b.ToTable("companySubscriptions");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.CompanyVerificationRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("companyVerificationRequests");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.Coupon", b =>
@@ -491,19 +467,11 @@ namespace Graduation_Project.Migrations
                     b.Property<Guid>("ApplicantId")
                         .HasColumnType("uniqueidentifier");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InterviewType")
-                        .HasColumnType("nvarchar(max)");
-=======
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<DateOnly>("InterviewDate")
                         .HasColumnType("date");
->>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
 
                     b.Property<string>("InterviewerName")
                         .IsRequired()
@@ -528,13 +496,8 @@ namespace Graduation_Project.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-=======
                     b.Property<int>("interviewType")
                         .HasColumnType("int");
->>>>>>> eaac8262416df8044c7b7b09e0f831adee87ff0b
 
                     b.HasKey("InterviewId");
 
@@ -832,6 +795,68 @@ namespace Graduation_Project.Migrations
                     b.ToTable("subscriptionPlans");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.VerificationDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("FileSize")
+                        .HasColumnType("real");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("VerificationRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VerificationRequestId");
+
+                    b.ToTable("VerificationDocument");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.WebsiteSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TwitterUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YoutubeUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WebsiteSettings");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1051,6 +1076,17 @@ namespace Graduation_Project.Migrations
                     b.Navigation("SubscriptionPlan");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.CompanyVerificationRequest", b =>
+                {
+                    b.HasOne("Company", "Company")
+                        .WithMany("VerificationRequests")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Graduation_Project.Models.Experience", b =>
                 {
                     b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
@@ -1166,6 +1202,17 @@ namespace Graduation_Project.Migrations
                     b.Navigation("JobPosting");
                 });
 
+            modelBuilder.Entity("Graduation_Project.Models.VerificationDocument", b =>
+                {
+                    b.HasOne("Graduation_Project.Models.CompanyVerificationRequest", "VerificationRequest")
+                        .WithMany("Documents")
+                        .HasForeignKey("VerificationRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VerificationRequest");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1220,6 +1267,8 @@ namespace Graduation_Project.Migrations
             modelBuilder.Entity("Company", b =>
                 {
                     b.Navigation("JobPostings");
+
+                    b.Navigation("VerificationRequests");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.Applicant", b =>
@@ -1238,6 +1287,11 @@ namespace Graduation_Project.Migrations
             modelBuilder.Entity("Graduation_Project.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Graduation_Project.Models.CompanyVerificationRequest", b =>
+                {
+                    b.Navigation("Documents");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.JobPosting", b =>

@@ -3,6 +3,9 @@ using Graduation_Project.Dtos.Admin.Applicant;
 using Graduation_Project.Dtos.Admin.Company;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
+using Microsoft.AspNetCore.Identity;
+using System.Globalization;
+using System.Linq;
 
 namespace Graduation_Project.Services
 {
@@ -13,15 +16,17 @@ namespace Graduation_Project.Services
         private readonly IUserRepository userRepository;
         private readonly ICompanyRepository companyRepository;
         private readonly IJobPostingRepository jobPostingRepository;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IApplicantRepository _applicantRepository ;
 
-        public AdminServices(IAdminRepository adminRepository,IUserRepository userRepository,ICompanyRepository companyRepository,IJobPostingRepository jobPostingRepository,
+        public AdminServices(IAdminRepository adminRepository,IUserRepository userRepository,ICompanyRepository companyRepository,IJobPostingRepository jobPostingRepository,UserManager<ApplicationUser> userManager,
             IApplicantRepository applicantRepository)
         {
             this.adminRepository = adminRepository;
             this.userRepository = userRepository;
             this.companyRepository = companyRepository;
             this.jobPostingRepository = jobPostingRepository;
+            this.userManager = userManager;
             this._applicantRepository = applicantRepository ;
         }
 
@@ -36,7 +41,24 @@ namespace Graduation_Project.Services
             var pendingJobs = await jobPostingRepository.GetPendingApprovalsAsync();
             var monthlyJobStat = await jobPostingRepository.GetMonthlyStatsAsync();
 
-            var MonthlyStats = monthlyJobStat.Select(i => new MonthlyJobStatsDto { Month = i.month, JobPosts = i.JobCount, Applications = i.ApplicationCount });
+
+
+            var monthlyStats = Enumerable.Range(1, 12)
+             .Select(month =>
+            {
+                var data = monthlyJobStat
+             .FirstOrDefault(x => x.month == month);
+
+                var date = new DateTime(DateTime.UtcNow.Year, month, 1);
+
+                  return new MonthlyJobStatsDto
+                {
+             Month = date.ToString("MMM"),
+             JobPosts = data?.JobCount ?? 0,
+             Applications = data?.ApplicationCount ?? 0
+         };
+     })
+     .ToList();
             AdminDashboardResponseDto adminDashboardResponseDto = new AdminDashboardResponseDto()
             {
                 TotalUsers = userCounts,
@@ -44,15 +66,16 @@ namespace Graduation_Project.Services
                 ActiveJobPosts = ActiveJobsCount,
                 PendingJobs = pendingJobsCount,
                 Year= DateTime.UtcNow.Year,
-                MonthlyStats = MonthlyStats.ToList(),
+                MonthlyStats = monthlyStats.ToList(),
                 LatestJobs = latestJobs.Select(i => new LatestJobDto
                 {
+                    JobId=i.JobID,
                     JobTitle = i.Title,
                     TotalApplications = i.Applications.Count(),
                     PostedAt = i.PostedDate
 
                 }).ToList(),
-                PendingApprovals=pendingJobs.Select(i=>new PendingApprovalDto {JobTitle=i.Title,CreatedAt=i.PostedDate, CompanyName=i.Company.Name,}).ToList()
+                PendingApprovals=pendingJobs.Select(i=>new PendingApprovalDto {JobId=i.JobID,JobTitle=i.Title,CreatedAt=i.PostedDate, Logo=i.Company.LogoUrl,}).ToList()
 
 
 
@@ -108,8 +131,8 @@ namespace Graduation_Project.Services
                 JobCategory = job.JobCategory,
                 Location = job.Location,
                 Status = job.Status.ToString(),
-                PostedAgo = GetTimeAgo(job.PostedDate),
-                Skills = job.Skills.Select(x => x.ToString()).ToList(),
+                PostedAgo =job.PostedDate.ToString(),
+                Skills = job.Skills.Select(x => x.Name).ToList(),
                 JobTypes = job.JobTypes.Select(x => x.ToString()).ToList(),
                 WorkApproaches = job.WorkApproaches.Select(x => x.ToString()).ToList(),
                 ApplicationsCount = job.Applications.Count(),
@@ -117,8 +140,7 @@ namespace Graduation_Project.Services
                 CompanyName = job.Company.Name,
                 CompanyLogoUrl = job.Company.LogoUrl,
                 CompanyIndustry = job.Company.Industry,
-                MinEmployees = job.Company.MinEmployees,
-                MaxEmployees = job.Company.MaxEmployees,
+                CompanySize=job.Company.CompanySize,
                 candidates = job.Applications.Select(x => new CandidateDto
                 {
                     ApplicationId = x.ApplicationID,
@@ -128,7 +150,7 @@ namespace Graduation_Project.Services
                     Location = x.Applicant.Location ?? "—",
                     AvatarUrl = x.Applicant.ProfilePicURL,
                     ApplicationStatus = x.ApplicationStatus.ToString(),
-                    AppliedAgo = GetTimeAgo(x.AppliedDate),
+                    AppliedAgo = x.AppliedDate.ToString(),
                     MatchPercentage = 0,   // calculate from your matching logic if available
                     CvUrl = x.Applicant.Resumes
                             .OrderByDescending(r => r.IsActive)
@@ -154,7 +176,16 @@ namespace Graduation_Project.Services
         }
         public static string GetTimeAgo(DateTime date)
         {
-            var span = DateTime.UtcNow - date;
+            var now = DateTime.UtcNow;
+
+            // حماية من DateTime غير صحيح
+            if (date == default)
+                return "unknown";
+
+            if (date > now)
+                return "just now";
+
+            var span = now - date;
 
             if (span.TotalMinutes < 1)
                 return "Just now";
@@ -164,10 +195,14 @@ namespace Graduation_Project.Services
 
             if (span.TotalDays < 1)
                 return $"{(int)span.TotalHours} hours ago";
-            if(span.TotalDays<30)
-            return $"{(int)span.TotalDays} days ago";
 
-            return $"{(int)span.TotalDays / 30} month ago";
+            if (span.TotalDays < 30)
+                return $"{(int)span.TotalDays} days ago";
+
+            if (span.TotalDays < 365)
+                return $"{(int)(span.TotalDays / 30)} months ago";
+
+            return $"{(int)(span.TotalDays / 365)} years ago";
         }
         #endregion
 
@@ -190,10 +225,11 @@ namespace Graduation_Project.Services
             return applicants.Select(a => new AdminUserListDto
             {
                 ApplicantId = a.ApplicantID,
+                ProfilePic=a.ProfilePicURL,
                 FullName = $"{a.FirstName} {a.LastName}",
                 Email = a.User?.Email ?? a.Email ?? string.Empty,
                 JobTitle = a.JobTitle,
-                Status = a.IsBlocked ? "Blocked" : a.Status.ToString(),
+                 IsBlocked = a.IsBlocked,
                 Location = a.Location,
                 JoinedDate = a.User?.CreatedAt ?? DateTime.UtcNow
             }).ToList();
@@ -211,8 +247,9 @@ namespace Graduation_Project.Services
                 // Basic Info
                 ApplicantId = applicant.ApplicantID,
                 FullName = $"{applicant.FirstName} {applicant.LastName}",
+                ImageUrl=applicant.ProfilePicURL,
                 JobTitle = applicant.JobTitle,
-                Status = applicant.IsBlocked ? "Blocked" : applicant.Status.ToString(),
+                IsBlocked = applicant.IsBlocked ,
                 JoinedDate = applicant.User?.CreatedAt ?? DateTime.UtcNow,
 
                 // Contact Info
@@ -241,34 +278,44 @@ namespace Graduation_Project.Services
         public async Task<bool> BlockApplicantAsync(Guid applicantId)
         {
             var applicant = await _applicantRepository.GetByIdAsync(applicantId);
-            if(applicant == null) return false;
 
+            if (applicant == null)
+                return false;
+
+            var user = await userManager.FindByIdAsync(applicant.UserId);
+
+            if (user == null)
+                return false;
             applicant.IsBlocked = true;
-            applicant.Status = UserStatus.Blocked;
+            user.IsBlocked = true;
+
             await _applicantRepository.UpdateAsync(applicant);
-            return true;
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
 
         public async Task<bool> UnblockApplicantAsync(Guid applicantId)
         {
             var applicant = await _applicantRepository.GetByIdAsync(applicantId);
-            if(applicant == null) return false;
 
+            if (applicant == null)
+                return false;
+
+            var user = await userManager.FindByIdAsync(applicant.UserId);
+
+            if (user == null)
+                return false;
+
+            user.IsBlocked = false;
             applicant.IsBlocked = false;
-            applicant.Status = UserStatus.Active;
             await _applicantRepository.UpdateAsync(applicant);
-            return true;
+
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
 
-        public async Task<bool> ApproveApplicantAsync(Guid applicantId)
-        {
-            var applicant = await _applicantRepository.GetByIdAsync(applicantId);
-            if(applicant == null) return false;
-
-            applicant.Status = UserStatus.Active;
-            await _applicantRepository.UpdateAsync(applicant);
-            return true;
-        }
 
         public async Task<bool> DeleteApplicantAsync(Guid applicantId)
         {
@@ -309,12 +356,13 @@ namespace Graduation_Project.Services
                 {
                     CompanyId = company.CompanyID,
                     Name = company.Name,
+                    Logo=company.LogoUrl,
                     Location = company.Location,
                     Country = company.Country,
                     Email = company.User?.Email ?? string.Empty,
                     Industry = company.Industry,
                     TotalJobs = totalJobs,
-                    Status = company.IsBlocked ? "Blocked" : company.Status.ToString(),
+                    Status = company.Status.ToString(),
                     JoinedDate = company.User?.CreatedAt ?? DateTime.UtcNow,
                     SubscriptionPlan = subscriptionPlan ?? "Free"
                 });
@@ -352,8 +400,8 @@ namespace Graduation_Project.Services
                 CompanySize = company.CompanySize,
 
                 // Status
-                Status = company.IsBlocked ? "Blocked" : company.Status.ToString(),
-                IsBlocked = company.IsBlocked,
+                Status =  company.Status.ToString(),
+
 
                 // Subscription
                 SubscriptionPlan = subscriptionPlan ?? "Free",
@@ -366,7 +414,7 @@ namespace Graduation_Project.Services
             };
         }
 
-        // Verify/Approve a company (change status from Pending to Verified)
+   
         public async Task<bool> VerifyCompanyAsync(Guid companyId)
         {
             var company = await companyRepository.GetByIdAsync(companyId);
@@ -381,25 +429,46 @@ namespace Graduation_Project.Services
         public async Task<bool> BlockCompanyAsync(Guid companyId)
         {
             var company = await companyRepository.GetByIdAsync(companyId);
-            if(company == null) return false;
 
-            company.IsBlocked = true;
+            if (company == null)
+                return false;
+
+            var user = await userManager.FindByIdAsync(company.UserId);
+
+            if (user == null)
+                return false;
+
+            user.IsBlocked = true;
             company.Status = CompanyStatus.Blocked;
             await companyRepository.UpdateAsync(company);
-            return true;
+
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
 
         // Unblock a company
         public async Task<bool> UnblockCompanyAsync(Guid companyId)
         {
             var company = await companyRepository.GetByIdAsync(companyId);
-            if(company == null) return false;
 
-            company.IsBlocked = false;
-            company.Status = CompanyStatus.Verified;
+            if (company == null)
+                return false;
+
+            var user = await userManager.FindByIdAsync(company.UserId);
+
+            if (user == null)
+                return false;
+
+            user.IsBlocked = false;
+            company.Status = CompanyStatus.Active;
             await companyRepository.UpdateAsync(company);
-            return true;
+
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
+
 
         // Delete a company permanently
         public async Task<bool> DeleteCompanyAsync(Guid companyId)

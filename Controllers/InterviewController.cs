@@ -83,7 +83,7 @@ namespace Graduation_Project.Controllers
             var interviews = await _interviewService.GetAllAsync(applicantId);
             return Ok(new {stats= InterviewStatisticsDto, interviews =interviews });
         }
-        [HttpGet("{id}")]
+        [HttpGet("get-by-company/{id}")]
         [Authorize(Roles =Roles.Company)]
         public async Task<IActionResult> GetInterviewById(Guid id)
         {

@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public string PortfolioLink { get; set; }
+        public Guid ApplicantId { get; set; }
         public string ImageUrl { get; set; }
         public string CvPath { get; set; }
         public string CVName { get; set; }

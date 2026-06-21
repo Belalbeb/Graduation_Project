@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260612121430_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260612154541_matchscore")]
+    partial class matchscore
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,7 +117,16 @@ namespace Graduation_Project.Migrations
                     b.Property<string>("AboutMe")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Behance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CoverPhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dribble")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -157,6 +166,7 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePicURL")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -214,11 +224,13 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CoverLetter")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("JobPostingID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MatchScore")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("ResumeID")
                         .HasColumnType("uniqueidentifier");
@@ -436,13 +448,14 @@ namespace Graduation_Project.Migrations
                     b.Property<Guid>("ApplicantId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
-                    b.Property<string>("InterviewType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateOnly>("InterviewDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("InterviewerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InterviewerPosition")
@@ -452,19 +465,20 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MeetingLink")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("interviewType")
+                        .HasColumnType("int");
 
                     b.HasKey("InterviewId");
 
@@ -535,8 +549,14 @@ namespace Graduation_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaxExperience")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("MaxSalary")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MinExperience")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("MinSalary")
                         .HasColumnType("decimal(18,2)");
@@ -583,7 +603,7 @@ namespace Graduation_Project.Migrations
 
                     b.HasIndex("JobPostingId");
 
-                    b.ToTable("JobSkill");
+                    b.ToTable("JobSkills");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.ProfileView", b =>
@@ -1010,7 +1030,7 @@ namespace Graduation_Project.Migrations
                     b.HasOne("Graduation_Project.Models.JobPosting", "JobPosting")
                         .WithOne("JobMetric")
                         .HasForeignKey("Graduation_Project.Models.JobMetric", "JobID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("JobPosting");

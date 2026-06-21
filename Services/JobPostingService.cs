@@ -203,6 +203,8 @@ namespace Graduation_Project.Services
                         Email = i.Applicant.Email,
                         ImageUrl = i.Applicant.ProfilePicURL,
                         InterviewDate = i.InterviewDate,
+                        StartTime=i.StartTime,
+                        EndTime=i.EndTime,
                         InterviewStatus = i.Status.ToString()
                     }).ToList()
             };

@@ -6,6 +6,8 @@ namespace Graduation_Project.Services
     {
         Task<CompanyProfileSettingsDto?> GetProfileDetailsAsync(Guid companyId);
         Task<bool> UpdateProfileAsync(Guid companyId,UpdateCompanyProfileDto dto);
+        Task<bool> UpdateCoverImage(Guid CompanyId, IFormFile cover);
+        Task<bool> UpdateLogo(Guid CompanyId, IFormFile logo);
 
         // Socials Tab
         Task<CompanySocialsSettingsDto?> GetSocialsDetailsAsync(Guid companyId);

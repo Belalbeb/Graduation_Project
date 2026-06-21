@@ -79,7 +79,7 @@ namespace Graduation_Project.Controllers
         [Authorize(Roles=Roles.Company)]
         public async Task<IActionResult> GetSubscriptionPage()
         {
-            // ── Extract companyId from the JWT token (no id in the route needed) ──────
+            
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
             if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
@@ -157,6 +157,7 @@ namespace Graduation_Project.Controllers
         }
 
        
+
         //stripe listen --forward-to https://localhost:7109/api/subscription/webhook
         [HttpPost("webhook")]
         public async Task<IActionResult> StripeWebhook()

@@ -29,11 +29,12 @@ namespace Graduation_Project.Controllers
                 return Unauthorized("Invalid or missing ProfileId");
 
             var profile = await _settingsService.GetProfileDetailsAsync(companyId);
+            var socials = await _settingsService.GetSocialsDetailsAsync(companyId);
 
-            if(profile == null)
+            if (profile == null)
                 return NotFound("Company profile not found.");
 
-            return Ok(profile);
+            return Ok(new {profile=profile,socials=socials});
         }
 
         [HttpPut("profile")]
@@ -54,24 +55,34 @@ namespace Graduation_Project.Controllers
 
             return Ok(new { message = "Company profile updated successfully" });
         }
-
-        // ====================== Socials Tab ======================
-
-        [HttpGet("socials")]
-        public async Task<IActionResult> GetSocials()
+        [HttpPut("cover-image")]
+        public async Task<IActionResult> UpdateCoverImage([FromForm]IFormFile cover)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
-            if(!Guid.TryParse(profileIdClaim,out Guid companyId))
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
 
-            var socials = await _settingsService.GetSocialsDetailsAsync(companyId);
-
-            if(socials == null)
-                return NotFound("Company profile not found.");
-
-            return Ok(socials);
+            if (cover.Length == 0) return BadRequest(new { message= "no file uploaded" });
+            var result = await _settingsService.UpdateCoverImage(companyId, cover);
+            if (!result) return BadRequest(new { message = "failed to upload to cloudinary please try again later" });
+            return Ok(new { message = "updated success" });
         }
+        [HttpPut("logo")]
+        public async Task<IActionResult> UpdateLogoUrl([FromForm]IFormFile logo)
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            if (logo.Length == 0) return BadRequest(new { message = "no file uploaded" });
+            var result = await _settingsService.UpdateLogo(companyId, logo);
+            if (!result) return BadRequest(new { message = "failed to upload to cloudinary please try again later" });
+            return Ok(new { message = "updated success" });
+        }
+
+
 
         [HttpPut("socials")]
         public async Task<IActionResult> UpdateSocials([FromBody] UpdateCompanySocialsDto dto)

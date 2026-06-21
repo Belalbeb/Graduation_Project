@@ -1,8 +1,11 @@
-﻿using Graduation_Project.Models;
+﻿using Graduation_Project.Dtos;
+using Graduation_Project.Models;
+using Graduation_Project.Repositories;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace Graduation_Project.Controllers
 {
@@ -11,10 +14,14 @@ namespace Graduation_Project.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminServices adminServices;
+        private readonly ICompanyVerificationService companyVerificationService;
+        private readonly IWebsiteSettingsService websiteSettingsService;
 
-        public AdminController(IAdminServices adminServices)
+        public AdminController(IAdminServices adminServices,ICompanyVerificationService companyVerificationService,IWebsiteSettingsService websiteSettingsService)
         {
             this.adminServices = adminServices;
+            this.companyVerificationService = companyVerificationService;
+            this.websiteSettingsService = websiteSettingsService;
         }
         #region Belal
         [HttpGet("dashboard-overview")]
@@ -81,20 +88,15 @@ namespace Graduation_Project.Controllers
         #region Applicants
         // ==================== USER MANAGEMENT ENDPOINTS ====================
 
-        [HttpGet("users/stats")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> GetUserStats()
-        {
-            var stats = await adminServices.GetUserStatsAsync();
-            return Ok(stats);
-        }
 
         [HttpGet("users")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetAllApplicants()
         {
             var applicants = await adminServices.GetAllApplicantsAsync();
-            return Ok(applicants);
+            var stats = await adminServices.GetUserStatsAsync();
+
+            return Ok(new {stats=stats,applicants=applicants});
         }
 
         [HttpGet("users/{applicantId}")]
@@ -127,17 +129,8 @@ namespace Graduation_Project.Controllers
             return Ok(new { message = "User unblocked successfully" });
         }
 
-        [HttpPut("users/{applicantId}/approve")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> ApproveUser(Guid applicantId)
-        {
-            var result = await adminServices.ApproveApplicantAsync(applicantId);
-            if(!result)
-                return NotFound(new { message = "Applicant not found" });
-            return Ok(new { message = "User approved successfully" });
-        }
 
-        [HttpDelete("users/{applicantId}")]
+        [HttpDelete("user/{applicantId}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> DeleteUser(Guid applicantId)
         {
@@ -151,20 +144,15 @@ namespace Graduation_Project.Controllers
         #region Company
         // ==================== COMPANY MANAGEMENT ENDPOINTS ====================
 
-        [HttpGet("companies/stats")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> GetCompanyStats()
-        {
-            var stats = await adminServices.GetCompanyStatsAsync();
-            return Ok(stats);
-        }
+
 
         [HttpGet("companies")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetAllCompanies()
         {
             var companies = await adminServices.GetAllCompaniesAsync();
-            return Ok(companies);
+            var stats = await adminServices.GetCompanyStatsAsync();
+            return Ok(new {stats=stats,companies=companies});
         }
 
         [HttpGet("companies/{companyId}")]
@@ -216,6 +204,86 @@ namespace Graduation_Project.Controllers
                 return NotFound(new { message = "Company not found" });
             return Ok(new { message = "Company deleted successfully" });
         }
+
+
+
+        [HttpGet("verification-requests")]
+        public async Task<IActionResult> GetPending()
+        {
+            var result = await companyVerificationService.GetAllRequestsAsync();
+
+            
+
+            return Ok(result);
+        }
+        [HttpGet("vertification-request-details/{id}")]
+        public async Task<IActionResult> GetVertificationRequestDetails(Guid id)
+        {
+            var result = await companyVerificationService.GetVertificationRequestDetails(id);
+            if (result == null) return NotFound(new { message = "no request founf with this Id" });
+            return Ok(result);
+        }
+
+
+        [HttpPut("verification-requests/{id}/approve")]
+        public async Task<IActionResult> Approve(Guid id)
+        {
+            var result = await companyVerificationService.ApproveAsync(id);
+
+            if (!result)
+                return NotFound();
+
+            return Ok("Company verified");
+        }
+
+        [HttpPut("verification-requests/{id}/reject")]
+        public async Task<IActionResult> Reject(Guid id)
+        {
+            var result = await companyVerificationService.RejectAsync(id);
+
+            if (!result)
+                return NotFound();
+
+            return Ok("Request rejected");
+        }
+        [HttpPut("verification-requests/{id}/request-more-information")]
+        public async Task<IActionResult> RequestMoreInformation(Guid id,[FromBody] RequestMoreInformationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await companyVerificationService
+                .RequestMoreInformationAsync(id, dto.Notes);
+
+            if (!result)
+                return NotFound();
+
+            return Ok("Request updated. Company has been asked to provide more information.");
+        }
+        #endregion
+        #region WebsiteSetting
+
+
+        [HttpGet("website-settings")]
+        public async Task<IActionResult> Get()
+        {
+            var result = await websiteSettingsService.GetAsync();
+
+         
+
+            return Ok(result);
+        }
+        [HttpPut("website-settings")]
+        public async Task<IActionResult> Update([FromBody] UpdateWebsiteSettingsDto dto)
+        {
+            var result = await websiteSettingsService.UpdateAsync(dto);
+
+            if (!result)
+                return NotFound();
+
+            return Ok("Settings updated successfully");
+        }
         #endregion
     }
 }
+
