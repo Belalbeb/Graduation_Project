@@ -13,10 +13,40 @@ namespace Graduation_Project.Repositories
         {
             _context = context;
         }
-
-        public async Task<IEnumerable<JobPosting>> GetAllAsync()
+        public async Task<List<JobPosting>> GetAllAsync()
         {
-            return await _context.JobPostings.Include(x => x.Company).Include(x=>x.Applications).Take(10).ToListAsync();
+            return await _context.JobPostings.ToListAsync();
+        }
+
+        public async Task<(IEnumerable<JobPosting> Jobs, int TotalCount)> GetAllAsync(JobFilterDto filter)
+        {
+            var query = _context.JobPostings.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.Title))
+            {
+                query = query.Where(j =>
+                    j.Title.Contains(filter.Title));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Location))
+            {
+                query = query.Where(j =>
+                    j.Location.Contains(filter.Location));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Category))
+            {
+                query = query.Where(j =>
+                    j.JobCategory.Contains( filter.Category));
+            }
+            var totalCount = await query.CountAsync();
+            var jobs = await query
+                 .OrderByDescending(j => j.PostedDate)
+                 .Skip((filter.Page - 1) * filter.PageSize)
+                 .Take(filter.PageSize)
+                 .ToListAsync();
+            return (jobs, totalCount);
+
         }
         public async Task<int> TotalJobs()
         {

@@ -3,6 +3,8 @@ using Graduation_Project.Dtos;
 using Graduation_Project.DTOs.Subscriptions;
 using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
+using System.ComponentModel.Design;
 
 namespace Graduation_Project.Repositories
 {
@@ -19,21 +21,29 @@ namespace Graduation_Project.Repositories
             await _context.companySubscriptions.AddAsync(subscription);
             await _context.SaveChangesAsync();
         }
+        public async Task Update(CompanySubscription companySubscription)
+        {
+           _context.companySubscriptions.Update(companySubscription);
+            await _context.SaveChangesAsync();
+        }
         public async Task<List<SubscriptionDetailsDto>> GetAllAsync()
         {
             return await _context.companySubscriptions
                 .Include(x => x.Company)
+                  .ThenInclude(x=>x.User)
                 .Include(x => x.SubscriptionPlan)
                 .Select(x => new SubscriptionDetailsDto
                 {
                     Id = x.Id,
                     CompanyName = x.Company.Name,
+                    LogoUrl=x.Company.LogoUrl,
+                    Email=x.Company.User.Email,
                     PlanName = x.SubscriptionPlan.Name,
-                    BillingCycle = x.BillingCycle,
+                    BillingCycle = x.BillingCycle.ToString(),
                     PaidAmount = x.PaidAmount,
                     StartDate = x.StartDate,
                     EndDate = x.EndDate,
-                    IsCancelled = x.IsCancelled
+                    IsActive = x.IsActive
                 })
                 .ToListAsync();
         }
@@ -54,14 +64,14 @@ namespace Graduation_Project.Repositories
 
             var activeSubscriptions = await _context.companySubscriptions
                 .CountAsync(x =>
-                    !x.IsCancelled &&
+                    x.IsActive &&
                     x.EndDate > DateTime.UtcNow);
 
             var cancelledSubscriptions = await _context.companySubscriptions
                 .CountAsync(x =>
-                    x.IsCancelled ||
+                    x.IsActive ||
                     x.EndDate <= DateTime.UtcNow);
-            var plans = await _context.subscriptionPlans.Select(x => new SubscriptionPlanResponseDto
+            var plans = await _context.subscriptionPlans.Include(x=>x.Subscriptions).Select(x => new SubscriptionPlanResponseDto
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -73,6 +83,7 @@ namespace Graduation_Project.Repositories
                 HasAiToolsAccess = x.HasAiToolsAccess,
                 HasCandidateSearch = x.HasCandidateSearch,
                 HasPrioritySupport = x.HasPrioritySupport,
+                NumberOfUser=x.Subscriptions.Count,
                 CreatedAt = x.CreatedAt,
                 IsPublished = x.IsPublished
             }).ToListAsync();
@@ -95,7 +106,7 @@ namespace Graduation_Project.Repositories
                 .Include(cs => cs.SubscriptionPlan)
                 .FirstOrDefaultAsync(cs =>
                     cs.Id == Id &&
-                    !cs.IsCancelled);
+                    cs.IsActive);
         }
 
         public async Task<int> GetActiveJobsCountAsync(Guid companyId)
@@ -112,6 +123,14 @@ namespace Graduation_Project.Repositories
                 .CountAsync(j =>
                     j.CompanyID == companyId &&
                     j.IsFeatured);
+        }
+        public async Task<CompanySubscription> GetActiveSubscription(Guid companyId)
+        {
+            var activeSubscription = await _context.companySubscriptions
+             .FirstOrDefaultAsync(x =>
+             x.CompanyId == companyId &&
+             x.IsActive);
+            return activeSubscription;
         }
         public async Task<SubscriptionFullDetailsDto?> GetFullDetailsBySubscriptionIdAsync(Guid subscriptionId)
         {
@@ -139,7 +158,7 @@ namespace Graduation_Project.Repositories
                     PlanName = s.SubscriptionPlan.Name,
                     s.PaidAmount,
                     BillingDate = s.StartDate,
-                    s.IsCancelled,
+                    s.IsActive,
                     s.EndDate,
                 })
                 .ToListAsync();
@@ -173,12 +192,12 @@ namespace Graduation_Project.Repositories
                     PlanName = plan.Name,
                     PlanDescription = plan.ShortDescription,
                     Price = current.PaidAmount,
-                    BillingCycle = current.BillingCycle,
+                    BillingCycle = current.BillingCycle.ToString(),
                     StartDate = current.StartDate,
                     EndDate = current.EndDate,
                     DaysLeft = Math.Max(0, (current.EndDate - now).Days),
-                    IsCancelled = current.IsCancelled,
-                    Status = ResolveStatus(current.IsCancelled, current.StartDate, current.EndDate, now),
+                    IsActive = current.IsActive,
+                    Status = ResolveStatus(!current.IsActive, current.StartDate, current.EndDate, now),
                 },
 
                 // ── Usage ────────────────────────────────────────────────────────────
@@ -217,12 +236,12 @@ namespace Graduation_Project.Repositories
                     TotalSubscriptions = history.Count,
                     Records = history.Select((s, index) => new SubscriptionRecordDto
                     {
-                        Number = index + 1,
+                        
                         Id = s.Id,
                         PlanName = s.PlanName,
                         Price = s.PaidAmount,
                         BillingDate = s.BillingDate,
-                        Status = ResolveStatus(s.IsCancelled, default, s.EndDate, now),
+                        Status = ResolveStatus(!s.IsActive, default, s.EndDate, now),
                     }).ToList(),
                 },
             };
@@ -230,12 +249,12 @@ namespace Graduation_Project.Repositories
 
         // ── Private helpers ───────────────────────────────────────────────────────────
 
-        private static string ResolveStatus(bool isCancelled, DateTime startDate, DateTime endDate, DateTime now)
+        private static string ResolveStatus(bool isActive, DateTime startDate, DateTime endDate, DateTime now)
         {
-            if (isCancelled) return "Cancelled";
+            if (isActive) return "Active";
             if (endDate < now) return "Expired";
-            if (startDate > now) return "Pending";
-            return "Active";
+           
+            return "Cancelled";
         }
 
 
@@ -243,11 +262,11 @@ namespace Graduation_Project.Repositories
         {
             var now = DateTime.UtcNow;
 
-            // ── 1. Active subscription + plan ─────────────────────────────────────────
+
             var current = await _context.companySubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .Include(s=>s.Company)
-                .Where(s => s.CompanyId == companyId && !s.IsCancelled)
+                .Where(s => s.CompanyId == companyId && s.IsActive)
                 .OrderByDescending(s => s.StartDate)
                 .FirstOrDefaultAsync();
 
@@ -256,14 +275,14 @@ namespace Graduation_Project.Repositories
             var plan = current.SubscriptionPlan;
             var company = current.Company;
 
-            // ── 2. Usage counters (scoped to current subscription) ────────────────────
+           
             var activeJobsUsed = await _context.JobPostings
               .CountAsync(j => j.CompanyID == company.CompanyID && j.IsActive);
 
             var featuredJobsUsed = await _context.JobPostings
                 .CountAsync(j => j.CompanyID == company.CompanyID && j.IsFeatured);
 
-            // ── 3. All available plans (for the "Upgrade Your Plan" cards) ────────────
+            
             var allPlans = await _context.subscriptionPlans
                
                 .OrderBy(p => p.MonthlyPrice)
@@ -294,7 +313,7 @@ namespace Graduation_Project.Repositories
                     Amount = s.PaidAmount,
                     PurchaseDate = s.StartDate,
                     EndDate = s.EndDate,
-                    Status = s.IsCancelled ? "Cancelled"
+                    Status = !s.IsActive? "Cancelled"
                                    : s.EndDate < now ? "Expired"
                                    : s.StartDate > now ? "Pending"
                                    : "Active",
@@ -308,9 +327,9 @@ namespace Graduation_Project.Repositories
                 {
                     SubscriptionId = current.Id,
                     PlanName = plan.Name,
-                    BillingCycle = current.BillingCycle,
+                    BillingCycle = current.BillingCycle.ToString(),
                     RenewalDate = current.EndDate,
-                    Status = current.IsCancelled ? "Cancelled"
+                    Status = !current.IsActive? "Cancelled"
                                    : current.EndDate < now ? "Expired"
                                    : "Active",
 

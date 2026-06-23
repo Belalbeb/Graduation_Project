@@ -4,7 +4,9 @@ using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -18,6 +20,7 @@ namespace Graduation_Project.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;
         private readonly IProfileService profileService;
+        private readonly ApplicationDbContext context;
 
         public IApplicantServices ApplicantServices { get; }
         public ICompanyServices CompanyServices { get; }
@@ -27,13 +30,14 @@ namespace Graduation_Project.Controllers
             IApplicantServices applicantServices,
             ICompanyServices companyServices,
             IConfiguration configuration,
-            IProfileService profileService)
+            IProfileService profileService,ApplicationDbContext context)
         {
             this.userManager = userManager;
             ApplicantServices = applicantServices;
             CompanyServices = companyServices;
             this.configuration = configuration;
             this.profileService = profileService;
+            this.context = context;
         }
 
 
@@ -162,6 +166,23 @@ namespace Graduation_Project.Controllers
             };
 
             await CompanyServices.AddCompanyAsync(company);
+            var freePlan = await context.subscriptionPlans
+               .FirstAsync(x => x.Name == "Free");
+
+            var subscription = new CompanySubscription
+            {
+                CompanyId = company.CompanyID,
+                SubscriptionPlanId = freePlan.Id,
+                BillingCycle = BillingCycle.Monthly,
+                
+                StartDate = DateTime.UtcNow,
+                
+
+            };
+
+            context.companySubscriptions.Add(subscription);
+
+            await context.SaveChangesAsync();
 
             var token = await GenerateJwtToken(user);
 

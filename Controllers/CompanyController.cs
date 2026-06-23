@@ -110,5 +110,20 @@ namespace Graduation_Project.Controllers
 
             return Ok("Verification request submitted");
         }
+        [HttpGet("candidates")]
+        public async Task<IActionResult> GetCandidatesForCompany(
+            [FromQuery] int page = 1,
+            [FromQuery] CandidateFilterDto filter = null)
+        {
+            if (page < 1)
+                return BadRequest(new
+                {
+                    Message = "Page must be greater than or equal to 1."
+                });
+
+            var candidates = await companyServices.GetAllCandidate(page, filter);
+
+            return Ok(candidates);
+        }
     }
 }

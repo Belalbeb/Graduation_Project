@@ -28,23 +28,29 @@ namespace Graduation_Project.Services
 
             var startDate = DateTime.UtcNow;
 
-            var endDate = dto.BillingCycle == BillingCycle.Monthly
+            BillingCycle billingCycle = dto.BillingCycle?.ToLower() switch
+            {
+                "monthly" => BillingCycle.Monthly,
+                "yearly" => BillingCycle.Yearly,
+                _ => throw new ArgumentException("Invalid billing cycle")
+            };
+
+            var endDate = billingCycle == BillingCycle.Monthly
                 ? startDate.AddMonths(1)
                 : startDate.AddYears(1);
 
-            var amount = dto.BillingCycle == BillingCycle.Monthly
+            var amount = billingCycle == BillingCycle.Monthly
                 ? plan.MonthlyPrice
                 : plan.YearlyPrice;
-
             var subscription = new CompanySubscription
             {
                 CompanyId = companyId,
                 SubscriptionPlanId = plan.Id,
-                BillingCycle = dto.BillingCycle,
+                BillingCycle = billingCycle,
                 StartDate = startDate,
                 EndDate = endDate,
                 PaidAmount = amount,
-                IsCancelled = false
+                IsActive = true
             };
 
             await SubscriptionRepository.AddAsync(subscription);
@@ -82,33 +88,52 @@ namespace Graduation_Project.Services
             return result;
         }
 
-        public async Task CreateFromStripeAsync(Guid companyId,Guid planId,string billingCycle,long amountTotal)
+        public async Task CreateFromStripeAsync(
+     Guid companyId,
+     Guid planId,
+     string billingCycle,
+     long amountTotal)
         {
             var plan = await _context.subscriptionPlans
-    .FirstOrDefaultAsync(x => x.Id == planId);
+                .FirstOrDefaultAsync(x => x.Id == planId);
 
             if (plan == null)
                 throw new Exception("Plan not found");
+
+            var activeSubscription = await SubscriptionRepository
+                .GetActiveSubscription(companyId);
+
+            // إذا كان يوجد اشتراك نشط، قم بإنهائه
+            if (activeSubscription != null)
+            {
+                activeSubscription.IsActive = false;
+                activeSubscription.EndDate = DateTime.UtcNow;
+
+                await SubscriptionRepository.Update(activeSubscription);
+            }
+
             var startDate = DateTime.UtcNow;
 
             var endDate = billingCycle == "Yearly"
                 ? startDate.AddYears(1)
                 : startDate.AddMonths(1);
+
             var subscription = new CompanySubscription
             {
                 CompanyId = companyId,
                 SubscriptionPlanId = planId,
                 BillingCycle = billingCycle == "Yearly"
-        ? BillingCycle.Yearly
-        : BillingCycle.Monthly,
+                    ? BillingCycle.Yearly
+                    : BillingCycle.Monthly,
 
                 StartDate = startDate,
                 EndDate = endDate,
                 PaidAmount = amountTotal / 100m,
-                IsCancelled = false
+                IsActive = true
             };
+
             await SubscriptionRepository.AddAsync(subscription);
         }
-        
-        }
+
+    }
 }

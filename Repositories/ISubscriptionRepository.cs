@@ -17,6 +17,8 @@ namespace Graduation_Project.Repositories
 
         Task<SubscriptionFullDetailsDto?> GetFullDetailsBySubscriptionIdAsync(Guid subscriptionId);
         Task<CompanySubscriptionPageDto?> GetSubscriptionPageAsync(Guid companyId);
+        Task<CompanySubscription> GetActiveSubscription(Guid companyId);
+        Task Update(CompanySubscription companySubscription);
 
     }
 }

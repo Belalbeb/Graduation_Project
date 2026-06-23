@@ -34,7 +34,66 @@ namespace Graduation_Project.Repositories
         {
             return await _context.Applicants.ToListAsync();
         }
+        public async Task<(List<Applicant> Items, int TotalCount)> GetCandidatesAsync(
+     int page,
+     CandidateFilterDto filter)
+        {
+            const int pageSize = 3;
 
+            if (page < 1)
+                page = 1;
+
+            var query = _context.Applicants
+                .AsNoTracking()
+                .Where(x => !x.IsBlocked)
+                .AsQueryable();
+
+          
+            if (!string.IsNullOrWhiteSpace(filter?.CandidateName))
+            {
+                var name = filter.CandidateName.Trim().ToLower();
+
+                query = query.Where(x =>
+                    ((x.FirstName ?? "") + " " + (x.LastName ?? ""))
+                    .ToLower()
+                    .Contains(name));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter?.Country))
+            {
+                var country = filter.Country.Trim().ToLower();
+
+                query = query.Where(x =>
+                    (x.Location ?? "")
+                    .ToLower()
+                    .Contains(country));
+            }
+
+     
+            if (!string.IsNullOrWhiteSpace(filter?.Industry))
+            {
+                var industry = filter.Industry.Trim().ToLower();
+
+                query = query.Where(x =>
+                    (x.Industry ?? "")
+                    .ToLower()
+                    .Contains(industry));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.ApplicantID)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+        public async Task<int> CountActiveApplicant()
+        {
+            return await _context.Applicants.CountAsync(x=>!x.IsBlocked);
+        }
         public async Task UpdateAsync(Applicant applicant)
         {
             _context.Applicants.Update(applicant);

@@ -7,17 +7,18 @@ namespace Graduation_Project.Dtos
         public Guid Id { get; set; }
 
         public string CompanyName { get; set; } = null!;
-
+        public string ?LogoUrl { get; set; }
+        public string ?Email { get; set; }
         public string PlanName { get; set; } = null!;
 
-        public BillingCycle BillingCycle { get; set; }
+        public string? BillingCycle { get; set; }
 
         public decimal PaidAmount { get; set; }
 
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
-        public bool IsCancelled { get; set; }
+        public bool IsActive { get; set; }
 
     }
 }

@@ -21,12 +21,12 @@ namespace Graduation_Project.Controllers
 
       
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery]JobFilterDto jobFilterDto)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
             Guid.TryParse(profileIdClaim, out Guid ApplicantId);
                
-            var jobs = await _service.GetAllJobsAsync(ApplicantId);
+            var jobs = await _service.GetAllJobsAsync(ApplicantId,jobFilterDto);
             return Ok(jobs);
         }
 

@@ -1,4 +1,5 @@
 ﻿using Graduation_Project.Dtos;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 
@@ -13,12 +14,13 @@ namespace Graduation_Project.Services
             _repository = repository;
         }
 
+ 
         public async Task<CouponResponseDto> CreateAsync(CreateCouponDto dto)
         {
             var code = dto.Code.ToUpper().Trim();
 
             if (await _repository.ExistsByCodeAsync(code))
-                throw new Exception("Coupon already exists");
+                throw new BadRequestException("Coupon already exists");
 
             var coupon = new Coupon
             {
@@ -26,28 +28,34 @@ namespace Graduation_Project.Services
                 Percentage = dto.Percentage,
                 TotalUsageLimit = dto.TotalUsageLimit,
                 IsActive = dto.IsActive,
-                ApplicablePlans = dto.ApplicablePlans,
+              
                 ExpiresAt = dto.ExpiresAt
             };
+
+            // Map Many-to-Many
+            if ( dto.SubscriptionPlanIds != null)
+            {
+                coupon.CouponSubscriptionPlans = dto.SubscriptionPlanIds
+                    .Select(id => new CouponSubscriptionPlan
+                    {
+                        SubscriptionPlanId = id
+                    })
+                    .ToList();
+            }
 
             var result = await _repository.CreateAsync(coupon);
             return Map(result);
         }
 
-        public async Task<PaginatedResult<CouponResponseDto>> GetAllAsync(QueryCouponDto query)
+     
+        public async Task<List<CouponResponseDto>> GetAllAsync(QueryCouponDto query)
         {
             var result = await _repository.GetAllAsync(query);
 
-            return new PaginatedResult<CouponResponseDto>
-            {
-                Data = result.Data.Select(Map).ToList(),
-                Total = result.Total,
-                Page = result.Page,
-                Limit = result.Limit,
-                TotalPages = result.TotalPages
-            };
+            return result.Select(Map).ToList();
         }
 
+        
         public async Task<CouponResponseDto> GetByIdAsync(Guid id)
         {
             var coupon = await _repository.GetByIdAsync(id)
@@ -56,6 +64,15 @@ namespace Graduation_Project.Services
             return Map(coupon);
         }
 
+        public async Task<CouponResponseDto> GetByCodeAsync(string code)
+        {
+            var coupon = await _repository.GetByCodeAsync(code)
+                ?? throw new Exception("Not found");
+
+            return Map(coupon);
+        }
+
+  
         public async Task<CouponResponseDto> UpdateAsync(Guid id, UpdateCouponDto dto)
         {
             var coupon = await _repository.GetByIdAsync(id)
@@ -73,8 +90,18 @@ namespace Graduation_Project.Services
             if (dto.IsActive.HasValue)
                 coupon.IsActive = dto.IsActive.Value;
 
-            if (dto.ApplicablePlans != null)
-                coupon.ApplicablePlans = dto.ApplicablePlans;
+
+            // reset & rebuild plans
+            if (dto.SubscriptionPlanIds != null)
+            {
+                coupon.CouponSubscriptionPlans.Clear();
+
+                coupon.CouponSubscriptionPlans = dto.SubscriptionPlanIds
+                    .Select(x => new CouponSubscriptionPlan
+                    {
+                        SubscriptionPlanId = x
+                    }).ToList();
+            }
 
             if (dto.ExpiresAt.HasValue)
                 coupon.ExpiresAt = dto.ExpiresAt.Value;
@@ -90,23 +117,52 @@ namespace Graduation_Project.Services
 
         public async Task<CouponValidationResult> ValidateAsync(ValidateCouponDto dto)
         {
-            var coupon = await _repository.GetValidCouponForPlanAsync(dto.Code, dto.Plan)
-                ?? throw new Exception("Invalid coupon");
+            var coupon = await _repository
+                .GetValidCouponForPlanAsync(dto.Code, dto.SubscriptionPlanId);
+
+
+                if (coupon == null) return new CouponValidationResult { IsValid = false, DiscountAmount = 0 };
 
             return new CouponValidationResult
             {
-                Valid = true,
-                Coupon = Map(coupon),
+                IsValid = true,
+               
+                
                 DiscountAmount = coupon.Percentage
             };
         }
 
+
         public async Task ApplyAsync(ApplyCouponDto dto)
         {
-            var result = await ValidateAsync(dto);
-            await _repository.IncrementUsageAsync(result.Coupon.Id);
+            await ValidateAsync(dto);
+
+            var coupon = await _repository.GetByCodeAsync(dto.Code);
+
+            await _repository.IncrementUsageAsync(coupon!.Id);
         }
 
+
+        public async Task RevokeAsync(Guid couponId)
+        {
+            var coupon = await _repository.GetByIdAsync(couponId)
+                ?? throw new NotFoundException("Not found");
+
+            coupon.IsActive = false;
+            await _repository.UpdateAsync(coupon);
+        }
+        public async Task<decimal> CalculateFinalPriceAsync(CalculatePriceDto dto)
+        {
+            var coupon = await _repository
+                .GetValidCouponForPlanAsync(dto.CouponCode, dto.SubscriptionPlanId)
+                ?? throw new Exception("Invalid coupon");
+
+            var discount = (dto.OriginalPrice * coupon.Percentage) / 100;
+
+            var finalPrice = dto.OriginalPrice - discount;
+
+            return finalPrice;
+        }
         private static CouponResponseDto Map(Coupon c)
         {
             return new CouponResponseDto
@@ -116,29 +172,17 @@ namespace Graduation_Project.Services
                 Percentage = c.Percentage,
                 TotalUsageLimit = c.TotalUsageLimit,
                 UsedCount = c.UsedCount,
-                RemainingUses = c.RemainingUses,
+            
                 IsActive = c.IsActive,
-                Status = c.Status,
-                ApplicablePlans = c.ApplicablePlans,
-                ExpiresAt = c.ExpiresAt,
-                CreatedAt = c.CreatedAt,
-                UpdatedAt = c.UpdatedAt
+               
+                
+                ApplicablePlans = c.CouponSubscriptionPlans?
+                    .Select(x => new SubscriptionPlanDto
+                    {
+                        Id = x.SubscriptionPlanId,
+                        Name=x.SubscriptionPlan?.Name
+                    }).ToList()
             };
-        }
-
-        public Task<CouponResponseDto> GetByCodeAsync(string code)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RevokeAsync(Guid couponId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<GeneratedCodeDto> GenerateCodeAsync(string? prefix = null)
-        {
-            throw new NotImplementedException();
         }
     }
 }

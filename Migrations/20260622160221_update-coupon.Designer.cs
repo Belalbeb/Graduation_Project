@@ -4,6 +4,7 @@ using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622160221_update-coupon")]
+    partial class updatecoupon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,9 +137,6 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Github")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Industry")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsBlocked")

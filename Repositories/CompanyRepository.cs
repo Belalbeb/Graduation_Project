@@ -157,7 +157,7 @@ namespace Graduation_Project.Repositories
         {
             var activeSubscription = await _context.companySubscriptions
                 .Include(s => s.SubscriptionPlan)
-                .Where(s => s.CompanyId == companyId && !s.IsCancelled && s.EndDate > DateTime.UtcNow)
+                .Where(s => s.CompanyId == companyId && s.IsActive && s.EndDate > DateTime.UtcNow)
                 .OrderByDescending(s => s.StartDate)
                 .FirstOrDefaultAsync();
 

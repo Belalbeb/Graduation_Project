@@ -1,17 +1,21 @@
 using Graduation_Project.Dtos;
 using Graduation_Project.Dtos.Company.Profile;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
+using Newtonsoft.Json.Serialization;
 
 namespace Graduation_Project.Services
 {
     public class ComapnyServices : ICompanyServices
     {
         private readonly ICompanyRepository _repository;
+        private readonly IApplicantRepository applicantRepository;
 
-        public ComapnyServices(ICompanyRepository repository)
+        public ComapnyServices(ICompanyRepository repository,IApplicantRepository applicantRepository)
         {
             _repository = repository;
+            this.applicantRepository = applicantRepository;
         }
 
         public async Task<Company> AddCompanyAsync(Company company)
@@ -180,6 +184,26 @@ namespace Graduation_Project.Services
                     WorkApproach = job.WorkApproaches.FirstOrDefault().ToString(),
                     PostedAt = job.PostedDate
                 }).ToList()
+            };
+        }
+        public async Task<CompanyCandidateDto> GetAllCandidate(int page, CandidateFilterDto filter)
+        {
+            var result = await applicantRepository.GetCandidatesAsync(page, filter);
+
+            var candidatesDto = result.Items.Select(x => new CandidateDetailsDto
+            {
+                Id = x.ApplicantID,
+                Name = $"{x.FirstName} {x.LastName}",
+                Image = x.ProfilePicURL,
+                Industry = x.Industry,
+                JobTitle = x.JobTitle,
+                Country = x.Location
+            }).ToList();
+            //var totalCandidates = await applicantRepository.CountActiveApplicant();
+            return new CompanyCandidateDto
+            {
+                candidates = candidatesDto,
+                totalCandidates = result.TotalCount
             };
         }
     }

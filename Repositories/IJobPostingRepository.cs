@@ -5,7 +5,8 @@ namespace Graduation_Project.Repositories
 {
     public interface IJobPostingRepository
     {
-        Task<IEnumerable<JobPosting>> GetAllAsync();
+        Task<List<JobPosting>> GetAllAsync();
+        Task<(IEnumerable<JobPosting> Jobs, int TotalCount)> GetAllAsync(JobFilterDto filter);
         Task<JobPosting?> GetByIdAsync(Guid id);
         Task<IEnumerable<JobPosting>> GetByCompanyAsync(Guid companyId);
         Task<JobPosting> AddAsync(JobPosting jobPosting);

@@ -4,6 +4,7 @@ using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Graduation_Project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622125322_isactive")]
+    partial class isactive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,9 +137,6 @@ namespace Graduation_Project.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Github")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Industry")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsBlocked")
@@ -384,6 +384,9 @@ namespace Graduation_Project.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.PrimitiveCollection<string>("ApplicablePlans")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -415,27 +418,6 @@ namespace Graduation_Project.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Coupons");
-                });
-
-            modelBuilder.Entity("Graduation_Project.Models.CouponSubscriptionPlan", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CouponId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubscriptionPlanId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CouponId");
-
-                    b.HasIndex("SubscriptionPlanId");
-
-                    b.ToTable("CouponSubscriptionPlan");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.Experience", b =>
@@ -1108,25 +1090,6 @@ namespace Graduation_Project.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("Graduation_Project.Models.CouponSubscriptionPlan", b =>
-                {
-                    b.HasOne("Graduation_Project.Models.Coupon", "Coupon")
-                        .WithMany("CouponSubscriptionPlans")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Graduation_Project.Models.SubscriptionPlan", "SubscriptionPlan")
-                        .WithMany()
-                        .HasForeignKey("SubscriptionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coupon");
-
-                    b.Navigation("SubscriptionPlan");
-                });
-
             modelBuilder.Entity("Graduation_Project.Models.Experience", b =>
                 {
                     b.HasOne("Graduation_Project.Models.Applicant", "Applicant")
@@ -1332,11 +1295,6 @@ namespace Graduation_Project.Migrations
             modelBuilder.Entity("Graduation_Project.Models.CompanyVerificationRequest", b =>
                 {
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("Graduation_Project.Models.Coupon", b =>
-                {
-                    b.Navigation("CouponSubscriptionPlans");
                 });
 
             modelBuilder.Entity("Graduation_Project.Models.JobPosting", b =>

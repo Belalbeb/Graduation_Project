@@ -11,9 +11,9 @@ namespace Graduation_Project.Repositories
 
         Task<Coupon?> GetByCodeAsync(string code);
 
-        Task<PaginatedResult<Coupon>> GetAllAsync(QueryCouponDto query);
+        Task<List<Coupon>> GetAllAsync(QueryCouponDto query);
 
-        Task<Coupon?> GetValidCouponForPlanAsync(string code, Coupon.ApplicablePlan plan);
+        Task<Coupon?> GetValidCouponForPlanAsync(string code, Guid subscriptionPlanId);
 
         Task<bool> ExistsByCodeAsync(string code, Guid? excludeId = null);
 

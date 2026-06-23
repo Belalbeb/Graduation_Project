@@ -1,4 +1,5 @@
 ﻿using Graduation_Project.Dtos;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +17,13 @@ namespace Graduation_Project.Controllers
     public class SubscriptionController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICouponService couponService;
 
-        public SubscriptionController(ISubscriptionService subscriptionService,ApplicationDbContext applicationDbContext)
+        public SubscriptionController(ISubscriptionService subscriptionService,ApplicationDbContext applicationDbContext, ICouponService couponService)
         {
             SubscriptionService = subscriptionService;
             this._context = applicationDbContext;
+            this.couponService = couponService;
         }
 
         public ISubscriptionService SubscriptionService { get; }
@@ -73,7 +76,7 @@ namespace Graduation_Project.Controllers
             return Ok(result);
         }
         [HttpGet("company-subscription")]
-        [ProducesResponseType(typeof(ApiResponse<CompanySubscriptionPageDto>), StatusCodes.Status200OK)]
+
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles=Roles.Company)]
@@ -91,7 +94,7 @@ namespace Graduation_Project.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ApiResponse<object>.Fail(ex.Message));
+                return NotFound(ex.Message);
             }
         }
         [HttpPost("checkout")]
@@ -109,9 +112,35 @@ namespace Graduation_Project.Controllers
             if (plan == null)
                 return NotFound("Plan not found");
 
-            var price = dto.BillingCycle == BillingCycle.Yearly
+            if (!Enum.TryParse<BillingCycle>(dto.BillingCycle, true, out var billingCycle))
+            {
+                throw new BadRequestException("Invalid billing cycle.");
+            }
+
+            var basePrice = billingCycle == BillingCycle.Yearly
                 ? plan.YearlyPrice
                 : plan.MonthlyPrice;
+
+            decimal finalPrice = basePrice;
+
+            //CouponResponseDto coupon = null;
+
+          
+            if (!string.IsNullOrEmpty(dto.CouponCode))
+            {
+                var validation = await couponService.ValidateAsync(
+                    new ValidateCouponDto
+                    {
+                        Code = dto.CouponCode,
+                        SubscriptionPlanId = dto.SubscriptionPlanId
+                    });
+
+                if (validation.IsValid)
+                {
+                    finalPrice = basePrice - (basePrice * validation.DiscountAmount / 100);
+                    //coupon = validation.Coupon;
+                }
+            }
 
             var options = new SessionCreateOptions
             {
@@ -122,29 +151,30 @@ namespace Graduation_Project.Controllers
                 CancelUrl = "https://localhost:3000/cancel",
 
                 Metadata = new Dictionary<string, string>
-            {
-                { "companyId", companyId.ToString() },
-                { "planId", plan.Id.ToString() },
-                { "billingCycle", dto.BillingCycle.ToString() }
-            },
+              {
+                 { "companyId", companyId.ToString() },
+                 { "planId", plan.Id.ToString() },
+                 { "billingCycle", dto.BillingCycle.ToString() },
+                 { "couponCode", dto.CouponCode ?? "" }
+    },
 
                 LineItems = new List<SessionLineItemOptions>
+              {
+        new SessionLineItemOptions
+        {
+            PriceData = new SessionLineItemPriceDataOptions
             {
-                new SessionLineItemOptions
-                {
-                    PriceData = new SessionLineItemPriceDataOptions
-                    {
-                        Currency = "usd",
-                        UnitAmount = (long)(price * 100),
+                Currency = "usd",
+                UnitAmount = (long)(finalPrice * 100),
 
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
-                        {
-                            Name = plan.Name
-                        }
-                    },
-                    Quantity = 1
+                ProductData = new SessionLineItemPriceDataProductDataOptions
+                {
+                    Name = plan.Name
                 }
-            }
+            },
+            Quantity = 1
+        }
+    }
             };
 
             var service = new SessionService();
@@ -156,7 +186,7 @@ namespace Graduation_Project.Controllers
             });
         }
 
-       
+
 
         //stripe listen --forward-to https://localhost:7109/api/subscription/webhook
         [HttpPost("webhook")]
@@ -167,28 +197,55 @@ namespace Graduation_Project.Controllers
 
             var stripeEvent = EventUtility.ParseEvent(json);
 
-            if (stripeEvent.Type == "checkout.session.completed")
+            if (stripeEvent.Type != "checkout.session.completed")
+                return Ok();
+
+            var session = stripeEvent.Data.Object as Session;
+
+            if (session == null)
+                return BadRequest("Invalid session");
+
+      
+            var companyId = Guid.Parse(session.Metadata["companyId"]);
+            var planId = Guid.Parse(session.Metadata["planId"]);
+            var billingCycle = session.Metadata["billingCycle"];
+            var couponCode = session.Metadata.ContainsKey("couponCode")
+                ? session.Metadata["couponCode"]
+                : null;
+
+            var amount = session.AmountTotal ?? 0;
+
+            
+            await SubscriptionService.CreateFromStripeAsync(
+                companyId,
+                planId,
+                billingCycle,
+                amount
+            );
+
+            if (!string.IsNullOrEmpty(couponCode))
             {
-                var session = stripeEvent.Data.Object as Session;
-
-                var companyId = Guid.Parse(session.Metadata["companyId"]);
-                var planId = Guid.Parse(session.Metadata["planId"]);
-                var billingCycle = session.Metadata["billingCycle"];
-                var amount = session.AmountTotal ?? 0;
-
-                await SubscriptionService.CreateFromStripeAsync(
-                    companyId,
-                    planId,
-                    billingCycle,
-                    amount
-                );
+                try
+                {
+                   
+                    await couponService.ApplyAsync(new ApplyCouponDto
+                    {
+                        Code = couponCode,
+                       
+                        SubscriptionPlanId = planId 
+                    });
+                }
+                catch
+                {
+                   
+                }
             }
 
             return Ok();
         }
 
- 
-       
+
+
     }
 }
 

@@ -8,6 +8,7 @@ namespace Graduation_Project.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? JobTitle { get; set; }
+        public string? Industry { get; set; }
         public string ?Address { get; set; }
         public string? AboutMe { get; set; }
         public string ProfilePicURL { get; set; } = DefaultImage.ApplicantImage;

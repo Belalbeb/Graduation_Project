@@ -9,6 +9,9 @@ namespace Graduation_Project.Repositories
         Task<Applicant?> GetByIdAsync(Guid id);
         Task<Applicant?> GetByUserIdAsync(string userId);
         Task<List<Applicant>> GetAllAsync();
+       Task<(List<Applicant> Items, int TotalCount)> GetCandidatesAsync(
+int page,
+CandidateFilterDto filter);
         Task UpdateAsync(Applicant applicant);
         Task DeleteAsync(Applicant applicant);
 
@@ -29,6 +32,7 @@ namespace Graduation_Project.Repositories
         Task AddResumeAsync(Resume resume);
         Task<string?> GetActiveResumePathAsync(Guid applicantId);
         Task<string?> GetActiveResumePathByUserIdAsync(string userId);
+       Task<int> CountActiveApplicant();
 
 
         Task<List<Applicant>> GetAllApplicantsWithDetailsAsync();

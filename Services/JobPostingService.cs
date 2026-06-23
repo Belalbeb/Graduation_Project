@@ -19,34 +19,23 @@ namespace Graduation_Project.Services
             InterviewRepository = interviewRepository;
             this.cache = cache;
         }
-        public async Task<IEnumerable<JobCardDto>> GetAllJobsAsync(Guid currentApplicantId)
+        public async Task<PagedResult<JobCardDto>> GetAllJobsAsync(Guid currentApplicantId,JobFilterDto jobFilterDto)
         {
-            const string cacheKey = "all_jobs";
+            var result = await _repository.GetAllAsync(jobFilterDto);
 
-            if (!cache.TryGetValue(cacheKey, out IEnumerable<JobPosting> jobs))
-            {
-                jobs = await _repository.GetAllAsync();
-
-                cache.Set(
-                    cacheKey,
-                    jobs,
-                    new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-            }
-
-            return jobs.Select(job => new JobCardDto
+            var items = result.Jobs.Select(job => new JobCardDto
             {
                 JobID = job.JobID,
                 CompanyName = job.Company?.Name,
                 CompanyLogoUrl = job.Company?.LogoUrl,
                 Location = job.Location,
+                Category=job.JobCategory,
                 Title = job.Title,
                 Description = job.Description,
                 MinSalary = job.MinSalary,
                 MaxSalary = job.MaxSalary,
                 PostedDate = job.PostedDate,
+
                 JobTypes = job.JobTypes
                     .Select(t => t.ToString())
                     .ToList(),
@@ -58,7 +47,15 @@ namespace Graduation_Project.Services
                 IsApplied = currentApplicantId != Guid.Empty &&
                             job.Applications.Any(a =>
                                 a.ApplicantID == currentApplicantId)
-            });
+            }).ToList();
+
+            return new PagedResult<JobCardDto>
+            {
+                Items = items,
+                TotalCount = result.TotalCount,
+                Page = jobFilterDto.Page,
+                PageSize = jobFilterDto.PageSize
+            };
         }
 
         public async Task<JobPosting> GetJobByIdAsync(Guid id)

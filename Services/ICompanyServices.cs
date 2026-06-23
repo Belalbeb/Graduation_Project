@@ -14,5 +14,6 @@ namespace Graduation_Project.Services
         public Task<CompanyResponseDto?> GetCompanyDashboardAsync(Guid CompanyId);
         public Task<Company?> GetCompanyByUserIdAsync(string userid);
         Task<CompanyPublicProfileDto?> GetCompanyProfileAsync(Guid companyId);
+        Task<CompanyCandidateDto> GetAllCandidate(int page, CandidateFilterDto filter);
     }
 }

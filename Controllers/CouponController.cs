@@ -8,7 +8,7 @@ namespace Graduation_Project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles =Roles.Admin)]
+   
     public class CouponController : ControllerBase
     {
         private readonly ICouponService _service;
@@ -19,113 +19,74 @@ namespace Graduation_Project.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateCouponDto dto)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> Create(CreateCouponDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var result = await _service.CreateAsync(dto);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Id },
-                ApiResponse<CouponResponseDto>.Ok(result, "Coupon created"));
+            return Ok(result);
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetAll([FromQuery] QueryCouponDto query)
         {
             var result = await _service.GetAllAsync(query);
-            return Ok(ApiResponse<PaginatedResult<CouponResponseDto>>.Ok(result));
+            return Ok(result);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            try
-            {
-                var result = await _service.GetByIdAsync(id);
-                return Ok(ApiResponse<CouponResponseDto>.Ok(result));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ApiResponse<CouponResponseDto>.Fail(ex.Message));
-            }
+            var result = await _service.GetByIdAsync(id);
+            return Ok(result);
         }
 
         [HttpGet("code/{code}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetByCode(string code)
         {
-            try
-            {
-                var result = await _service.GetByCodeAsync(code);
-                return Ok(ApiResponse<CouponResponseDto>.Ok(result));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ApiResponse<CouponResponseDto>.Fail(ex.Message));
-            }
+            var result = await _service.GetByCodeAsync(code);
+            return Ok(result);
         }
-
-        [HttpPatch("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCouponDto dto)
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, UpdateCouponDto dto)
         {
-            try
-            {
-                var result = await _service.UpdateAsync(id, dto);
-                return Ok(ApiResponse<CouponResponseDto>.Ok(result, "Updated"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResponse<CouponResponseDto>.Fail(ex.Message));
-            }
+            var result = await _service.UpdateAsync(id, dto);
+            return Ok(result);
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _service.DeleteAsync(id);
-            return NoContent();
+            return Ok(new {message="deleted success"});
         }
-
+        [Authorize(Roles =Roles.Company)]
         [HttpPost("validate")]
-        public async Task<IActionResult> Validate([FromBody] ValidateCouponDto dto)
+        public async Task<IActionResult> Validate(ValidateCouponDto dto)
         {
-            try
-            {
-                var result = await _service.ValidateAsync(dto);
-                return Ok(ApiResponse<CouponValidationResult>.Ok(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResponse<CouponValidationResult>.Fail(ex.Message));
-            }
+            var result = await _service.ValidateAsync(dto);
+            return Ok(result);
         }
 
         [HttpPost("apply")]
-        public async Task<IActionResult> Apply([FromBody] ApplyCouponDto dto)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> Apply(ApplyCouponDto dto)
         {
-            try
-            {
-                await _service.ApplyAsync(dto);
-                return Ok(ApiResponse<object>.Ok(null, "Applied successfully"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResponse<object>.Fail(ex.Message));
-            }
+            await _service.ApplyAsync(dto);
+            return Ok(new { message = "Applied success" });
         }
 
-        [HttpPost("{id:guid}/revoke")]
+        [HttpPost("{id}/revoke")]
         public async Task<IActionResult> Revoke(Guid id)
         {
             await _service.RevokeAsync(id);
-            return Ok(ApiResponse<object>.Ok(null, "Revoked"));
+            return Ok(new { message = "revoked success" });
         }
 
-        [HttpGet("generate-code")]
-        public async Task<IActionResult> GenerateCode([FromQuery] string? prefix)
-        {
-            var result = await _service.GenerateCodeAsync(prefix);
-            return Ok(ApiResponse<GeneratedCodeDto>.Ok(result));
-        }
+      
     }
 }

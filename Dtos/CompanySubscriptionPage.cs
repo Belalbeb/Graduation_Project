@@ -14,7 +14,7 @@ namespace Graduation_Project.Dtos
     {
         public Guid SubscriptionId { get; set; }
         public string PlanName { get; set; } = null!;
-        public BillingCycle BillingCycle { get; set; }   // Monthly | Annually
+        public string? BillingCycle { get; set; }   // Monthly | Annually
         public DateTime RenewalDate { get; set; }
         public string Status { get; set; } = null!; // "Active" | "Expired" | "Cancelled"
 
@@ -30,15 +30,10 @@ namespace Graduation_Project.Dtos
         public int Limit { get; set; }
 
         /// <summary>0–100 for the progress bar width.</summary>
-        public double Percentage => Limit > 0
-            ? Math.Round((double)Used / Limit * 100, 1)
-            : 0;
+      
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  2. AVAILABLE PLANS  ("Upgrade Your Plan" section)
-    //     Shown for both Monthly / Yearly toggle on the frontend.
-    // ═══════════════════════════════════════════════════════════════════
+
 
     public class AvailablePlanDto
     {
@@ -62,9 +57,7 @@ namespace Graduation_Project.Dtos
         public bool IsCurrentPlan { get; set; }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  3. BILLING HISTORY  (bottom table)
-    // ═══════════════════════════════════════════════════════════════════
+
 
     public class BillingHistoryDto
     {

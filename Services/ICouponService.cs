@@ -6,7 +6,7 @@ namespace Graduation_Project.Services
     {
         Task<CouponResponseDto> CreateAsync(CreateCouponDto dto);
 
-        Task<PaginatedResult<CouponResponseDto>> GetAllAsync(QueryCouponDto query);
+        Task<List<CouponResponseDto>> GetAllAsync(QueryCouponDto query);
 
         Task<CouponResponseDto> GetByIdAsync(Guid id);
 
@@ -17,11 +17,12 @@ namespace Graduation_Project.Services
         Task DeleteAsync(Guid id);
 
         Task<CouponValidationResult> ValidateAsync(ValidateCouponDto dto);
+        Task<decimal> CalculateFinalPriceAsync(CalculatePriceDto dto);
 
         Task ApplyAsync(ApplyCouponDto dto);
 
         Task RevokeAsync(Guid couponId);
 
-        Task<GeneratedCodeDto> GenerateCodeAsync(string? prefix = null);
+   
     }
 }

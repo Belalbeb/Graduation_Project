@@ -7,6 +7,7 @@
         public string Name { get; set; } = null!;
 
         public string ShortDescription { get; set; } = null!;
+        public int NumberOfUser { get; set; }
 
         public decimal MonthlyPrice { get; set; }
 

@@ -6,6 +6,7 @@
         public string CompanyName { get; set; }
         public string CompanyLogoUrl { get; set; }
         public string Location { get; set; }
+        public string? Category { get; set; }
 
         public bool IsApplied { get; set; }
         public string Title { get; set; }

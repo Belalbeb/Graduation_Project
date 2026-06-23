@@ -15,10 +15,9 @@
 
         public bool IsActive { get; set; } = true;
 
-        /// <summary>
-        /// Null means applicable to all plans.
-        /// </summary>
-        public List<ApplicablePlan>? ApplicablePlans { get; set; }
+   
+        public ICollection<CouponSubscriptionPlan> CouponSubscriptionPlans { get; set; }
+    = new List<CouponSubscriptionPlan>();
 
         public DateTime? ExpiresAt { get; set; }
 
@@ -28,8 +27,7 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        // ── Computed ────────────────────────────────────────────────────────────────
-
+        
         public bool IsDeleted => DeletedAt.HasValue;
 
         public bool IsExpired => ExpiresAt.HasValue && DateTime.UtcNow > ExpiresAt.Value;
@@ -54,12 +52,6 @@
             Expired
         }
 
-        public enum ApplicablePlan
-        {
-            Basic,
-            Premium,
-            Enterprise
-        }
 
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Graduation_Project.DTOs.Subscriptions
 {
-    // ═══════════════════════════════════════════════════════════════════
-    //  MAIN RESPONSE — one object returned by GET /api/subscriptions/{subscriptionId}/details
-    // ═══════════════════════════════════════════════════════════════════
+ 
 
     public class SubscriptionFullDetailsDto
     {
@@ -15,9 +13,7 @@ namespace Graduation_Project.DTOs.Subscriptions
         public SubscriptionHistoryDto SubscriptionHistory { get; set; } = null!;
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  1. COMPANY INFO  (top-left card)
-    // ═══════════════════════════════════════════════════════════════════
+
 
     public class CompanyInfoDto
     {
@@ -30,9 +26,7 @@ namespace Graduation_Project.DTOs.Subscriptions
         public string? CompanyLogoUrl { get; set; }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  2. CURRENT SUBSCRIPTION / PLAN OVERVIEW  (top-right card)
-    // ═══════════════════════════════════════════════════════════════════
+ 
 
     public class CurrentSubscriptionDto
     {
@@ -40,17 +34,15 @@ namespace Graduation_Project.DTOs.Subscriptions
         public string PlanName { get; set; } = null!;
         public string PlanDescription { get; set; } = null!;
         public decimal Price { get; set; }
-        public BillingCycle BillingCycle { get; set; }   // Monthly | Annually
+        public string? BillingCycle { get; set; }   // Monthly | Annually
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }   // = Renewal Date on UI
         public int DaysLeft { get; set; }
-        public bool IsCancelled { get; set; }
+        public bool IsActive { get; set; }
         public string Status { get; set; } = null!; // "Active" | "Expired" | "Pending" | "Cancelled"
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  3. PLAN USAGE  (progress bars section)
-    // ═══════════════════════════════════════════════════════════════════
+
 
     public class PlanUsageDto
     {
@@ -70,9 +62,6 @@ namespace Graduation_Project.DTOs.Subscriptions
             : 0;
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  4. ALLOWED FEATURES  (right card with green/red icons)
-    // ═══════════════════════════════════════════════════════════════════
 
     public class PlanFeaturesDto
     {
@@ -96,11 +85,11 @@ namespace Graduation_Project.DTOs.Subscriptions
 
     public class SubscriptionRecordDto
     {
-        public int Number { get; set; }   
+      
         public Guid Id { get; set; }
         public string PlanName { get; set; } = null!;
         public decimal Price { get; set; }
         public DateTime BillingDate { get; set; }
-        public string Status { get; set; } = null!; // "Active" | "Expired" | "Pending" | "Cancelled"
+        public string Status { get; set; } = null!; // "Active" | "Expired" |  "Cancelled"
     }
 }

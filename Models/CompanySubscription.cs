@@ -12,7 +12,6 @@
 
         public SubscriptionPlan SubscriptionPlan { get; set; } = null!;
 
-        // Monthly or Yearly
         public BillingCycle BillingCycle { get; set; }
 
         public DateTime StartDate { get; set; }
@@ -21,7 +20,7 @@
 
         public decimal PaidAmount { get; set; }
 
-        public bool IsCancelled { get; set; }
+        public bool IsActive { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

@@ -6,6 +6,7 @@ namespace Graduation_Project.Dtos
     {
         public Guid SubscriptionPlanId { get; set; }
 
-        public BillingCycle BillingCycle { get; set; }
+        public string BillingCycle { get; set; }
+        public string? CouponCode { get; set; }
     }
 }
