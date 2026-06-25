@@ -1,6 +1,7 @@
 using Graduation_Project.Dtos;
 using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Stripe;
 
 namespace Graduation_Project.Repositories
@@ -63,12 +64,40 @@ namespace Graduation_Project.Repositories
         public async Task<JobPosting?> GetByIdAsync(Guid id)
         {
             return await _context.JobPostings
-                .Include(j => j.Company)
-                .Include(i=>i.Skills)
-                .Include(j => j.Applications)
-                  .ThenInclude(j=>j.Applicant)
-                    .ThenInclude(j=>j.Resumes)
-                .FirstOrDefaultAsync(j => j.JobID == id);
+              .Include(j => j.Company)
+              .Include(j => j.Skills)
+              .Include(j => j.Applications)
+                   .ThenInclude(a => a.Applicant)
+                       .ThenInclude(a => a.User)
+             .Include(j => j.Applications)
+                  .ThenInclude(a => a.Applicant)
+                      .ThenInclude(a => a.Resumes)
+             .FirstOrDefaultAsync(j => j.JobID == id);
+        }
+        public async Task<List<JobPosting>> GetSimilarJobs(
+     JobPosting job)
+        {
+            return await _context.JobPostings
+                .Include(x => x.Company)
+                .Include(x => x.Applications)
+                .Where(x =>
+                    x.JobID != job.JobID &&
+                    x.JobCategory == job.JobCategory &&
+                    x.IsActive)
+                .Take(3)
+                .ToListAsync();
+        }
+        public bool IsApplied(Guid ?ApplicantId,JobPosting job)
+        {
+            return job.Applications.Any(x => x.ApplicantID == ApplicantId);
+        }
+        public async Task<bool> IsSaved(
+      Guid ?applicantId,
+      JobPosting jobPosting)
+        {
+            return await _context.SavedJobs.AnyAsync(
+                x => x.ApplicantId == applicantId &&
+                     x.JobPostingId == jobPosting.JobID);
         }
         public async Task<bool> AcceptJobAsync(Guid jobId)
         {

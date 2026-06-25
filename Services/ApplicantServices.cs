@@ -1,6 +1,8 @@
 using Graduation_Project.Dtos;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
+using Stripe.V2.Core;
 
 namespace Graduation_Project.Services
 {
@@ -54,6 +56,17 @@ namespace Graduation_Project.Services
         public async Task<List<Applicant>> GetAllApplicantAsync()
         {
             return await _repository.GetAllAsync();
+        }
+        public async Task<ApplicantDetailsForApplicationDto> GetApplicantDetailsForApplication(Guid ApplicantId)
+        {
+            var applicant = await _repository.GetByIdAsync(ApplicantId);
+            if (applicant == null) throw new UnauthorizedException("No Applicant with this Id Please Login first");
+            return new ApplicantDetailsForApplicationDto
+            {
+                ApplicantName = $"{applicant.FirstName} {applicant.LastName}",
+                Email = applicant.User.Email,
+                Resumes = applicant.Resumes.Select(x => new ResumeDetails { ResumeId=x.ResumeID,FilePath = x.FilePath, FileName = x.FileName }).ToList()
+            };
         }
 
         public async Task<ApplicantDashboardResponseDto> GetDashboardAsync(Guid applicantId)

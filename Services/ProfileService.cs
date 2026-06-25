@@ -52,7 +52,7 @@ namespace Graduation_Project.Services
                 AboutMe = applicant.AboutMe,
                 ProfilePicUrl = applicant.ProfilePicURL,
                 CoverPhotoUrl = applicant.CoverPhotoUrl,
-                Email = applicant.Email,
+                Email = applicant.User.Email,
                 PhoneNumber = applicant.PhoneNumber,
                 Address = applicant.Address,
                 Linkedin = applicant.Linkedin,

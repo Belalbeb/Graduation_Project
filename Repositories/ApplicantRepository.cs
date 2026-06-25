@@ -22,7 +22,10 @@ namespace Graduation_Project.Repositories
 
         public async Task<Applicant?> GetByIdAsync(Guid id)
         {
-            return await _context.Applicants.FirstOrDefaultAsync(x => x.ApplicantID == id);
+            return await _context.Applicants
+                .Include(x=>x.Resumes)
+                .Include(x=>x.User).
+                FirstOrDefaultAsync(x => x.ApplicantID == id);
         }
 
         public async Task<Applicant?> GetByUserIdAsync(string userId)

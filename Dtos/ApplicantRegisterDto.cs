@@ -19,5 +19,7 @@ namespace Graduation_Project.Dtos
    
         [Required]
         public string Location { get; set; }
+        [Required]
+        public string Industry { get; set; }
     }
 }

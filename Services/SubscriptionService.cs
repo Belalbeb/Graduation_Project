@@ -3,6 +3,8 @@ using Graduation_Project.DTOs.Subscriptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Graduation_Project.Services
 {
@@ -10,13 +12,15 @@ namespace Graduation_Project.Services
     {
         private readonly ApplicationDbContext _context;
 
-        public SubscriptionService(ApplicationDbContext context, ISubscriptionRepository subscriptionRepository)
+        public SubscriptionService(ApplicationDbContext context, ISubscriptionRepository subscriptionRepository,ICompanyRepository companyRepository)
         {
             _context = context;
             SubscriptionRepository = subscriptionRepository;
+            CompanyRepository = companyRepository;
         }
 
         public ISubscriptionRepository SubscriptionRepository { get; }
+        public ICompanyRepository CompanyRepository { get; }
 
         public async Task SubscribeAsync(Guid companyId, CreateSubscriptionDto dto)
         {
@@ -134,6 +138,41 @@ namespace Graduation_Project.Services
 
             await SubscriptionRepository.AddAsync(subscription);
         }
+        public async Task<CompanySubscription> GetActiveSubscriptionForCompany(Guid companyId)
+        {
+            var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
+            return subscription;
+        }
+        public async Task<bool> HasCandidateSearch(Guid companyId)
+        {
+            var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
+            if (subscription.SubscriptionPlan.HasCandidateSearch)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
+        }
+        public async Task<bool> HasAiToolAccess(Guid companyId)
+        {
+            var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
+            return subscription.SubscriptionPlan.HasAiToolsAccess;
+        }
+        public async Task<bool> HasReachTheMaxJobPosting(Guid companyId)
+        {
+            var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
+            int numberOfJobPostingForThisMonth =
+                await CompanyRepository.CountCompanyJobsPerMonthAsync(companyId);
+
+            return numberOfJobPostingForThisMonth >=
+                   subscription.SubscriptionPlan.MaxJobPostsPerMonth;
+        }
+        public async Task UpdateAsync(CompanySubscription companySubscription)
+        {
+            await SubscriptionRepository.Update(companySubscription);
+        }
     }
 }

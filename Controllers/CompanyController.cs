@@ -15,11 +15,13 @@ namespace Graduation_Project.Controllers
     {
         private readonly ICompanyServices companyServices;
         private readonly ICompanyVerificationService companyVerificationService;
+        private readonly ISubscriptionService subscriptionService;
 
-        public CompanyController(ICompanyServices companyServices,ICompanyVerificationService companyVerificationService)
+        public CompanyController(ICompanyServices companyServices,ICompanyVerificationService companyVerificationService,ISubscriptionService subscriptionService)
         {
             this.companyServices = companyServices;
             this.companyVerificationService = companyVerificationService;
+            this.subscriptionService = subscriptionService;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCompanyById(Guid id)
@@ -27,6 +29,17 @@ namespace Graduation_Project.Controllers
             var company = await companyServices.GetCompanyByIdAsync(id);
             if (company == null) return NotFound();
             return Ok(company);
+        }
+        [HttpGet("get-public-profile")]
+        public async Task<IActionResult> GetPublicProfile(Guid companyId)
+        {
+            var profile = await companyServices.GetCompanyProfileAsync(companyId);
+
+            if (profile == null)
+                return NotFound("Company profile not found");
+
+            return Ok(profile);
+
         }
 
 
@@ -111,10 +124,23 @@ namespace Graduation_Project.Controllers
             return Ok("Verification request submitted");
         }
         [HttpGet("candidates")]
-        public async Task<IActionResult> GetCandidatesForCompany(
-            [FromQuery] int page = 1,
-            [FromQuery] CandidateFilterDto filter = null)
+        [Authorize(Roles=Roles.Company)]
+        public async Task<IActionResult> GetCandidatesForCompany([FromQuery] int page = 1, [FromQuery] CandidateFilterDto filter = null)
         {
+            var companyIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(companyIdClaim, out Guid companyId))
+                return Unauthorized();
+            bool HasCandidateSearch = await subscriptionService.HasCandidateSearch(companyId);
+            if (!HasCandidateSearch)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Upgrade your subscription to see relevant candidates."
+                });
+            }
+
+
             if (page < 1)
                 return BadRequest(new
                 {
@@ -124,6 +150,57 @@ namespace Graduation_Project.Controllers
             var candidates = await companyServices.GetAllCandidate(page, filter);
 
             return Ok(candidates);
+        }
+        [HttpGet("can-post-job")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> CanPostJobs()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            bool hasReachTheMaxJobPosting = await subscriptionService.HasReachTheMaxJobPosting(companyId);
+            if (hasReachTheMaxJobPosting)
+            {
+                return Ok(new { canPost = false });
+            }
+
+            return Ok(new { canPost = true });
+
+        }
+        [HttpGet("has-ai-access")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> HasAiToolAccess()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            bool result = await subscriptionService.HasAiToolAccess(companyId);
+            if (!result)
+            {
+                return Ok(new { hasAiToolAccess = false });
+            }
+
+            return Ok(new { hasAiToolAccess = true });
+
+        }
+        [HttpGet("has-candidate-search")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> HasCandidatesSearch()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid companyId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            bool result = await subscriptionService.HasCandidateSearch(companyId);
+            if (!result)
+            {
+                return Ok(new { hasCandidatesSearch = false });
+            }
+
+            return Ok(new { hasCandidatesSearch = true });
+
         }
     }
 }

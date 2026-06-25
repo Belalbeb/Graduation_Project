@@ -1,4 +1,5 @@
 using Graduation_Project.Dtos;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 using Microsoft.Extensions.Caching.Memory;
@@ -23,32 +24,40 @@ namespace Graduation_Project.Services
         {
             var result = await _repository.GetAllAsync(jobFilterDto);
 
-            var items = result.Jobs.Select(job => new JobCardDto
+            var items = new List<JobCardDto>();
+
+            foreach (var job in result.Jobs)
             {
-                JobID = job.JobID,
-                CompanyName = job.Company?.Name,
-                CompanyLogoUrl = job.Company?.LogoUrl,
-                Location = job.Location,
-                Category=job.JobCategory,
-                Title = job.Title,
-                Description = job.Description,
-                MinSalary = job.MinSalary,
-                MaxSalary = job.MaxSalary,
-                PostedDate = job.PostedDate,
+                items.Add(new JobCardDto
+                {
+                    JobID = job.JobID,
+                    CompanyName = job.Company?.Name,
+                    CompanyLogoUrl = job.Company?.LogoUrl,
+                    Location = job.Location,
+                    Category = job.JobCategory,
+                    MinExperience = job.MinExperience,
+                    MaxExperience = job.MaxExperience,
+                    Title = job.Title,
+                    
+                    Description = job.Description,
+                    MinSalary = job.MinSalary,
+                    MaxSalary = job.MaxSalary,
+                    PostedDate = job.PostedDate,
 
-                JobTypes = job.JobTypes
-                    .Select(t => t.ToString())
-                    .ToList(),
+                    JobTypes = job.JobTypes
+                        .Select(t => t.ToString())
+                        .ToList(),
 
-                WorkApproaches = job.WorkApproaches
-                    .Select(w => w.ToString())
-                    .ToList(),
+                    WorkApproaches = job.WorkApproaches
+                        .Select(w => w.ToString())
+                        .ToList(),
 
-                IsApplied = currentApplicantId != Guid.Empty &&
-                            job.Applications.Any(a =>
-                                a.ApplicantID == currentApplicantId)
-            }).ToList();
+                    IsApplied = currentApplicantId != Guid.Empty &&
+                                job.Applications.Any(a => a.ApplicantID == currentApplicantId),
 
+                    IsSaved = await _repository.IsSaved(currentApplicantId, job)
+                });
+            }
             return new PagedResult<JobCardDto>
             {
                 Items = items,
@@ -58,9 +67,100 @@ namespace Graduation_Project.Services
             };
         }
 
-        public async Task<JobPosting> GetJobByIdAsync(Guid id)
+        public async Task<JobPostingDetailsDto> GetJobByIdAsync(Guid id,Guid ?ApplicantId)
         {
-            return await _repository.GetByIdAsync(id);
+            var job = await _repository.GetByIdAsync(id);
+
+            if (job == null)
+                throw new NotFoundException("Job not found");
+
+            var dto = new JobPostingDetailsDto
+            {
+                CompanyImage = job.Company?.LogoUrl ?? string.Empty,
+                CompanyName = job.Company?.Name ?? string.Empty,
+
+                JobCategory = job.JobCategory,
+                JobLocation = job.Location,
+
+                Title = job.Title,
+
+                MinExperience = job.MinExperience,
+                MaxExperience = job.MaxExperience,
+
+                MinSalary = job.MinSalary,
+                MaxSalary = job.MaxSalary,
+
+                WorkApproaches = job.WorkApproaches
+                               .Select(x => x.ToString())
+                               .ToList(),
+
+                JobTypes = job.JobTypes
+                        .Select(x => x.ToString())
+                       .ToList(),
+
+                PostedDate = job.PostedDate,
+
+                Description = job.Description,
+                Responsibility = job.Responsibility,
+
+                RequiredSkill = job.Skills.Select(x => x.Name).ToList(),
+
+                IsActive = job.IsActive,
+
+                IsApplied = ApplicantId.HasValue &&
+                       _repository.IsApplied(ApplicantId.Value, job),
+
+                IsSaved = ApplicantId.HasValue &&
+                    await _repository.IsSaved(ApplicantId.Value, job),
+
+            };
+
+            return dto;
+        }
+        public async Task<List<SimilarJobDto>> GetSimilarJobsAsync(
+    Guid jobId,
+    Guid? applicantId)
+        {
+            var job = await _repository.GetByIdAsync(jobId);
+
+            if (job == null)
+                throw new NotFoundException("Job not found");
+
+            var similarJobs = await _repository.GetSimilarJobs(job);
+
+            var result = new List<SimilarJobDto>();
+
+            foreach (var item in similarJobs)
+            {
+                result.Add(new SimilarJobDto
+                {
+                    CompanyName = item.Company.Name,
+                    CompanyImage = item.Company.LogoUrl,
+
+                    JobLocation = item.Location,
+
+                    WorkApproach = item.WorkApproaches
+                        .Select(x => x.ToString())
+                        .ToList(),
+
+                    JobType = item.JobTypes
+                        .Select(x => x.ToString())
+                        .ToList(),
+
+                    PostedDate = item.PostedDate,
+
+                    MinSalary = item.MinSalary,
+                    MaxSalary = item.MaxSalary,
+
+                    IsApplied = applicantId.HasValue &&
+                        _repository.IsApplied(applicantId.Value, item),
+
+                    IsSaved = applicantId.HasValue &&
+                        await _repository.IsSaved(applicantId.Value, item)
+                });
+            }
+
+            return result;
         }
 
         public async Task<JobPostingDto> GetJobsByCompanyAsync(Guid companyId)
@@ -69,7 +169,7 @@ namespace Graduation_Project.Services
             var jobsList = jobs.ToList();
 
             int jobPostingCount = jobsList.Count;
-            int activeJobPostedCount = jobsList.Count(x => x.IsActive);
+            int activeJobPostedCount = jobsList.Count(x => x.Status==JobStatus.Approved);
             int applicantCount = jobsList
               .SelectMany(x => x.Applications ?? new List<Graduation_Project.Models.Application>())
               .Select(a => a.ApplicantID)
@@ -106,6 +206,7 @@ namespace Graduation_Project.Services
                 Responsibility = dto.JobDetails.Responsibilities,
                 MaxExperience=dto.JobBasicData.MaxExperience,
                 MinExperience=dto.JobBasicData.MinExperience,
+                IsFeatured=dto.JobBasicData.IsFeatured,
 
                 MinSalary = dto.JobBasicData.SalaryMin,
                 MaxSalary = dto.JobBasicData.SalaryMax,
@@ -186,7 +287,7 @@ namespace Graduation_Project.Services
                     {
                         ApplicantionId=x.ApplicationID,
                         ApplicantName = $"{x.Applicant.FirstName} {x.Applicant.LastName}",
-                        Email = x.Applicant.Email,
+                        Email = x.Applicant.User.Email,
                         ImageUrl = x.Applicant.ProfilePicURL,
                         AppliedDate = x.AppliedDate,
                         Status = x.ApplicationStatus.ToString()
@@ -197,7 +298,7 @@ namespace Graduation_Project.Services
                     {
                         InterviewId=i.InterviewId,
                         ApplicantName = $"{i.Applicant.FirstName} {i.Applicant.LastName}",
-                        Email = i.Applicant.Email,
+                        Email = i.Applicant.User.Email,
                         ImageUrl = i.Applicant.ProfilePicURL,
                         InterviewDate = i.InterviewDate,
                         StartTime=i.StartTime,

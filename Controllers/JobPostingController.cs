@@ -13,10 +13,12 @@ namespace Graduation_Project.Controllers
     public class JobPostingController : ControllerBase
     {
         private readonly IJobPostingService _service;
+        private readonly ISubscriptionService subscriptionService;
 
-        public JobPostingController(IJobPostingService service)
+        public JobPostingController(IJobPostingService service,ISubscriptionService subscriptionService)
         {
             _service = service;
+            this.subscriptionService = subscriptionService;
         }
 
       
@@ -34,10 +36,14 @@ namespace Graduation_Project.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var job = await _service.GetJobByIdAsync(id);
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            Guid.TryParse(profileIdClaim, out Guid ApplicantId);
+
+            var job = await _service.GetJobByIdAsync(id,ApplicantId);
+            var similarJobs = await _service.GetSimilarJobsAsync(id, ApplicantId);
             if (job == null) return NotFound("Job not found");
 
-            return Ok(job);
+            return Ok(new {job=job,similarJobs=similarJobs});
         }
 
         
@@ -61,6 +67,14 @@ namespace Graduation_Project.Controllers
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
             if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
+            bool hasReachTheMaxJobPosting = await subscriptionService.HasReachTheMaxJobPosting(companyId);
+            if (hasReachTheMaxJobPosting)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "You have reached the maximum number of job postings for this month. Please upgrade your plan."
+                });
+            }
 
             if (!ModelState.IsValid)
             {
@@ -76,7 +90,7 @@ namespace Graduation_Project.Controllers
             }
 
             var newJob = await _service.CreateJobAsync(job, companyId);
-            return Created();
+            return Created(string.Empty, newJob);
         }
         [HttpGet("job-details/{jobId}")]
         public async Task<IActionResult> GetJobDetails(Guid jobId)

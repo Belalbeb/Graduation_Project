@@ -33,7 +33,9 @@ namespace Graduation_Project.Repositories
         }
         public async Task<Application> GetApplicationByIdAsync(Guid ApplicationId)
         {
-            return await _context.Applications.Include(x=>x.Applicant).Include(x=>x.Resume).FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
+            return await _context.Applications.Include(x=>x.Applicant)
+                .ThenInclude(x=>x.User)
+                .Include(x=>x.Resume).FirstOrDefaultAsync(x => x.ApplicationID == ApplicationId);
 
         }
         public async Task<bool> ChangeApplicationStatus(Guid ApplicationId,Guid companyId ,ApplicationStatus status)

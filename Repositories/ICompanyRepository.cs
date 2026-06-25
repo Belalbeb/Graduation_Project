@@ -24,6 +24,7 @@ namespace Graduation_Project.Repositories
         Task<int> CountVerifiedCompaniesAsync();
         Task<int> CountPendingCompaniesAsync();
         Task<int> CountCompanyJobsAsync(Guid companyId);
+       Task<int> CountCompanyJobsPerMonthAsync(Guid companyId);
         Task<int> CountCompanyActiveJobsAsync(Guid companyId);
         Task<int> CountCompanyApplicantsAsync(Guid companyId);
         Task<int> CountCompanyInterviewsAsync(Guid companyId);

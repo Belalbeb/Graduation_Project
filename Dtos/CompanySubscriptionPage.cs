@@ -15,7 +15,7 @@ namespace Graduation_Project.Dtos
         public Guid SubscriptionId { get; set; }
         public string PlanName { get; set; } = null!;
         public string? BillingCycle { get; set; }   // Monthly | Annually
-        public DateTime RenewalDate { get; set; }
+        public DateTime? RenewalDate { get; set; }
         public string Status { get; set; } = null!; // "Active" | "Expired" | "Cancelled"
 
         // Progress bars
@@ -71,7 +71,7 @@ namespace Graduation_Project.Dtos
         public string PlanName { get; set; } = null!;
         public decimal Amount { get; set; }
         public DateTime PurchaseDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime ?EndDate { get; set; }
         public string Status { get; set; } = null!;
     }
 }

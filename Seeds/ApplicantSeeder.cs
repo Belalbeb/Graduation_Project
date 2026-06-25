@@ -25,8 +25,7 @@ namespace Graduation_Project.Seeds
                 .RuleFor(a => a.AboutMe, f => f.Lorem.Paragraph())
                 .RuleFor(a => a.Location, f => f.Address.City())
 
-                .RuleFor(a => a.Email,
-                    (f, a) => f.Internet.Email(a.FirstName, a.LastName))
+              
 
                 .RuleFor(a => a.PhoneNumber,
                     f => f.Phone.PhoneNumber())

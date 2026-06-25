@@ -26,6 +26,7 @@ namespace Graduation_Project.Repositories
         {
             return await _context.Applicants
                 .Include(a => a.Experiences)
+                .Include(u=>u.User)
                 .Include(a => a.ApplicantSkills)
                     .ThenInclude(s => s.Skill)
                 .Include(a => a.Projects)

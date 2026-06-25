@@ -130,6 +130,15 @@ namespace Graduation_Project.Repositories
         {
             return await _context.JobPostings.CountAsync(j => j.CompanyID == companyId);
         }
+        public async Task<int> CountCompanyJobsPerMonthAsync(Guid companyId)
+        {
+            var now = DateTime.UtcNow;
+
+            return await _context.JobPostings.CountAsync(j =>
+                j.CompanyID == companyId &&
+                j.PostedDate.Year == now.Year &&
+                j.PostedDate.Month == now.Month);
+        }
 
         // Count active jobs for a company
         public async Task<int> CountCompanyActiveJobsAsync(Guid companyId)

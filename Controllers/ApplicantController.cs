@@ -98,5 +98,16 @@ namespace Graduation_Project.Controllers
 
             return Ok(new { FilePath = path });
         }
+        [HttpGet("Application")]
+        [Authorize(Roles=Roles.Applicant)]
+        public async Task<IActionResult> GetApplicantDetailsForApplication()
+        {
+            var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
+            if (!Guid.TryParse(profileIdClaim, out Guid applicantId))
+                return Unauthorized("Invalid or missing ProfileId");
+
+            var result = await applicantServices.GetApplicantDetailsForApplication(applicantId);
+            return Ok(result);
+        }
     }
 }

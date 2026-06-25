@@ -14,7 +14,7 @@ namespace Graduation_Project.Repositories
 
         public async Task<Applicant?> GetApplicantByIdAsync(Guid applicantId)
         {
-            return await _context.Applicants.FindAsync(applicantId);
+            return await _context.Applicants.Include(x=>x.User).FirstOrDefaultAsync(x=>x.ApplicantID==applicantId);
         }
 
         public async Task<Resume?> GetActiveResumeAsync(Guid applicantId)

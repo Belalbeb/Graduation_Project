@@ -57,7 +57,7 @@ namespace Graduation_Project.Services
 
                 ImageUrl = interview.Applicant?.ProfilePicURL,
 
-                Email = interview.Applicant?.Email,
+                Email = interview.Applicant?.User.Email,
 
                 PositionTitle = interview.JobPosting?.Title,
 

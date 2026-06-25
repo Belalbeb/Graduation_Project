@@ -36,7 +36,7 @@ namespace Graduation_Project.DTOs.Subscriptions
         public decimal Price { get; set; }
         public string? BillingCycle { get; set; }   // Monthly | Annually
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }   // = Renewal Date on UI
+        public DateTime ?EndDate { get; set; }   // = Renewal Date on UI
         public int DaysLeft { get; set; }
         public bool IsActive { get; set; }
         public string Status { get; set; } = null!; // "Active" | "Expired" | "Pending" | "Cancelled"

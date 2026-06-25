@@ -23,6 +23,8 @@ namespace Graduation_Project.Repositories
         Task<bool> AcceptJobAsync(Guid jobId);
         Task<bool> RejectJobAsync(Guid jobId);
         public Task ReplaceSkillsAsync(Guid jobId, List<string> skills);
-
+      Task<List<JobPosting>> GetSimilarJobs(JobPosting job);
+        Task<bool> IsSaved(Guid ?applicantId,JobPosting jobPosting);
+        bool IsApplied(Guid ?ApplicantId, JobPosting job);
     }
 }

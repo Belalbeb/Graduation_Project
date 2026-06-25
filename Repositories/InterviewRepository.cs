@@ -86,6 +86,7 @@ namespace Graduation_Project.Repositories
         {
             var query = _context.Interviews
                 .Include(i => i.Applicant)
+                  .ThenInclude(i=>i.User)
                 .Include(i => i.JobPosting)
                 .Where(i => i.JobPosting.CompanyID == companyId);
 
@@ -114,6 +115,7 @@ namespace Graduation_Project.Repositories
         {
             return await _context.Interviews
                 .Include(i => i.Applicant)
+                  .ThenInclude(i=>i.User)
                 .Include(i => i.JobPosting)
                 .FirstOrDefaultAsync(i =>
                     i.InterviewId == interviewId &&
@@ -133,6 +135,7 @@ namespace Graduation_Project.Repositories
             return await _context.Interviews
                 .Where(i => i.JobPostingId == jobId)
                 .Include(i => i.Applicant)
+                  .ThenInclude(u=>u.User)
                 .ToListAsync();
         }
 

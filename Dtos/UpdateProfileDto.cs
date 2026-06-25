@@ -6,6 +6,7 @@
         public string ?JobTitle { get; set; } 
         public string? AboutMe { get; set; }
         public string ?Country { get; set; }
- 
+        public string? Industry { get; set; }
+
     }
 }

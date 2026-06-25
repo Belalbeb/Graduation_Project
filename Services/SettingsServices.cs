@@ -39,7 +39,7 @@ namespace Graduation_Project.Services
 
             return new SettingsContactDto
             {
-                Email     = applicant.Email ?? string.Empty,
+                Email     = applicant.User.Email ?? string.Empty,
                 Phone     = applicant.PhoneNumber ?? string.Empty,
                 Address   = applicant.Location ?? string.Empty,
                 Linkedin  = applicant.Linkedin,
@@ -89,7 +89,11 @@ namespace Graduation_Project.Services
                 applicant.Location = dto.Country;
                 hasChanges = true;
             }
-
+            if (dto.Industry != null)
+            {
+                applicant.Industry = dto.Industry;
+                hasChanges = true;
+            }
      
             if (hasChanges)
             {
@@ -151,7 +155,7 @@ namespace Graduation_Project.Services
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
             if (applicant == null) return false;
 
-            if (!string.IsNullOrEmpty(dto.Email))   applicant.Email       = dto.Email;
+            if (!string.IsNullOrEmpty(dto.Email))   applicant.User.Email       = dto.Email;
             if (!string.IsNullOrEmpty(dto.Phone))   applicant.PhoneNumber = dto.Phone;
            
             if (dto.Linkedin  != null) applicant.Linkedin  = dto.Linkedin;

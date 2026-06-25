@@ -1,4 +1,5 @@
 
+using Graduation_Project.BackgroundJobs;
 using Graduation_Project.Configurations;
 using Graduation_Project.Middlewares;
 using Graduation_Project.Models;
@@ -95,6 +96,8 @@ namespace Graduation_Project
             builder.Services.AddScoped<IApplicantSkillService, ApplicantSkillService>() ;
             builder.Services.AddScoped<ISettingsService, SettingsServices>() ;
             builder.Services.AddScoped<IProjectService, ProjectService>() ;
+            builder.Services.AddScoped<ISavedJobRepository, SavedJobRepository>();
+            builder.Services.AddScoped<ISavedJobService, SavedJobService>();
             builder.Services.AddScoped<ICompanySettingsService,CompanySettingsService>();
             builder.Services.AddScoped<ICompanyInterviewService,CompanyInterviewService>();
             builder.Services.AddAuthentication(x =>
@@ -114,7 +117,7 @@ namespace Graduation_Project
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
             });
-
+            //builder.Services.AddHostedService<SubscriptionExpirationJob>();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend",

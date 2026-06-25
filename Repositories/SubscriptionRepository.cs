@@ -47,6 +47,7 @@ namespace Graduation_Project.Repositories
                 })
                 .ToListAsync();
         }
+    
         public async Task<SubscriptionDashboardDto> GetDashboardAsync()
         {
             var currentMonth = DateTime.UtcNow.Month;
@@ -126,7 +127,7 @@ namespace Graduation_Project.Repositories
         }
         public async Task<CompanySubscription> GetActiveSubscription(Guid companyId)
         {
-            var activeSubscription = await _context.companySubscriptions
+            var activeSubscription = await _context.companySubscriptions.Include(x=>x.SubscriptionPlan)
              .FirstOrDefaultAsync(x =>
              x.CompanyId == companyId &&
              x.IsActive);
@@ -195,7 +196,7 @@ namespace Graduation_Project.Repositories
                     BillingCycle = current.BillingCycle.ToString(),
                     StartDate = current.StartDate,
                     EndDate = current.EndDate,
-                    DaysLeft = Math.Max(0, (current.EndDate - now).Days),
+                    DaysLeft = Math.Max(0, (current.EndDate.Value - now).Days),
                     IsActive = current.IsActive,
                     Status = ResolveStatus(!current.IsActive, current.StartDate, current.EndDate, now),
                 },
@@ -216,7 +217,7 @@ namespace Graduation_Project.Repositories
                     SubscriptionProgress = new UsageItemDto
                     {
                         Used = Math.Max(0, (now - current.StartDate).Days),
-                        Limit = Math.Max(1, (current.EndDate - current.StartDate).Days),
+                        Limit = Math.Max(1, (current.EndDate.Value - current.StartDate).Days),
                     },
                 },
 
@@ -249,7 +250,7 @@ namespace Graduation_Project.Repositories
 
         // ── Private helpers ───────────────────────────────────────────────────────────
 
-        private static string ResolveStatus(bool isActive, DateTime startDate, DateTime endDate, DateTime now)
+        private static string ResolveStatus(bool isActive, DateTime startDate, DateTime? endDate, DateTime now)
         {
             if (isActive) return "Active";
             if (endDate < now) return "Expired";
@@ -346,7 +347,7 @@ namespace Graduation_Project.Repositories
                     SubscriptionProgress = new UsageItem
                     {
                         Used = Math.Max(0, (now - current.StartDate).Days),
-                        Limit = Math.Max(1, (current.EndDate - current.StartDate).Days),
+                        Limit = Math.Max(1, (current.EndDate.Value - current.StartDate).Days),
                     },
                 },
 

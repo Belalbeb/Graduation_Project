@@ -16,5 +16,6 @@ namespace Graduation_Project.Services
         Task<string> GetActiveResumePathAsync(Guid applicantId);
         Task<string> GetActiveResumePathByUserIdAsync(string userId);
         public Task<Applicant> GetApplicantByUserIdAsync(string userId);
+    Task<ApplicantDetailsForApplicationDto> GetApplicantDetailsForApplication(Guid ApplicantId);
     }
 }

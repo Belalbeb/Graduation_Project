@@ -32,7 +32,7 @@ namespace Graduation_Project.Services
                 InterviewId = i.InterviewId,
                 CandidateName = $"{i.Applicant.FirstName} {i.Applicant.LastName}".Trim(),
                 ImageUrl=i.Applicant.ProfilePicURL,
-                Email=i.Applicant.Email,
+                Email=i.Applicant.User.Email,
                 JobId=i.JobPostingId,
                 JobTitle = i.JobPosting.Title,
 
@@ -60,7 +60,7 @@ namespace Graduation_Project.Services
                 InterviewId = interview.InterviewId,
                 ApplicantId = interview.ApplicantId,
                 CandidateName = $"{interview.Applicant.FirstName} {interview.Applicant.LastName}".Trim(),
-                CandidateEmail = interview.Applicant.Email ?? "",
+                CandidateEmail = interview.Applicant.User.Email ?? "",
                 JobTitle = interview.JobPosting.Title,
 
        

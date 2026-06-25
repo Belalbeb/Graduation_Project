@@ -25,7 +25,7 @@ namespace Graduation_Project.Services
             ApplicantCompanyDto applicantCompanyDto = new ApplicantCompanyDto()
             {
                 Name = $"{application.Applicant.FirstName} {application.Applicant.LastName}",
-                Email = application.Applicant.Email,
+                Email = application.Applicant.User.Email,
                 ApplicantId  = application.ApplicantID,
                 ImageUrl=application.Applicant.ProfilePicURL,
                 CvPath = application.Resume.FilePath,

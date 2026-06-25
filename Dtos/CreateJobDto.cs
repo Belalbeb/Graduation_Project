@@ -20,6 +20,8 @@ namespace Graduation_Project.Dtos
         public string JobTitle { get; set; }
         [Required]
         public string Location { get; set; }
+
+        public bool IsFeatured { get; set; } = false;
         public decimal SalaryMax { get; set; }
         public decimal SalaryMin { get; set; }
         public int MinExperience { get; set; }

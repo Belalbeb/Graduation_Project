@@ -109,6 +109,7 @@ namespace Graduation_Project.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Location = model.Location,
+                Industry=model.Industry
             };
 
             await ApplicantServices.CreateApplicantAsync(applicant);

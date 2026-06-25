@@ -112,6 +112,7 @@ namespace Graduation_Project.Controllers
             if (plan == null)
                 return NotFound("Plan not found");
 
+
             if (!Enum.TryParse<BillingCycle>(dto.BillingCycle, true, out var billingCycle))
             {
                 throw new BadRequestException("Invalid billing cycle.");
@@ -147,7 +148,7 @@ namespace Graduation_Project.Controllers
                 PaymentMethodTypes = new List<string> { "card" },
                 Mode = "payment",
 
-                SuccessUrl = "https://localhost:3000/success",
+                SuccessUrl = "http://localhost:3000/dashboard/company/subscription?isSuccess=true&token=",
                 CancelUrl = "https://localhost:3000/cancel",
 
                 Metadata = new Dictionary<string, string>
@@ -215,13 +216,28 @@ namespace Graduation_Project.Controllers
 
             var amount = session.AmountTotal ?? 0;
 
-            
-            await SubscriptionService.CreateFromStripeAsync(
-                companyId,
-                planId,
-                billingCycle,
-                amount
-            );
+            var current =
+          await SubscriptionService
+             .GetActiveSubscriptionForCompany(companyId);
+
+            if (current != null &&
+                current.SubscriptionPlanId == planId)
+            {
+                current.EndDate =
+                    billingCycle == "Yearly"
+                    ? current.EndDate!.Value.AddYears(1)
+                    : current.EndDate!.Value.AddMonths(1);
+
+                await SubscriptionService.UpdateAsync(current);
+            }
+            else
+            {
+                await SubscriptionService.CreateFromStripeAsync(
+                    companyId,
+                    planId,
+                    billingCycle,
+                    amount);
+            }
 
             if (!string.IsNullOrEmpty(couponCode))
             {

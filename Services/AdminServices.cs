@@ -227,7 +227,7 @@ namespace Graduation_Project.Services
                 ApplicantId = a.ApplicantID,
                 ProfilePic=a.ProfilePicURL,
                 FullName = $"{a.FirstName} {a.LastName}",
-                Email = a.User?.Email ?? a.Email ?? string.Empty,
+                Email = a.User?.Email ?? a.User.Email ?? string.Empty,
                 JobTitle = a.JobTitle,
                  IsBlocked = a.IsBlocked,
                 Location = a.Location,
@@ -253,7 +253,7 @@ namespace Graduation_Project.Services
                 JoinedDate = applicant.User?.CreatedAt ?? DateTime.UtcNow,
 
                 // Contact Info
-                Email = applicant.User?.Email ?? applicant.Email,
+                Email = applicant.User?.Email ?? applicant.User.Email,
                 PhoneNumber = applicant.PhoneNumber,
                 Location = applicant.Location,
 
