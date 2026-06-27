@@ -1,6 +1,7 @@
 ﻿using Graduation_Project.Dtos;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Graduation_Project.Services
 {
@@ -60,7 +61,7 @@ namespace Graduation_Project.Services
                
                 CompanyName = x.Company.Name,
                 Email = x.Company.User.Email,
-                Location =x.Company.Location,
+                Location =x.Company.Country,
                 Logo=x.Company.LogoUrl,
                 Industry=x.Company.Industry,
 
@@ -108,7 +109,9 @@ namespace Graduation_Project.Services
                 return false;
 
             request.Status = VerificationStatus.Approved;
-         
+            request.AdminNotes = null; 
+
+
 
             request.Company.Status = CompanyStatus.Verified;
 
@@ -125,8 +128,10 @@ namespace Graduation_Project.Services
                 return false;
 
             request.Status = VerificationStatus.Rejected;
-         
-            
+            request.Company.Status = CompanyStatus.Active;
+            request.AdminNotes = null;
+
+
 
             await _repo.UpdateAsync(request);
             await _repo.SaveChangesAsync();
@@ -146,6 +151,19 @@ namespace Graduation_Project.Services
             await _repo.SaveChangesAsync();
 
             return true;
+        }
+        public async Task<VerificationRequestStatusDtoForCompany?> GetVerificationRequestStatusAsync(Guid companyId)
+        {
+            var request =await _repo.GetByCompanyAsync(companyId);
+
+            if (request == null)
+                return null;
+
+            return new VerificationRequestStatusDtoForCompany
+            {
+                Status = request.Status.ToString(),
+                AdminNotes = request.AdminNotes
+            };
         }
     }
 }

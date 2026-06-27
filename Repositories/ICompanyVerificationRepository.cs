@@ -12,6 +12,7 @@ namespace Graduation_Project.Repositories
         Task<List<CompanyVerificationRequest>> GetAllRequestAsync();
 
         Task UpdateAsync(CompanyVerificationRequest request);
+        Task<CompanyVerificationRequest?> GetByCompanyAsync(Guid companyId);
 
         Task SaveChangesAsync();
     }

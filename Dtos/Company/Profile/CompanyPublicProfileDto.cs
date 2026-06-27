@@ -11,6 +11,7 @@
         public string? About { get; set; }     // Description
         public string? Address { get; set; }
         public string? Country { get; set; }
+        public bool IsVerified { get; set; }
         public string Industry { get; set; } = string.Empty;
         public string? CompanySize { get; set; }
         public int? FoundedYear { get; set; }

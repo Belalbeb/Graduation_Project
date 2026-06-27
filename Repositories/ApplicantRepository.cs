@@ -41,7 +41,7 @@ namespace Graduation_Project.Repositories
      int page,
      CandidateFilterDto filter)
         {
-            const int pageSize = 3;
+            const int pageSize = 20;
 
             if (page < 1)
                 page = 1;

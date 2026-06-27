@@ -25,7 +25,13 @@ namespace Graduation_Project.Repositories
                 .Include(x=>x.Company)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-
+        public async Task<CompanyVerificationRequest?> GetByCompanyAsync(Guid companyId)
+        {
+            return await _context.companyVerificationRequests
+                .Where(x => x.CompanyId == companyId)
+                .OrderByDescending(x => x.SubmittedAt)
+                .FirstOrDefaultAsync();
+        }
         public async Task<CompanyVerificationRequest?> GetByIdWithCompanyAsync(Guid id)
         {
             return await _context.companyVerificationRequests
@@ -40,7 +46,8 @@ namespace Graduation_Project.Repositories
                 .Include(x => x.Company)
                   .ThenInclude(x=>x.User)
                 .Include(x=>x.Documents)
-            
+               .OrderByDescending(x => x.SubmittedAt)
+
                 .ToListAsync();
         }
 

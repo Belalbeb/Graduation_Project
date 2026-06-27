@@ -59,9 +59,12 @@ namespace Graduation_Project.Services
             if (applicant == null)
                 return false;
 
-            bool hasChanges = false;
-
-            if (!string.IsNullOrWhiteSpace(dto.FullName))
+            if (string.IsNullOrWhiteSpace(dto.FullName))
+            {
+                applicant.FirstName = string.Empty;
+                applicant.LastName = string.Empty;
+            }
+            else
             {
                 var nameParts = dto.FullName.Trim().Split(' ', 2);
 
@@ -69,39 +72,16 @@ namespace Graduation_Project.Services
                 applicant.LastName = nameParts.Length > 1
                     ? nameParts[1]
                     : string.Empty;
-
-                hasChanges = true;
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.JobTitle))
-            {
-                applicant.JobTitle = dto.JobTitle;
-                hasChanges = true;
-            }
+            applicant.JobTitle = dto.JobTitle;
+            applicant.AboutMe = dto.AboutMe;
+            applicant.Location = dto.Country;
+            applicant.Industry = dto.Industry;
 
-            if (dto.AboutMe != null)
-            {
-                applicant.AboutMe = dto.AboutMe;
-                hasChanges = true;
-            }
-            if (dto.Country != null)
-            {
-                applicant.Location = dto.Country;
-                hasChanges = true;
-            }
-            if (dto.Industry != null)
-            {
-                applicant.Industry = dto.Industry;
-                hasChanges = true;
-            }
-     
-            if (hasChanges)
-            {
-                await _repository.UpdateApplicantAsync(applicant);
-                return true;
-            }
+            await _repository.UpdateApplicantAsync(applicant);
 
-            return false;
+            return true;
         }
         public async Task<bool> updatePhoto(Guid applicantId,IFormFile photo)
         {
@@ -153,25 +133,24 @@ namespace Graduation_Project.Services
         public async Task<bool> UpdateContactAsync(Guid applicantId, UpdateContactDto dto)
         {
             var applicant = await _repository.GetApplicantByIdAsync(applicantId);
-            if (applicant == null) return false;
 
-            if (!string.IsNullOrEmpty(dto.Email))   applicant.User.Email       = dto.Email;
-            if (!string.IsNullOrEmpty(dto.Phone))   applicant.PhoneNumber = dto.Phone;
-           
-            if (dto.Linkedin  != null) applicant.Linkedin  = dto.Linkedin;
-            if (dto.Behance != null) applicant.Behance = dto.Behance;
-            if (dto.Dribbble != null) applicant.Dribble = dto.Dribbble;
-            if (dto.Address != null) applicant.Address = dto.Address;
-            if (dto.Github    != null) applicant.Github    = dto.Github;
-            if (dto.Facebook  != null) applicant.Facebook  = dto.Facebook;
-            if (dto.Portfolio != null) applicant.Portfolio = dto.Portfolio;
-            if (dto.Address != null) applicant.Address = dto.Address;
+            if (applicant == null)
+                return false;
 
+            applicant.PhoneNumber = dto.Phone;
+
+            applicant.Linkedin = dto.Linkedin;
+            applicant.Behance = dto.Behance;
+            applicant.Dribble = dto.Dribbble;
+            applicant.Address = dto.Address;
+            applicant.Github = dto.Github;
+            applicant.Facebook = dto.Facebook;
+            applicant.Portfolio = dto.Portfolio;
 
             await _repository.UpdateApplicantAsync(applicant);
+
             return true;
         }
-
         private async Task UpdateActiveResumeAsync(Guid applicantId, string resumeUrl,string fileName)
         {
             await _repository.DeactivateAllResumesAsync(applicantId);

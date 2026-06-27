@@ -6,6 +6,7 @@
         public string FullName { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
+        public string ?Industry { get; set; }
         public string? AboutMe { get; set; }
         public string? ProfilePicUrl { get; set; }
         public string? CoverPhotoUrl { get; set; }

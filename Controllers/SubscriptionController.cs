@@ -148,8 +148,8 @@ namespace Graduation_Project.Controllers
                 PaymentMethodTypes = new List<string> { "card" },
                 Mode = "payment",
 
-                SuccessUrl = "http://localhost:3000/dashboard/company/subscription?isSuccess=true",
-                CancelUrl = "http://localhost:3000/dashboard/company/subscription?isSuccess=false",
+                SuccessUrl = "http://localhost:3000/subscription?isSuccess=true",
+                CancelUrl = "http://localhost:3000/subscription?isSuccess=false",
 
                 Metadata = new Dictionary<string, string>
               {

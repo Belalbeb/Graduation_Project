@@ -5,7 +5,7 @@ namespace Graduation_Project.Models
     public class ApplicationUser:IdentityUser
     {
         //public readonly string  Type { get; set; } // "Applicant" or "Company"
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime LastLogin { get; set; }
         public bool IsBlocked { get; set; }
 

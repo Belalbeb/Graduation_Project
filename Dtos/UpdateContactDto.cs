@@ -8,7 +8,7 @@ namespace Graduation_Project.Dtos
         [StringLength(100)]
         public string? Email { get; set; }
 
-        [Phone(ErrorMessage = "Invalid phone number")]
+        
         [RegularExpression(
             @"^(\+20|0)?1[0125][0-9]{8}$",
             ErrorMessage = "Invalid Egyptian phone number")]

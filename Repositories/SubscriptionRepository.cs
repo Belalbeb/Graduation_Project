@@ -235,9 +235,15 @@ namespace Graduation_Project.Repositories
                     BillingCycle = current.BillingCycle.ToString(),
                     StartDate = current.StartDate,
                     EndDate = current.EndDate,
-                    DaysLeft = Math.Max(0, (current.EndDate.Value - now).Days),
+                    DaysLeft = current.EndDate.HasValue
+                        ? Math.Max(0, (current.EndDate.Value - now).Days)
+                              : 0,
                     IsActive = current.IsActive,
-                    Status = ResolveStatus(!current.IsActive, current.StartDate, current.EndDate, now),
+                    Status = ResolveStatus(
+                   current.IsActive,
+                   current.StartDate,
+                   current.EndDate,
+                      now),
                 },
 
                 // ── Usage ────────────────────────────────────────────────────────────
@@ -253,11 +259,18 @@ namespace Graduation_Project.Repositories
                         Used = featuredJobsUsed,
                         Limit = plan.FeaturedJobPostsPerMonth,
                     },
-                    SubscriptionProgress = new UsageItemDto
+                    SubscriptionProgress = current.EndDate.HasValue
+                                          ? new UsageItemDto
+                               {
+                                  Used = Math.Max(0, (now - current.StartDate).Days),
+                                 Limit = Math.Max(1,
+                          (current.EndDate.Value - current.StartDate).Days)
+                           }
+                      : new UsageItemDto
                     {
-                        Used = Math.Max(0, (now - current.StartDate).Days),
-                        Limit = Math.Max(1, (current.EndDate.Value - current.StartDate).Days),
-                    },
+                   Used = 0,
+                  Limit = 0
+                   },
                 },
 
                 // ── Features ─────────────────────────────────────────────────────────
@@ -281,7 +294,7 @@ namespace Graduation_Project.Repositories
                         PlanName = s.PlanName,
                         Price = s.PaidAmount,
                         BillingDate = s.BillingDate,
-                        Status = ResolveStatus(!s.IsActive, default, s.EndDate, now),
+                        Status = ResolveStatus(s.IsActive, default, s.EndDate, now),
                     }).ToList(),
                 },
             };
@@ -289,11 +302,18 @@ namespace Graduation_Project.Repositories
 
         // ── Private helpers ───────────────────────────────────────────────────────────
 
-        private static string ResolveStatus(bool isActive, DateTime startDate, DateTime? endDate, DateTime now)
+        private static string ResolveStatus(
+          bool isActive,
+          DateTime startDate,
+          DateTime? endDate,
+          DateTime now)
         {
-            if (isActive) return "Active";
-            if (endDate < now) return "Expired";
-           
+            if (isActive)
+                return "Active";
+
+            if (endDate.HasValue && endDate.Value < now)
+                return "Expired";
+
             return "Cancelled";
         }
 

@@ -200,14 +200,21 @@ namespace Graduation_Project.Controllers
             token = WebEncoders.Base64UrlEncode(
                 Encoding.UTF8.GetBytes(token));
 
-        
-            var baseUrl = "http://jobify-api.runasp.net";
+            var frontendUrl = "http://localhost:3000";
 
             var confirmationLink =
-                $"{baseUrl}/api/Settings/confirm-email-change" +
+                $"{frontendUrl}/confirm-email-change" +
                 $"?userId={user.Id}" +
                 $"&newEmail={Uri.EscapeDataString(dto.NewEmail)}" +
                 $"&token={Uri.EscapeDataString(token)}";
+
+            //var baseUrl = "http://jobify-api.runasp.net";
+
+            //var confirmationLink =
+            //    $"{baseUrl}/api/Settings/confirm-email-change" +
+            //    $"?userId={user.Id}" +
+            //    $"&newEmail={Uri.EscapeDataString(dto.NewEmail)}" +
+            //    $"&token={Uri.EscapeDataString(token)}";
 
             // send email
             await emailService.SendEmailAsync(

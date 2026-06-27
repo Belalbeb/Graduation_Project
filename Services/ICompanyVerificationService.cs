@@ -6,7 +6,7 @@ namespace Graduation_Project.Services
     public interface ICompanyVerificationService
     {
         Task<bool> CreateRequestAsync(Guid companyId, List<IFormFile> documents);
-
+        Task<VerificationRequestStatusDtoForCompany?> GetVerificationRequestStatusAsync(Guid companyId);
         Task<List<VerificationRequestDto>> GetAllRequestsAsync();
      Task<VertificationRequestDetailsDto> GetVertificationRequestDetails(Guid VertificationId);
 

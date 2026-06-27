@@ -123,6 +123,23 @@ namespace Graduation_Project.Controllers
 
             return Ok("Verification request submitted");
         }
+        [HttpGet("verification-request-status")]
+        [Authorize(Roles = Roles.Company)]
+        public async Task<IActionResult> GetVerificationRequestStatus()
+        {
+            var profileId = User.FindFirstValue(CustomClaims.ProfileId);
+
+            if (!Guid.TryParse(profileId, out Guid companyId))
+                return Unauthorized();
+
+            var result = await companyVerificationService
+                .GetVerificationRequestStatusAsync(companyId);
+
+            if (result == null)
+                return Ok(new VerificationRequestStatusDtoForCompany { Status = null, AdminNotes=null} );
+
+            return Ok(result);
+        }
         [HttpGet("candidates")]
         [Authorize(Roles=Roles.Company)]
         public async Task<IActionResult> GetCandidatesForCompany([FromQuery] int page = 1, [FromQuery] CandidateFilterDto filter = null)

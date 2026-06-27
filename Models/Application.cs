@@ -8,7 +8,7 @@ namespace Graduation_Project.Models
         [Key]
         public Guid ApplicationID { get; set; } = Guid.NewGuid();
         public ApplicationStatus ApplicationStatus { get; set; } = ApplicationStatus.Pending;
-        public DateTime AppliedDate { get; set; }
+        public DateTime AppliedDate { get; set; }= DateTime.Now;
         public string ?CoverLetter { get; set; }
 
         // FKs

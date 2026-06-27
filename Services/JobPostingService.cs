@@ -176,7 +176,7 @@ namespace Graduation_Project.Services
             var jobsList = jobs.ToList();
 
             int jobPostingCount = jobsList.Count;
-            int activeJobPostedCount = jobsList.Count(x => x.Status==JobStatus.Approved);
+            int activeJobPostedCount = jobsList.Count(x => x.Status==JobStatus.Approved&&x.IsActive);
             int applicantCount = jobsList
               .SelectMany(x => x.Applications ?? new List<Graduation_Project.Models.Application>())
               .Select(a => a.ApplicantID)
@@ -188,6 +188,7 @@ namespace Graduation_Project.Services
                 JobId = job.JobID,
                 JobTitle = job.Title,
                 JobStatus=job.Status.ToString(),
+                IsActive=job.IsActive,
                 Location = job.Location,
                 PostedAt = job.PostedDate,
                 JobType = job.JobTypes.Select(x=>x.ToString()).ToList(),

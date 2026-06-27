@@ -50,6 +50,7 @@ namespace Graduation_Project.Services
                 JobTitle = applicant.JobTitle ?? string.Empty,
                 Location = applicant.Location ?? string.Empty,
                 AboutMe = applicant.AboutMe,
+                Industry=applicant.Industry,
                 ProfilePicUrl = applicant.ProfilePicURL,
                 CoverPhotoUrl = applicant.CoverPhotoUrl,
                 Email = applicant.User.Email,

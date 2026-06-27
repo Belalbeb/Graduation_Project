@@ -50,7 +50,7 @@ namespace Graduation_Project.Services
             var statistics = new CompanyResponseDto.StatisticsDto
             {
                 TotalJobPosts       = allJobPostings.Count(),
-                ActiveJobPosts      = allJobPostings.Count(jp => jp.IsActive),
+                ActiveJobPosts      = allJobPostings.Count(jp=>jp.IsActive&&jp.Status==JobStatus.Approved),
                 TotalApplicants     = allApplications.Count(),
                 ScheduledInterviews = allJobPostings
                     .SelectMany(jp => jp.Interviews)
@@ -146,6 +146,7 @@ namespace Graduation_Project.Services
             {
                 CompanyId = company.CompanyID,
                 Name = company.Name,
+                IsVerified = company.Status == CompanyStatus.Verified,
                 LogoUrl = company.LogoUrl,
                 WebsiteUrl=company.WebsiteURL,
                 CoverLogoUrl = company.CoverLogoUrl,
