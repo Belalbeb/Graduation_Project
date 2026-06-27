@@ -9,15 +9,18 @@ namespace Graduation_Project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+   
     public class ProfileController : ControllerBase
     {
         private readonly IProfileService _profileService ;
-        public ProfileController(IProfileService profileService)
+        private readonly ICompanyServices companyServices;
+
+        public ProfileController(IProfileService profileService,ICompanyServices companyServices)
         {
             _profileService = profileService ;
+            this.companyServices = companyServices;
         }
-
+        [Authorize]
         [HttpGet("{applicantId}")]
         public async Task<IActionResult> GetProfile(Guid applicantId)
         {
@@ -32,7 +35,24 @@ namespace Graduation_Project.Controllers
 
             return Ok(profile);
         }
+        [HttpGet("public-profile/{id}")]
+        public async Task<IActionResult> GetPublicProfile([FromRoute]Guid id)
+        {
+            object? profile = await _profileService.GetPublicProfileAsync(id);
 
+            if (profile == null)
+            {
+                profile = await companyServices.GetCompanyProfileAsync(id);
+            }
+
+            if (profile == null)
+            {
+                return NotFound("Profile not found.");
+            }
+
+            return Ok(profile);
+        }
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMyProfile()
         {

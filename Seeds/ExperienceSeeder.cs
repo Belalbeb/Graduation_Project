@@ -1,4 +1,3 @@
-﻿
 using Bogus;
 using Graduation_Project.Models;
 
@@ -16,33 +15,37 @@ namespace Graduation_Project.Seeds
             if (!applicants.Any())
                 return;
 
-            var faker = new Faker<Experience>()
-                .RuleFor(e => e.CompanyName,
-                    f => f.Company.CompanyName())
+            var faker = new Faker();
+            var experiences = new List<Experience>();
 
-                .RuleFor(e => e.Location,
-                    f => f.Address.City())
+            foreach (var applicant in applicants)
+            {
+                var count = faker.Random.Int(2, 5);
+                var cursor = DateTime.UtcNow;
 
-                .RuleFor(e => e.JobTitle,
-                    f => f.Name.JobTitle())
+                for (int i = 0; i < count; i++)
+                {
+                    // Build chronologically backwards so no overlapping dates
+                    var durationMonths = faker.Random.Int(6, 36);
+                    var endDate = cursor.AddDays(-faker.Random.Int(0, 90)); // gap between jobs
+                    var startDate = endDate.AddMonths(-durationMonths);
+                    cursor = startDate;
 
-                .RuleFor(e => e.Description,
-                    f => f.Lorem.Paragraph())
+                    var isCurrent = i == 0 && faker.Random.Bool(0.4f);
 
-                .RuleFor(e => e.JobType,
-                    f => f.PickRandom<JobType>())
-
-      
-                .RuleFor(e => e.StartDate,
-                    f => f.Date.Past(5))
-
-                .RuleFor(e => e.EndDate,
-                    (f, e) => e.StartDate.AddMonths(f.Random.Int(3, 36)))
-
-                .RuleFor(e => e.ApplicantID,
-                    f => f.PickRandom(applicants).ApplicantID);
-
-            var experiences = faker.Generate(20);
+                    experiences.Add(new Experience
+                    {
+                        CompanyName = faker.Company.CompanyName(),
+                        Location = faker.Address.City(),
+                        JobTitle = faker.Name.JobTitle(),
+                        Description = faker.Lorem.Paragraph(),
+                        JobType = faker.PickRandom<JobType>(),
+                        StartDate = startDate,
+                        EndDate = isCurrent ? null : endDate,
+                        ApplicantID = applicant.ApplicantID
+                    });
+                }
+            }
 
             context.Experiences.AddRange(experiences);
             await context.SaveChangesAsync();

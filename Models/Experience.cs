@@ -9,7 +9,7 @@ namespace Graduation_Project.Models
         public string Description { get; set; }
         public JobType JobType { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime ?EndDate { get; set; }
 
         // FK
         public Guid ApplicantID { get; set; }

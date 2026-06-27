@@ -163,7 +163,7 @@ namespace Graduation_Project.Controllers
                 UserId = user.Id,
                 Name = companyDto.Name,
                 Industry = companyDto.Industry,
-                Location = companyDto.Location
+                Country= companyDto.Location
             };
 
             await CompanyServices.AddCompanyAsync(company);
@@ -175,13 +175,14 @@ namespace Graduation_Project.Controllers
                 CompanyId = company.CompanyID,
                 SubscriptionPlanId = freePlan.Id,
                 BillingCycle = BillingCycle.Monthly,
+                IsActive=true,
                 
                 StartDate = DateTime.UtcNow,
                 
 
             };
 
-            context.companySubscriptions.Add(subscription);
+           await context.companySubscriptions.AddAsync(subscription);
 
             await context.SaveChangesAsync();
 

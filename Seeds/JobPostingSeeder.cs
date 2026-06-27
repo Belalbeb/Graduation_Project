@@ -1,46 +1,95 @@
-﻿using Bogus;
+using Bogus;
 using Graduation_Project.Models;
-using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Graduation_Project.Seeds
 {
     public class JobPostingSeeder
     {
+        private static readonly string[] JobTitles =
+        {
+            "Senior Software Engineer", "Full Stack Developer", "Backend Developer",
+            "Frontend Developer", "Data Scientist", "ML Engineer", "DevOps Engineer",
+            "Cloud Architect", "Mobile Developer (iOS)", "Mobile Developer (Android)",
+            "UI/UX Designer", "Product Manager", "QA Engineer", "Security Engineer",
+            "Site Reliability Engineer", "Database Administrator", "Solutions Architect",
+            "React Developer", "Node.js Developer", "Python Developer"
+        };
+
         public static async Task Seed(ApplicationDbContext context)
         {
             if (context.JobPostings.Any())
                 return;
 
-            var companies = context.Companies.ToList();
+            var companies = await context.Companies.ToListAsync();
+            if (!companies.Any())
+                return;
 
-            var faker = new Faker<JobPosting>()
-                .RuleFor(j => j.Title, f => f.Name.JobTitle())
-                .RuleFor(j => j.Description, f => f.Lorem.Paragraph())
-                .RuleFor(j => j.Responsibility, f => f.Lorem.Sentence())
-                .RuleFor(j => j.MinSalary, f => f.Random.Decimal(5000, 10000))
-                .RuleFor(j => j.MaxSalary, f => f.Random.Decimal(10000, 20000))
-                .RuleFor(j => j.Location, f => f.Address.City())
-                .RuleFor(j => j.JobCategory,
-    f => f.PickRandom(new[]
-    {
-        "Software Development",
-        "Data Science",
-        "Cyber Security",
-        "Web Development",
-        "Mobile Development",
-        "UI/UX Design",
-        "DevOps",
-        "Cloud Computing",
-        "AI / Machine Learning",
-        "QA / Testing",
-        "IT Support",
-        "Networking"
-    }))
-                .RuleFor(j => j.CompanyID, f => f.PickRandom(companies).CompanyID);
+            var categories = new[]
+            {
+                "Software Development", "Data Science", "Cyber Security",
+                "Web Development", "Mobile Development", "UI/UX Design",
+                "DevOps", "Cloud Computing", "AI / Machine Learning",
+                "QA / Testing", "IT Support", "Networking"
+            };
 
-            var data = faker.Generate(10);
+            var jobTypes = Enum.GetValues<JobType>();
+            var workApproaches = Enum.GetValues<WorkApproach>();
+            var faker = new Faker();
+            var jobs = new List<JobPosting>();
+            var metrics = new List<JobMetric>();
 
-            context.JobPostings.AddRange(data);
+            foreach (var company in companies)
+            {
+                var subscription = await SeedDependencies.GetActiveSubscriptionAsync(context, company.CompanyID);
+                var maxJobs = subscription?.SubscriptionPlan?.MaxJobPostsPerMonth ?? 2;
+                var jobCount = faker.Random.Int(1, Math.Max(1, maxJobs));
+
+                for (int i = 0; i < jobCount; i++)
+                {
+                    var workApproach = faker.PickRandom(workApproaches);
+                    var minExperience = faker.Random.Int(0, 4);
+                    var minSalary = Math.Round(faker.Random.Decimal(3000, 8000) / 500) * 500; // round to $500
+                    var postedDate = faker.Date.Past(1);
+                    var title = faker.PickRandom(JobTitles);
+
+                    var job = new JobPosting
+                    {
+                        Title = title,
+                        Description = faker.Lorem.Paragraphs(3),
+                        Responsibility = string.Join(" ", Enumerable.Range(0, 4).Select(_ => "• " + faker.Lorem.Sentence())),
+                        MinSalary = minSalary,
+                        MaxSalary = minSalary + Math.Round(faker.Random.Decimal(1000, 8000) / 500) * 500,
+                        Location = company.Location ?? faker.Address.City(),
+                        JobCategory = faker.PickRandom(categories),
+                        PostedDate = postedDate,
+                       
+                        IsActive = faker.Random.Bool(0.85f), // 85% active
+                        IsFeatured = subscription?.SubscriptionPlan?.FeaturedJobPostsPerMonth > 0
+                            && faker.Random.Bool(0.3f),
+                        JobTypes = new List<JobType> { faker.PickRandom(jobTypes) },
+                        WorkApproaches = new List<WorkApproach> { workApproach },
+                        IsRemote = workApproach == WorkApproach.Remote,
+                        MinExperience = minExperience,
+                        MaxExperience = minExperience + faker.Random.Int(2, 7),
+                        Status = JobStatus.Approved,
+                        CompanyID = company.CompanyID
+                    };
+
+                    jobs.Add(job);
+
+                    metrics.Add(new JobMetric
+                    {
+                        JobID = job.JobID,
+                        Views = faker.Random.Int(50, 5000),
+                        ApplicationCount = 0,
+                        LastUpdated = postedDate.AddDays(faker.Random.Int(1, 14))
+                    });
+                }
+            }
+
+            context.JobPostings.AddRange(jobs);
+            context.JobMetrics.AddRange(metrics);
             await context.SaveChangesAsync();
         }
     }

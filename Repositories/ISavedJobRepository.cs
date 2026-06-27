@@ -10,5 +10,6 @@ namespace Graduation_Project.Repositories
         Task UnsaveJobAsync(Guid applicantId, Guid jobId);
 
         Task<bool> ExistsAsync(Guid applicantId, Guid jobId);
+     Task<List<Guid>> GetSavedJobIdsAsync(Guid applicantId);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Graduation_Project.Models;
-using System;
+using Graduation_Project.Models;
 
 namespace Graduation_Project.Seeds
 {
@@ -10,27 +9,32 @@ namespace Graduation_Project.Seeds
             if (context.Skills.Any())
                 return;
 
-            var skills = new List<Skill>
+            var skillNames = new[]
             {
-                new Skill { SkillName = "C#" },
-                new Skill { SkillName = "ASP.NET Core" },
-                new Skill { SkillName = "Entity Framework Core" },
-                new Skill { SkillName = "SQL Server" },
-                new Skill { SkillName = "JavaScript" },
-                new Skill { SkillName = "TypeScript" },
-                new Skill { SkillName = "React.js" },
-                new Skill { SkillName = "Angular" },
-                new Skill { SkillName = "Node.js" },
-                new Skill { SkillName = "Docker" },
-                new Skill { SkillName = "Kubernetes" },
-                new Skill { SkillName = "REST API" },
-                new Skill { SkillName = "Git & GitHub" },
-                new Skill { SkillName = "System Design" },
-                new Skill { SkillName = "Problem Solving" },
-                new Skill { SkillName = "OOP" },
-                new Skill { SkillName = "Design Patterns" },
-                new Skill { SkillName = "LINQ" }
+                // Backend
+                "C#", "ASP.NET Core", "Entity Framework Core", "SQL Server",
+                "PostgreSQL", "Redis", "Node.js", "Python", "Java", "Go",
+                // Frontend
+                "JavaScript", "TypeScript", "React.js", "Angular", "Vue.js",
+                "HTML5", "CSS3", "Tailwind CSS",
+                // Mobile
+                "Flutter", "React Native", "Swift", "Kotlin",
+                // DevOps & Cloud
+                "Docker", "Kubernetes", "CI/CD", "AWS", "Azure", "GCP",
+                "Terraform", "Linux",
+                // Data & AI
+                "Machine Learning", "TensorFlow", "PyTorch", "Data Analysis",
+                "Power BI", "Pandas",
+                // General
+                "REST API", "GraphQL", "Git & GitHub", "System Design",
+                "Problem Solving", "OOP", "Design Patterns", "LINQ",
+                "Agile / Scrum", "Microservices", "Clean Architecture"
             };
+
+            var skills = skillNames
+                .Distinct()
+                .Select(name => new Skill { SkillName = name })
+                .ToList();
 
             context.Skills.AddRange(skills);
             await context.SaveChangesAsync();

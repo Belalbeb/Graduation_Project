@@ -16,6 +16,7 @@ namespace Graduation_Project.Repositories
         {
             _context = context;
         }
+   
         public async Task AddAsync(CompanySubscription subscription)
         {
             await _context.companySubscriptions.AddAsync(subscription);
@@ -69,9 +70,7 @@ namespace Graduation_Project.Repositories
                     x.EndDate > DateTime.UtcNow);
 
             var cancelledSubscriptions = await _context.companySubscriptions
-                .CountAsync(x =>
-                    x.IsActive ||
-                    x.EndDate <= DateTime.UtcNow);
+               .CountAsync(x => !x.IsActive);
             var plans = await _context.subscriptionPlans.Include(x=>x.Subscriptions).Select(x => new SubscriptionPlanResponseDto
             {
                 Id = x.Id,
@@ -115,7 +114,7 @@ namespace Graduation_Project.Repositories
             return await _context.JobPostings
                 .CountAsync(j =>
                     j.CompanyID == companyId &&
-                    j.IsActive);
+                    j.IsActive&&j.Status==JobStatus.Approved);
         }
 
         public async Task<int> GetFeaturedJobsCountAsync(Guid companyId)
@@ -165,11 +164,51 @@ namespace Graduation_Project.Repositories
                 .ToListAsync();
 
             // ── 3. Usage counters (BASED ON COMPANY, NOT SUBSCRIPTION) ──────────────
+           
+
+            DateTime cycleStart;
+            DateTime cycleEnd;
+
+            if (current.BillingCycle == BillingCycle.Monthly)
+            {
+                var monthsPassed =
+                    ((now.Year - current.StartDate.Year) * 12) +
+                    now.Month - current.StartDate.Month;
+
+                cycleStart = current.StartDate.AddMonths(monthsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddMonths(-1);
+
+                cycleEnd = cycleStart.AddMonths(1);
+            }
+            else // Yearly
+            {
+                var yearsPassed = now.Year - current.StartDate.Year;
+
+                cycleStart = current.StartDate.AddYears(yearsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddYears(-1);
+
+                cycleEnd = cycleStart.AddYears(1);
+            }
             var activeJobsUsed = await _context.JobPostings
-                .CountAsync(j => j.CompanyID == company.CompanyID && j.IsActive);
+             .CountAsync(j =>
+            j.CompanyID == company.CompanyID &&
+            j.IsActive &&
+            
+            j.PostedDate >= cycleStart &&
+            j.PostedDate < cycleEnd);
 
             var featuredJobsUsed = await _context.JobPostings
-                .CountAsync(j => j.CompanyID == company.CompanyID && j.IsFeatured);
+                .CountAsync(j =>
+                    j.CompanyID == company.CompanyID &&
+                    j.IsFeatured &&
+                    j.IsActive &&
+                    
+                    j.PostedDate >= cycleStart &&
+                    j.PostedDate < cycleEnd);
 
             // ── 4. Build DTO ────────────────────────────────────────────────────────
             return new SubscriptionFullDetailsDto
@@ -276,14 +315,51 @@ namespace Graduation_Project.Repositories
             var plan = current.SubscriptionPlan;
             var company = current.Company;
 
-           
+
+            DateTime cycleStart;
+            DateTime cycleEnd;
+
+            if (current.BillingCycle == BillingCycle.Monthly)
+            {
+                var monthsPassed =
+                    ((now.Year - current.StartDate.Year) * 12) +
+                    now.Month - current.StartDate.Month;
+
+                cycleStart = current.StartDate.AddMonths(monthsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddMonths(-1);
+
+                cycleEnd = cycleStart.AddMonths(1);
+            }
+            else // Yearly
+            {
+                var yearsPassed = now.Year - current.StartDate.Year;
+
+                cycleStart = current.StartDate.AddYears(yearsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddYears(-1);
+
+                cycleEnd = cycleStart.AddYears(1);
+            }
             var activeJobsUsed = await _context.JobPostings
-              .CountAsync(j => j.CompanyID == company.CompanyID && j.IsActive);
+             .CountAsync(j =>
+            j.CompanyID == company.CompanyID &&
+            j.IsActive &&
+            
+            j.PostedDate >= cycleStart &&
+            j.PostedDate < cycleEnd);
 
             var featuredJobsUsed = await _context.JobPostings
-                .CountAsync(j => j.CompanyID == company.CompanyID && j.IsFeatured);
+                .CountAsync(j =>
+                    j.CompanyID == company.CompanyID &&
+                    j.IsFeatured &&
+                    j.IsActive &&
+                   
+                    j.PostedDate >= cycleStart &&
+                    j.PostedDate < cycleEnd);
 
-            
             var allPlans = await _context.subscriptionPlans
                
                 .OrderBy(p => p.MonthlyPrice)
@@ -347,7 +423,9 @@ namespace Graduation_Project.Repositories
                     SubscriptionProgress = new UsageItem
                     {
                         Used = Math.Max(0, (now - current.StartDate).Days),
-                        Limit = Math.Max(1, (current.EndDate.Value - current.StartDate).Days),
+                        Limit = current.EndDate.HasValue
+                     ? Math.Max(1, (current.EndDate.Value - current.StartDate).Days)
+                     : 0
                     },
                 },
 

@@ -67,6 +67,7 @@ namespace Graduation_Project.Controllers
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
             if (!Guid.TryParse(profileIdClaim, out Guid companyId))
                 return Unauthorized("Invalid or missing ProfileId");
+            bool hasReachTheMaxFeatureJob = await subscriptionService.HasReachTheMaxFeatureJobs(companyId);
             bool hasReachTheMaxJobPosting = await subscriptionService.HasReachTheMaxJobPosting(companyId);
             if (hasReachTheMaxJobPosting)
             {
@@ -74,6 +75,14 @@ namespace Graduation_Project.Controllers
                 {
                     message = "You have reached the maximum number of job postings for this month. Please upgrade your plan."
                 });
+            }
+            if (job.JobBasicData.IsFeatured&&hasReachTheMaxFeatureJob)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "You have reached the maximum number of Feauture job postings for this month. Please upgrade your plan."
+                });
+
             }
 
             if (!ModelState.IsValid)
@@ -90,7 +99,7 @@ namespace Graduation_Project.Controllers
             }
 
             var newJob = await _service.CreateJobAsync(job, companyId);
-            return Created(string.Empty, newJob);
+            return Created();
         }
         [HttpGet("job-details/{jobId}")]
         public async Task<IActionResult> GetJobDetails(Guid jobId)

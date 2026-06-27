@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Graduation_Project.Models;
+﻿using Graduation_Project.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Graduation_Project.Seeds.Identity
 {
@@ -16,21 +16,22 @@ namespace Graduation_Project.Seeds.Identity
 
             foreach (var user in users)
             {
-                // prevent duplicates
                 var userRoles = await userManager.GetRolesAsync(user);
                 if (userRoles.Any())
                     continue;
 
-                int chance = random.Next(1, 101); // 1 - 100
+                if (user.Email == UserSeeder.AdminEmail)
+                {
+                    await userManager.AddToRoleAsync(user, Roles.Admin);
+                    continue;
+                }
+
+                int chance = random.Next(1, 101);
 
                 if (chance <= 30)
-                {
                     await userManager.AddToRoleAsync(user, Roles.Company);
-                }
                 else
-                {
                     await userManager.AddToRoleAsync(user, Roles.Applicant);
-                }
             }
         }
     }

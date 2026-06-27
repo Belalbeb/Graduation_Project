@@ -1,4 +1,5 @@
 using Graduation_Project.Dtos;
+using Graduation_Project.Exceptions;
 using Graduation_Project.Models;
 using Graduation_Project.Repositories;
 
@@ -45,6 +46,12 @@ namespace Graduation_Project.Services
         }
         public async Task<Application> CreateApplication(Guid ApplicantId, CreateApplicationDto createApplicationDto)
         {
+            bool alreadyApplied = await _repository
+                  .ExistsAsync(ApplicantId, createApplicationDto.JobPostingID);
+
+            if (alreadyApplied)
+                throw new BadRequestException(
+                    "You have already applied for this job.");
             Application application = new Application()
             {
                 ApplicantID = ApplicantId,

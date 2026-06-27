@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Graduation_Project.Models;
-using System;
 
 namespace Graduation_Project.Seeds
 {
@@ -18,27 +17,26 @@ namespace Graduation_Project.Seeds
                 return;
 
             var levels = new[] { "Beginner", "Intermediate", "Advanced", "Expert" };
+            var faker = new Faker();
+            var applicantSkills = new List<ApplicantSkill>();
 
-            var faker = new Faker<ApplicantSkill>()
-                .RuleFor(x => x.ApplicantID,
-                    f => f.PickRandom(applicants).ApplicantID)
+            foreach (var applicant in applicants)
+            {
+                var skillCount = faker.Random.Int(3, Math.Min(6, skills.Count));
+                var pickedSkills = faker.PickRandom(skills, skillCount).DistinctBy(s => s.SkillID);
 
-                .RuleFor(x => x.SkillID,
-                    f => f.PickRandom(skills).SkillID)
+                foreach (var skill in pickedSkills)
+                {
+                    applicantSkills.Add(new ApplicantSkill
+                    {
+                        ApplicantID = applicant.ApplicantID,
+                        SkillID = skill.SkillID,
+                        ProficiencyLevel = faker.PickRandom(levels)
+                    });
+                }
+            }
 
-                .RuleFor(x => x.ProficiencyLevel,
-                    f => f.PickRandom(levels));
-
-            // generate more records than applicants for realism
-            var data = faker.Generate(30);
-
-            // optional: remove duplicates (important for many-to-many)
-            var uniqueData = data
-                .GroupBy(x => new { x.ApplicantID, x.SkillID })
-                .Select(g => g.First())
-                .ToList();
-
-            context.ApplicantSkills.AddRange(uniqueData);
+            context.ApplicantSkills.AddRange(applicantSkills);
             await context.SaveChangesAsync();
         }
     }

@@ -130,16 +130,53 @@ namespace Graduation_Project.Repositories
         {
             return await _context.JobPostings.CountAsync(j => j.CompanyID == companyId);
         }
-        public async Task<int> CountCompanyJobsPerMonthAsync(Guid companyId)
+        public async Task<int> CountCompanyJobsInCurrentSubscriptionAsync(Guid companyId)
         {
+            var currentSubscription = await _context.companySubscriptions
+                .Where(x => x.CompanyId == companyId && x.IsActive)
+                .OrderByDescending(x => x.StartDate)
+                .FirstOrDefaultAsync();
+
+            if (currentSubscription == null)
+                return 0;
+
             var now = DateTime.UtcNow;
+
+            DateTime cycleStart;
+            DateTime cycleEnd;
+
+            if (currentSubscription.BillingCycle == BillingCycle.Monthly)
+            {
+                var monthsPassed =
+                    ((now.Year - currentSubscription.StartDate.Year) * 12) +
+                    now.Month - currentSubscription.StartDate.Month;
+
+                cycleStart = currentSubscription.StartDate.AddMonths(monthsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddMonths(-1);
+
+                cycleEnd = cycleStart.AddMonths(1);
+            }
+            else
+            {
+                var yearsPassed = now.Year - currentSubscription.StartDate.Year;
+
+                cycleStart = currentSubscription.StartDate.AddYears(yearsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddYears(-1);
+
+                cycleEnd = cycleStart.AddYears(1);
+            }
 
             return await _context.JobPostings.CountAsync(j =>
                 j.CompanyID == companyId &&
-                j.PostedDate.Year == now.Year &&
-                j.PostedDate.Month == now.Month);
-        }
+                j.IsActive &&
 
+                j.PostedDate >= cycleStart &&
+                j.PostedDate < cycleEnd);
+        }
         // Count active jobs for a company
         public async Task<int> CountCompanyActiveJobsAsync(Guid companyId)
         {
@@ -159,6 +196,54 @@ namespace Graduation_Project.Repositories
         {
             return await _context.Interviews
                 .CountAsync(i => i.JobPosting.CompanyID == companyId);
+        }
+        public async Task<int> CountFeaturedJobsAsync(Guid companyId)
+        {
+            var currentSubscription = await _context.companySubscriptions
+                .Where(x => x.CompanyId == companyId && x.IsActive)
+                .OrderByDescending(x => x.StartDate)
+                .FirstOrDefaultAsync();
+
+            if (currentSubscription == null)
+                return 0;
+
+            var now = DateTime.UtcNow;
+
+            DateTime cycleStart;
+            DateTime cycleEnd;
+
+            if (currentSubscription.BillingCycle == BillingCycle.Monthly)
+            {
+                var monthsPassed =
+                    ((now.Year - currentSubscription.StartDate.Year) * 12) +
+                    now.Month - currentSubscription.StartDate.Month;
+
+                cycleStart = currentSubscription.StartDate.AddMonths(monthsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddMonths(-1);
+
+                cycleEnd = cycleStart.AddMonths(1);
+            }
+            else
+            {
+                var yearsPassed = now.Year - currentSubscription.StartDate.Year;
+
+                cycleStart = currentSubscription.StartDate.AddYears(yearsPassed);
+
+                if (cycleStart > now)
+                    cycleStart = cycleStart.AddYears(-1);
+
+                cycleEnd = cycleStart.AddYears(1);
+            }
+
+            return await _context.JobPostings.CountAsync(j =>
+                j.CompanyID == companyId &&
+                j.IsFeatured &&
+                j.IsActive &&
+                
+                j.PostedDate >= cycleStart &&
+                j.PostedDate < cycleEnd);
         }
 
         // Get company's current active subscription plan name

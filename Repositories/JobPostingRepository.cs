@@ -16,12 +16,19 @@ namespace Graduation_Project.Repositories
         }
         public async Task<List<JobPosting>> GetAllAsync()
         {
-            return await _context.JobPostings.ToListAsync();
+            return await _context.JobPostings.Include(x=>x.Company).ToListAsync();
         }
 
         public async Task<(IEnumerable<JobPosting> Jobs, int TotalCount)> GetAllAsync(JobFilterDto filter)
         {
-            var query = _context.JobPostings.AsNoTracking().AsQueryable();
+            var query = _context.JobPostings
+                     .Include(x => x.Applications)
+                     .Include(x=>x.Company)
+                     .Where(x => x.Status == JobStatus.Approved && x.IsActive)
+                     .OrderByDescending(x => x.IsFeatured)
+                     .ThenByDescending(x => x.PostedDate)
+                      .AsNoTracking()
+                      .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.Title))
             {
@@ -83,6 +90,7 @@ namespace Graduation_Project.Repositories
                 .Where(x =>
                     x.JobID != job.JobID &&
                     x.JobCategory == job.JobCategory &&
+                     x.Status == JobStatus.Approved&&
                     x.IsActive)
                 .Take(3)
                 .ToListAsync();

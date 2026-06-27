@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Graduation_Project.Models;
-using System;
 
 namespace Graduation_Project.Seeds
 {
@@ -16,23 +15,20 @@ namespace Graduation_Project.Seeds
             if (!applicants.Any())
                 return;
 
-            var faker = new Faker<Resume>()
-                .RuleFor(r => r.FileName,
-                    f => $"CV_{f.Name.FirstName()}_{f.Name.LastName()}.pdf")
+            var faker = new Faker();
+            var resumes = new List<Resume>();
 
-                .RuleFor(r => r.FilePath,
-                    f => $"/uploads/resumes/{Guid.NewGuid()}.pdf")
-
-                .RuleFor(r => r.UploadDate,
-                    f => f.Date.Past(1))
-
-                .RuleFor(r => r.IsActive,
-                    f => true)
-
-                .RuleFor(r => r.ApplicantID,
-                    f => f.PickRandom(applicants).ApplicantID);
-
-            var resumes = faker.Generate(10);
+            foreach (var applicant in applicants)
+            {
+                resumes.Add(new Resume
+                {
+                    FileName = $"CV_{applicant.FirstName}_{applicant.LastName}.pdf",
+                    FilePath = $"/uploads/resumes/{Guid.NewGuid()}.pdf",
+                    UploadDate = faker.Date.Past(1),
+                    IsActive = true,
+                    ApplicantID = applicant.ApplicantID
+                });
+            }
 
             context.Resumes.AddRange(resumes);
             await context.SaveChangesAsync();

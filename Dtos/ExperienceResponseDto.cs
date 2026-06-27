@@ -11,7 +11,7 @@ namespace Graduation_Project.Dtos
         public string Description { get; set; } = string.Empty;
         public string JobType { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime ?EndDate { get; set; }
         public Guid ApplicantID { get; set; }
     }
 }

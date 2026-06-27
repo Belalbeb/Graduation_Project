@@ -1,17 +1,13 @@
 ﻿using Graduation_Project.Models;
 using Microsoft.EntityFrameworkCore;
-using Stripe;
 
 namespace Graduation_Project.BackgroundJobs
 {
-
-
     public class SubscriptionExpirationJob : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public SubscriptionExpirationJob(
-            IServiceScopeFactory scopeFactory)
+        public SubscriptionExpirationJob(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
         }
@@ -23,25 +19,38 @@ namespace Graduation_Project.BackgroundJobs
             {
                 using var scope = _scopeFactory.CreateScope();
 
-
                 var context = scope.ServiceProvider
                     .GetRequiredService<ApplicationDbContext>();
 
                 var expiredSubscriptions = await context.companySubscriptions
-                .Where(s =>
-                        s.IsActive &&
-                        s.EndDate <= DateTime.UtcNow)
+                    .Include(x => x.SubscriptionPlan)
+                    .Where(x =>
+                        x.IsActive &&
+                        x.SubscriptionPlan.Name != "Free" &&
+                        x.EndDate <= DateTime.UtcNow)
                     .ToListAsync(stoppingToken);
 
                 foreach (var subscription in expiredSubscriptions)
                 {
+                    // Disable expired paid subscription
                     subscription.IsActive = false;
-                       
+
+                    // Reactivate existing free subscription
+                    var freeSubscription = await context.companySubscriptions
+                        .Include(x => x.SubscriptionPlan)
+                        .FirstOrDefaultAsync(x =>
+                            x.CompanyId == subscription.CompanyId &&
+                            x.SubscriptionPlan.Name == "Free",
+                            stoppingToken);
+
+                    if (freeSubscription != null)
+                    {
+                        freeSubscription.IsActive = true;
+                    }
                 }
 
                 await context.SaveChangesAsync(stoppingToken);
 
-                // تتكرر كل ساعة
                 await Task.Delay(
                     TimeSpan.FromDays(1),
                     stoppingToken);

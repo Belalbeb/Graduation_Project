@@ -1,6 +1,6 @@
-﻿using Bogus;
-using Microsoft.AspNetCore.Identity;
+using Bogus;
 using Graduation_Project.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Graduation_Project.Seeds
 {
@@ -18,42 +18,43 @@ namespace Graduation_Project.Seeds
             if (!applicantUsers.Any())
                 return;
 
-            var faker = new Faker<Applicant>()
-                .RuleFor(a => a.FirstName, f => f.Name.FirstName())
-                .RuleFor(a => a.LastName, f => f.Name.LastName())
-                .RuleFor(a => a.JobTitle, f => f.Name.JobTitle())
-                .RuleFor(a => a.AboutMe, f => f.Lorem.Paragraph())
-                .RuleFor(a => a.Location, f => f.Address.City())
+            var industries = new[]
+            {
+                "Software Development", "Data Science", "UI/UX Design",
+                "DevOps", "Mobile Development", "Cyber Security"
+            };
 
-              
+            var faker = new Faker();
 
-                .RuleFor(a => a.PhoneNumber,
-                    f => f.Phone.PhoneNumber())
+            var applicants = applicantUsers.Select(user =>
+            {
+                var firstName = faker.Name.FirstName();
+                var lastName = faker.Name.LastName();
+                var username = $"{firstName.ToLower()}.{lastName.ToLower()}{faker.Random.Int(1, 99)}";
 
-                .RuleFor(a => a.ProfilePicURL,
-                    f => $"https://i.pravatar.cc/150?u={Guid.NewGuid()}")
+                return new Applicant
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    JobTitle = faker.Name.JobTitle(),
+                    Industry = faker.PickRandom(industries),
+                    Address = faker.Address.StreetAddress(),
+                    AboutMe = faker.Lorem.Paragraph(),
+                    Location = faker.Address.City(),
+                    PhoneNumber = faker.Phone.PhoneNumber("+1-###-###-####"),
+                    ProfilePicURL = $"https://i.pravatar.cc/150?u={user.Id}",
+                    CoverPhotoUrl = $"https://picsum.photos/seed/{user.Id}/800/300",
+                    Linkedin = $"https://linkedin.com/in/{firstName.ToLower()}-{lastName.ToLower()}-{faker.Random.AlphaNumeric(6)}",
+                    Github = $"https://github.com/{username}",
+                    Facebook = $"https://facebook.com/{username}",
+                    Behance = $"https://behance.net/{username}",
+                    Dribble = $"https://dribbble.com/{username}",
+                    Portfolio = $"https://{username}.dev",
+                    UserId = user.Id
+                };
+            }).ToList();
 
-                .RuleFor(a => a.CoverPhotoUrl,
-                    f => $"https://picsum.photos/seed/{Guid.NewGuid()}/800/300")
-
-                .RuleFor(a => a.Linkedin,
-                    (f, a) => $"https://linkedin.com/in/{a.FirstName.ToLower()}{a.LastName.ToLower()}")
-
-                .RuleFor(a => a.Github,
-                    f => $"https://github.com/{f.Internet.UserName()}")
-
-                .RuleFor(a => a.Portfolio,
-                    f => f.Internet.Url())
-
-                .RuleFor(a => a.Facebook,
-                    f => f.Internet.Url())
-
-                .RuleFor(a => a.UserId,
-                    f => f.PickRandom(applicantUsers).Id);
-
-            var data = faker.Generate(applicantUsers.Count);
-
-            context.Applicants.AddRange(data);
+            context.Applicants.AddRange(applicants);
             await context.SaveChangesAsync();
         }
     }

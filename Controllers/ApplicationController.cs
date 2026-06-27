@@ -4,6 +4,7 @@ using Graduation_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,11 +16,13 @@ namespace Graduation_Project.Controllers
     {
         private readonly IApplicationServivces applicationServivces;
         private readonly IApplicantServices applicantServices;
+        private readonly IAiService aiService;
 
-        public ApplicationController(IApplicationServivces applicationServivces,IApplicantServices applicantServices)
+        public ApplicationController(IApplicationServivces applicationServivces,IApplicantServices applicantServices,IAiService aiService)
         {
             this.applicationServivces = applicationServivces;
             this.applicantServices = applicantServices;
+            this.aiService = aiService;
         }
 
 
@@ -79,18 +82,34 @@ namespace Graduation_Project.Controllers
 
             return Ok(new { message = "updated success" });
         }
-    
+
         [HttpPost]
-        [Authorize(Roles =Roles.Applicant)]
+        [Authorize(Roles = Roles.Applicant)]
         public async Task<IActionResult> CreateApplication(CreateApplicationDto createApplicationDto)
         {
             var profileIdClaim = User.FindFirstValue(CustomClaims.ProfileId);
 
             if (!Guid.TryParse(profileIdClaim, out Guid applicantId))
                 return Unauthorized("Invalid or missing ProfileId");
-          var result=  await applicationServivces.CreateApplication(applicantId, createApplicationDto);
-            return Ok(new {message="created success", applicationId=result.ApplicationID});
 
+            var application = await applicationServivces.CreateApplication(
+                applicantId,
+                createApplicationDto);
+
+            //try
+            //{
+            //    await aiService.CalculateMatchScoreAsync(application.ApplicationID);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex);
+            //}
+
+            return Ok(new
+            {
+                message = "created success",
+                applicationId = application.ApplicationID
+            });
         }
 
     }

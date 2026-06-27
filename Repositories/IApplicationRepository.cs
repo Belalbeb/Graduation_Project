@@ -9,5 +9,6 @@ namespace Graduation_Project.Repositories
         public Task<Application> GetApplicationByIdAsync(Guid ApplicationId);
         public  Task<bool> ChangeApplicationStatus(Guid ApplicationId, Guid companyId, ApplicationStatus status);
         public Task AddApplication(Application application);
+        Task<bool> ExistsAsync(Guid applicantId, Guid jobId);
     }
 }

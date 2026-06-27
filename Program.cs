@@ -85,6 +85,10 @@ namespace Graduation_Project
             builder.Services.AddScoped<ICouponService, Services.CouponService>();
             builder.Services.AddScoped<IWebsiteSettingsRepository, WebsiteSettingsRepository>();
             builder.Services.AddScoped<IWebsiteSettingsService, WebsiteSettingsService>();
+            builder.Services.AddHttpClient<IAiService, AiService>(client =>
+            {
+                client.BaseAddress = new Uri("https://ai-service-url/");
+            });
 
             builder.Services.AddScoped<IApplicantServices, ApplicantServices>();
             builder.Services.AddScoped<IProfileService, ProfileService>();

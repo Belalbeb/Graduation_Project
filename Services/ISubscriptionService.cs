@@ -20,6 +20,7 @@ namespace Graduation_Project.Services
         Task<bool> HasCandidateSearch(Guid companyId);
         Task<bool> HasReachTheMaxJobPosting(Guid companyId);
          Task<bool> HasAiToolAccess(Guid companyId);
+         Task<bool> HasReachTheMaxFeatureJobs(Guid companyId);
        Task UpdateAsync(CompanySubscription companySubscription);
     }
 }

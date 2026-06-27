@@ -145,6 +145,8 @@ namespace Graduation_Project.Repositories
                 .Include(i => i.JobPosting)
                 .Include(i => i.Applicant)
                     .ThenInclude(a => a.Resumes)
+                 .Include(i=>i.Applicant)
+                 .ThenInclude(i=>i.User)
                 .FirstOrDefaultAsync(i => i.InterviewId == interviewId);
         }
 

@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Graduation_Project.Models;
-using System;
 
 namespace Graduation_Project.Seeds
 {
@@ -17,17 +16,24 @@ namespace Graduation_Project.Seeds
             if (!applicants.Any() || !jobs.Any())
                 return;
 
-            var faker = new Faker<SavedJobs>()
-                .RuleFor(s => s.ApplicantId,
-                    f => f.PickRandom(applicants).ApplicantID)
+            var faker = new Faker();
+            var savedJobs = new List<SavedJobs>();
 
-                .RuleFor(s => s.JobPostingId,
-                    f => f.PickRandom(jobs).JobID)
+            foreach (var applicant in applicants)
+            {
+                var saveCount = faker.Random.Int(1, Math.Min(5, jobs.Count));
+                var pickedJobs = faker.PickRandom(jobs, saveCount).DistinctBy(j => j.JobID);
 
-                .RuleFor(s => s.SavedAt,
-                    f => f.Date.Past(1));
-
-            var savedJobs = faker.Generate(20);
+                foreach (var job in pickedJobs)
+                {
+                    savedJobs.Add(new SavedJobs
+                    {
+                        ApplicantId = applicant.ApplicantID,
+                        JobPostingId = job.JobID,
+                        SavedAt = faker.Date.Past(1)
+                    });
+                }
+            }
 
             context.SavedJobs.AddRange(savedJobs);
             await context.SaveChangesAsync();

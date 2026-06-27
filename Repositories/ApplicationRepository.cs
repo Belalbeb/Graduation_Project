@@ -52,5 +52,12 @@ namespace Graduation_Project.Repositories
             await _context.SaveChangesAsync();
             ;
         }
+        public async Task<bool> ExistsAsync(Guid applicantId, Guid jobId)
+        {
+            return await _context.Applications
+                .AnyAsync(a =>
+                    a.ApplicantID == applicantId &&
+                    a.JobPostingID == jobId);
+        }
     }
 }

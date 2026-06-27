@@ -52,5 +52,13 @@ namespace Graduation_Project.Repositories
                 .Where(x => x.ApplicantId == applicantId)
                 .ToListAsync();
         }
+        // for get all jobs
+        public async Task<List<Guid>> GetSavedJobIdsAsync(Guid applicantId)
+        {
+            return await _context.SavedJobs
+                .Where(x => x.ApplicantId == applicantId)
+                .Select(x => x.JobPostingId)
+                .ToListAsync();
+        }
     }
 }

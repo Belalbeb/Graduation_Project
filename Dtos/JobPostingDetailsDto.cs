@@ -35,6 +35,8 @@
     {
         public string CompanyName { get; set; } = string.Empty;
         public string CompanyImage { get; set; } = string.Empty;
+        public Guid JobId { get; set; }
+        public string ?JobTitle { get; set; }
 
         public string JobLocation { get; set; } = string.Empty;
 

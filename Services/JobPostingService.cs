@@ -11,53 +11,58 @@ namespace Graduation_Project.Services
     {
         private readonly IJobPostingRepository _repository;
         private readonly IMemoryCache cache;
+        private readonly ISavedJobRepository savedJobRepository;
 
         public IInterviewRepository InterviewRepository { get; }
 
-        public JobPostingService(IJobPostingRepository repository,IInterviewRepository interviewRepository, IMemoryCache cache)
+        public JobPostingService(IJobPostingRepository repository,IInterviewRepository interviewRepository, IMemoryCache cache,ISavedJobRepository  savedJobRepository)
         {
             _repository = repository;
             InterviewRepository = interviewRepository;
             this.cache = cache;
+            this.savedJobRepository = savedJobRepository;
         }
-        public async Task<PagedResult<JobCardDto>> GetAllJobsAsync(Guid currentApplicantId,JobFilterDto jobFilterDto)
+        public async Task<PagedResult<JobCardDto>> GetAllJobsAsync(
+     Guid currentApplicantId,
+     JobFilterDto jobFilterDto)
         {
             var result = await _repository.GetAllAsync(jobFilterDto);
 
-            var items = new List<JobCardDto>();
+            var savedJobIds = currentApplicantId != Guid.Empty
+                ? (await savedJobRepository.GetSavedJobIdsAsync(currentApplicantId))
+                    .ToHashSet()
+                : new HashSet<Guid>();
 
-            foreach (var job in result.Jobs)
+            var items = result.Jobs.Select(job => new JobCardDto
             {
-                items.Add(new JobCardDto
-                {
-                    JobID = job.JobID,
-                    CompanyName = job.Company?.Name,
-                    CompanyLogoUrl = job.Company?.LogoUrl,
-                    Location = job.Location,
-                    Category = job.JobCategory,
-                    MinExperience = job.MinExperience,
-                    MaxExperience = job.MaxExperience,
-                    Title = job.Title,
-                    
-                    Description = job.Description,
-                    MinSalary = job.MinSalary,
-                    MaxSalary = job.MaxSalary,
-                    PostedDate = job.PostedDate,
+                JobID = job.JobID,
+                CompanyName = job.Company?.Name,
+                CompanyLogoUrl = job.Company?.LogoUrl,
+                Location = job.Location,
+                Category = job.JobCategory,
+                MinExperience = job.MinExperience,
+                MaxExperience = job.MaxExperience,
+                Title = job.Title,
+                Description = job.Description,
+                MinSalary = job.MinSalary,
+                MaxSalary = job.MaxSalary,
+                PostedDate = job.PostedDate,
 
-                    JobTypes = job.JobTypes
-                        .Select(t => t.ToString())
-                        .ToList(),
+                JobTypes = job.JobTypes
+                    .Select(t => t.ToString())
+                    .ToList(),
 
-                    WorkApproaches = job.WorkApproaches
-                        .Select(w => w.ToString())
-                        .ToList(),
+                WorkApproaches = job.WorkApproaches
+                    .Select(w => w.ToString())
+                    .ToList(),
 
-                    IsApplied = currentApplicantId != Guid.Empty &&
-                                job.Applications.Any(a => a.ApplicantID == currentApplicantId),
+                IsApplied = currentApplicantId != Guid.Empty &&
+                            job.Applications.Any(a =>
+                                a.ApplicantID == currentApplicantId),
 
-                    IsSaved = await _repository.IsSaved(currentApplicantId, job)
-                });
-            }
+                IsSaved = savedJobIds.Contains(job.JobID)
+            }).ToList();
+
             return new PagedResult<JobCardDto>
             {
                 Items = items,
@@ -136,6 +141,8 @@ namespace Graduation_Project.Services
                 {
                     CompanyName = item.Company.Name,
                     CompanyImage = item.Company.LogoUrl,
+                    JobId=item.JobID,
+                    JobTitle=item.Title,
 
                     JobLocation = item.Location,
 
@@ -198,6 +205,7 @@ namespace Graduation_Project.Services
      
         public async Task<JobPosting> CreateJobAsync(CreateJobDto dto,Guid companyId)
         {
+
             
             var jobPosting = new JobPosting
             {

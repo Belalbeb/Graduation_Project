@@ -107,7 +107,6 @@ namespace Graduation_Project.Services
             var activeSubscription = await SubscriptionRepository
                 .GetActiveSubscription(companyId);
 
-            // إذا كان يوجد اشتراك نشط، قم بإنهائه
             if (activeSubscription != null)
             {
                 activeSubscription.IsActive = false;
@@ -165,10 +164,17 @@ namespace Graduation_Project.Services
         {
             var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
             int numberOfJobPostingForThisMonth =
-                await CompanyRepository.CountCompanyJobsPerMonthAsync(companyId);
+                await CompanyRepository.CountCompanyJobsInCurrentSubscriptionAsync(companyId);
 
             return numberOfJobPostingForThisMonth >=
                    subscription.SubscriptionPlan.MaxJobPostsPerMonth;
+        }
+        public async Task<bool> HasReachTheMaxFeatureJobs(Guid companyId)
+        {
+            var subscription = await SubscriptionRepository.GetActiveSubscription(companyId);
+            var countFeatureJobs = await CompanyRepository.CountFeaturedJobsAsync(companyId);
+
+            return countFeatureJobs >= subscription.SubscriptionPlan.FeaturedJobPostsPerMonth;
         }
         public async Task UpdateAsync(CompanySubscription companySubscription)
         {
